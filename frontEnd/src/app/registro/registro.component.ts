@@ -31,7 +31,7 @@ export class RegistroComponent implements OnInit {
       return;
     }
 
-    alert(JSON.stringify(this.formularioRegistro.value));
+    console.log(JSON.stringify(this.formularioRegistro.value));
   }
 
 }
