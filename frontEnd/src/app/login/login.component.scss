@@ -1,0 +1,225 @@
+/* COLORS */
+$primaryColor: #0049b7;
+$textColor: #272727;
+$grayColor: #a9a9a9;
+$whiteColor: #ffffff;
+
+#container {
+    /* max-width: 1200px; */
+    margin: auto;
+    display: flex;
+    min-height: 100vh;
+    .left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .logo {
+            margin: 10px auto;
+            text-decoration: none;
+            color: $textColor;
+            font-size: 40px;
+            font-weight: 900;
+        }
+        .title {
+            margin-bottom: 10px;
+            font-size: 40px;
+            color: $textColor;
+            @media (max-width: 576px) {
+                font-size: 30px;
+            }
+        }
+        .googleButton {
+            font-family: "Nunito", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            width: 60%;
+            border-radius: 4px;
+            border: none;
+            background: $whiteColor;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            outline: 0;
+            color: $textColor;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            img {
+                width: 18px;
+                height: 18px;
+                margin-right: 10px;
+            }
+            @media (max-width: 768px) {
+                width: 90%;
+            }
+        }
+        .separator {
+            width: 60%;
+            justify-content: space-between;
+            display: flex;
+            align-items: center;
+            margin: 40px auto;
+            color: $grayColor;
+            @media (max-width: 768px) {
+                width: 90%;
+                margin: 30px auto;
+            }
+
+            hr {
+                width: 25%;
+                border: none;
+                border-top: 1px solid $grayColor;
+                @media (max-width: 576px) {
+                    width: 15%;
+                }
+            }
+            span {
+                text-transform: uppercase;
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 1px;
+                @media (max-width: 576px) {
+                    font-size: 10px;
+                }
+            }
+        }
+        #formularioLogin {
+            width: 60%;
+            @media (max-width: 768px) {
+                width: 90%;
+            }
+            .formField {
+                font-family: "Nunito", sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 15px;
+                width: 100%;
+                border-radius: 2px;
+                border: 1px solid transparent;
+                background: $whiteColor;
+                font-weight: bold;
+                font-size: 15px;
+                outline: 0;
+                margin: 12px 0;
+                color: $textColor;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                -webkit-appearance: none;
+                transition: all 0.1s;
+                &::placeholder {
+                    font-size: 14px;
+                    color: $textColor;
+                }
+                @media (max-width: 576px) {
+                    padding: 12px;
+                    font-size: 14px;
+                }
+                &:focus {
+                    border-color: $primaryColor;
+                }
+            }
+            button[type="submit"] {
+                cursor: pointer;
+                background-color: $primaryColor;
+                color: $whiteColor;
+                border-radius: 3px;
+                i {
+                    margin-left: 10px;
+                    transition: all 0.2s;
+                }
+                &:hover {
+                    i {
+                        margin-left: 20px;
+                    }
+                }
+            }
+            .loginOptions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 30px auto;
+                @media (max-width: 576px) {
+                    font-size: 12px;
+                }
+                .keepSesion {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    input {
+                        margin-right: 10px;
+                    }
+                    label {
+                        cursor: pointer;
+                    }
+                }
+                a {
+                    color: $textColor;
+                }
+            }
+        }
+        .separator2 {
+            border: 0;
+            border-top: 1px solid $grayColor;
+            margin: 30px auto;
+            width: 60%;
+            @media (max-width: 768px) {
+                width: 90%;
+                margin: 15px auto;
+            }
+        }
+        .linkRegistro {
+            color: $grayColor;
+            margin-bottom: 15px;
+            a {
+                margin-left: 10px;
+                color: $primaryColor;
+            }
+            @media (max-width: 768px) {
+                font-size: 14px;
+            }
+        }
+    }
+    .right {
+        background: #e2f2ff;
+        flex: 1;
+        background-image: url("../../assets/images/4.svg");
+        background-size: 80%;
+        background-repeat: no-repeat;
+        background-position-y: 74%;
+        background-position-x: center;
+        @media (max-width: 1200px) {
+            display: none;
+        }
+        .text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin: 40px 20px;
+            h3 {
+                color: $textColor;
+            }
+            p {
+                max-width: 40%;
+                text-align: right;
+                color: $grayColor;
+                margin: 20px 0;
+            }
+            button {
+                width: 160px;
+                padding: 10px;
+                border: 1px solid $primaryColor;
+                border-radius: 2px;
+                outline: 0;
+                background: none;
+                font-weight: bold;
+                font-family: "Nunito", sans-serif;
+                color: $textColor;
+                cursor: pointer;
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "",
+    "sources": [
+        "send-email.component.scss"
+    ],
+    "names": [],
+    "file": "send-email.component.css"
+}

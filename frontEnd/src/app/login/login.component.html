@@ -1,1 +1,34 @@
-<p>login works!</p>
+<div id="container">
+    <div class="left">
+        <a routerLink="/" class="logo">HUBBET</a>
+        <h2 class="title">Bienvenido de nuevo</h2>
+        <button class="googleButton"><img src="../../assets/images/googleLogo.png" alt="">Iniciar sesión con
+            Google</button>
+        <div class="separator">
+            <hr>
+            <span>O inicia sesión con tu email</span>
+            <hr>
+        </div>
+        <form id="formularioLogin">
+            <input type="email" placeholder="Tu Email" class="formField">
+            <input type="password" placeholder="Tu Contraseña" class="formField">
+            <div class="loginOptions">
+                <div class="keepSesion">
+                    <input type="checkbox" id="mantenerSesion">
+                    <label for="mantenerSesion">Mantener sesión iniciada</label>
+                </div>
+                <a href="#0">¿Contraseña olvidada?</a>
+            </div>
+            <button type="submit" class="formField">Iniciar sesión <i class="fas fa-long-arrow-alt-right"></i></button>
+        </form>
+        <hr class="separator2">
+        <p class="linkRegistro">¿Todavía no tienes cuenta?<a routerLink="/registro">Regístrate aquí</a></p>
+    </div>
+    <div class="right">
+        <div class="text">
+            <h3>Crea una nueva cuenta</h3>
+            <p>Hemos agregado algunas nuevas características increíbles</p>
+            <button>CREAR CUENTA</button>
+        </div>
+    </div>
+</div>

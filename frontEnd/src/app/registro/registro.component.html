@@ -7,6 +7,9 @@
         </div>
     </div>
     <div class="right">
+        <app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion"
+            (mostrarNotificacion)="ocultarNotificacion($event)">
+        </app-notificaciones>
         <a routerLink="/" class="logo">HUBBET</a>
         <h2 class="title">Crear Nueva Cuenta</h2>
         <form id="formularioRegistro" [formGroup]="formularioRegistro" (ngSubmit)="validarDatosRegistro()">

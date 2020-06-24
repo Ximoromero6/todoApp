@@ -1,7 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 use DI\ContainerBuilder;
+use DI\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;

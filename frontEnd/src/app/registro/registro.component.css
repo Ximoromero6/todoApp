@@ -1,0 +1,252 @@
+/* COLORS */
+#container {
+  /* max-width: 1200px; */
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100vh;
+}
+
+#container .right {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#container .right .logo {
+  margin: 10px auto;
+  text-decoration: none;
+  color: #272727;
+  font-size: 40px;
+  font-weight: 900;
+}
+
+#container .right .title {
+  margin-bottom: 10px;
+  font-size: 40px;
+  color: #272727;
+}
+
+@media (max-width: 576px) {
+  #container .right .title {
+    font-size: 30px;
+  }
+}
+
+#container .right #formularioRegistro {
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  #container .right #formularioRegistro {
+    width: 90%;
+  }
+}
+
+#container .right #formularioRegistro .formField {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  width: 100%;
+  border-radius: 2px;
+  background: #ffffff;
+  margin: 12px 0;
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  -webkit-appearance: none;
+}
+
+#container .right #formularioRegistro .formField.valid {
+  border: 1px solid #2ecc40;
+}
+
+#container .right #formularioRegistro .formField.valid::after {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #2ecc40;
+}
+
+#container .right #formularioRegistro .formField.invalid {
+  border: 1px solid #ff4136;
+}
+
+#container .right #formularioRegistro .formField.invalid::after {
+  content: "\f00d";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #ff4136;
+}
+
+#container .right #formularioRegistro .formField.focused {
+  border-color: #0049b7;
+}
+
+#container .right #formularioRegistro .formField input {
+  font-family: "Nunito", sans-serif;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  width: 93%;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #272727;
+  outline: 0;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+}
+
+#container .right #formularioRegistro .formField input::-webkit-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .right #formularioRegistro .formField input:-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .right #formularioRegistro .formField input::-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .right #formularioRegistro .formField input::placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+@media (max-width: 576px) {
+  #container .right #formularioRegistro .formField input {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+#container .right #formularioRegistro button[type="submit"] {
+  font-family: "Nunito", sans-serif;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  cursor: pointer;
+  background-color: #0049b7;
+  color: #ffffff;
+  border: none;
+  padding: 15px;
+  outline: 0;
+  border-radius: 3px;
+  margin-top: 20px;
+}
+
+#container .right #formularioRegistro span {
+  color: #a9a9a9;
+}
+
+#container .right .separator2 {
+  border: 0;
+  border-top: 1px solid #a9a9a9;
+  margin: 30px auto;
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  #container .right .separator2 {
+    width: 90%;
+    margin: 15px auto;
+  }
+}
+
+#container .right .linkLogin {
+  color: #a9a9a9;
+  margin-bottom: 15px;
+}
+
+#container .right .linkLogin a {
+  margin-left: 10px;
+  color: #0049b7;
+}
+
+@media (max-width: 768px) {
+  #container .right .linkLogin {
+    font-size: 14px;
+  }
+}
+
+#container .left {
+  background: #e2f2ff;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  background-image: url("../../assets/images/3.svg");
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position-y: 70%;
+  background-position-x: center;
+}
+
+@media (max-width: 1200px) {
+  #container .left {
+    display: none;
+  }
+}
+
+#container .left .text {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  margin: 40px 20px;
+}
+
+#container .left .text h3 {
+  color: #272727;
+}
+
+#container .left .text p {
+  max-width: 40%;
+  text-align: left;
+  color: #a9a9a9;
+  margin: 20px 0;
+}
+
+#container .left .text button {
+  width: 160px;
+  padding: 10px;
+  border: 1px solid #0049b7;
+  border-radius: 2px;
+  outline: 0;
+  background: none;
+  font-weight: bold;
+  font-family: "Nunito", sans-serif;
+  color: #272727;
+  cursor: pointer;
+}
+/*# sourceMappingURL=registro.component.css.map */

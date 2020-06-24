@@ -5,24 +5,35 @@ import { AppComponent } from './app.component';
 import { RegistroComponent } from './registro/registro.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { RegistroService } from './registro/registro.service';
 import { LoginService } from './login/login.service';
+import { ActivateAccountComponent } from './activate-account/activate-account.component';
+import { SendEmailComponent } from './send-email/send-email.component';
+import { HomeComponent } from './home/home.component';
+import { NotificacionesComponent } from './notificaciones/notificaciones.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RegistroComponent,
-    LoginComponent
+    LoginComponent,
+    ActivateAccountComponent,
+    SendEmailComponent,
+    HomeComponent,
+    NotificacionesComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [
     RegistroService,
     LoginService
+
   ],
   bootstrap: [AppComponent]
 })
