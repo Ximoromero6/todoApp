@@ -173,4 +173,59 @@ return function (App $app) {
         return $response;
     });
 
+//Validar el login del usuario
+$app->post('/validarLogin', function ($request, $response) {
+
+    $db = $this->get('db');
+    $postResponse = $request->getParsedBody();
+    $email = filter_var($postResponse['email'], FILTER_SANITIZE_STRING);
+    $clave = filter_var($postResponse['clave'], FILTER_SANITIZE_STRING);
+
+    $arrayResponse = [
+        "status" => '',
+        "response" => '',
+        "checkSendEmail" => '',
+        "data" => array()
+    ];
+
+    try{
+        //Comprobamos que exista y esté verificado
+        $queryExisteUsuario = "SELECT usuario, email  FROM usuarios WHERE (usuario = '$email' || email = '$email') && verificado = 1";
+        $resultadoExisteUser = $db->prepare($queryExisteUsuario);
+        $resultadoExisteUser->execute();
+
+        if($resultadoExisteUser->rowCount() === 1){
+
+            //Verrificamos login
+            $queryLogin = "SELECT usuario, token, nombre, email, verificado FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
+            $resultadoLogin = $db->prepare($queryLogin);
+            $resultadoLogin->bindparam(1, $email);
+            $resultadoLogin->bindparam(2, $email);
+            $resultadoLogin->bindparam(3, $clave);
+            $resultadoLogin->execute();
+
+        if($resultadoLogin->rowCount() === 1){
+
+            //Si el login es correcto devolvemos los datos
+            $arrayResponse['status'] = 1;
+            $arrayResponse['data'] = $resultadoLogin->fetchAll(PDO::FETCH_ASSOC);
+            
+        }else{
+            $arrayResponse['status'] = 0;
+            $arrayResponse['response'] = 'Ha ocurrido un error al iniciar sesión!';
+        }
+
+        }else{
+            $arrayResponse['status'] = 0;
+            $arrayResponse['response'] = 'La cuenta no existe o no está verificada!';
+        }
+
+        }catch (Exception $e) {
+            $arrayResponse['status'] = 0;
+            $arrayResponse['response'] = $e->getMessage();
+        }
+    $response->getBody()->write(json_encode($arrayResponse));
+    return $response;
+});
+
 };

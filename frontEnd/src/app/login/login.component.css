@@ -1,1 +1,387 @@
-/* No CSS *//*# sourceMappingURL=login.component.css.map */
+/* COLORS */
+#container {
+  /* max-width: 1200px; */
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100vh;
+}
+
+#container .left {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#container .left .logo {
+  margin: 10px auto;
+  text-decoration: none;
+  color: #272727;
+  font-size: 40px;
+  font-weight: 900;
+}
+
+#container .left .title {
+  margin-bottom: 10px;
+  font-size: 40px;
+  color: #272727;
+}
+
+@media (max-width: 576px) {
+  #container .left .title {
+    font-size: 30px;
+  }
+}
+
+#container .left .googleButton {
+  font-family: "Nunito", sans-serif;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 15px;
+  width: 60%;
+  border-radius: 4px;
+  border: none;
+  background: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  outline: 0;
+  color: #272727;
+  margin-top: 20px;
+  -webkit-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+#container .left .googleButton img {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  #container .left .googleButton {
+    width: 90%;
+  }
+}
+
+#container .left .separator {
+  width: 60%;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 40px auto;
+  color: #a9a9a9;
+}
+
+@media (max-width: 768px) {
+  #container .left .separator {
+    width: 90%;
+    margin: 30px auto;
+  }
+}
+
+#container .left .separator hr {
+  width: 25%;
+  border: none;
+  border-top: 1px solid #a9a9a9;
+}
+
+@media (max-width: 576px) {
+  #container .left .separator hr {
+    width: 15%;
+  }
+}
+
+#container .left .separator span {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 576px) {
+  #container .left .separator span {
+    font-size: 10px;
+  }
+}
+
+#container .left #formularioLogin {
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  #container .left #formularioLogin {
+    width: 90%;
+  }
+}
+
+#container .left #formularioLogin .formField {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  width: 100%;
+  border-radius: 2px;
+  background: #ffffff;
+  margin: 12px 0;
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  -webkit-appearance: none;
+}
+
+#container .left #formularioLogin .formField.valid {
+  border: 1px solid #2ecc40;
+}
+
+#container .left #formularioLogin .formField.valid::after {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #2ecc40;
+}
+
+#container .left #formularioLogin .formField.invalid {
+  border: 1px solid #ff4136;
+}
+
+#container .left #formularioLogin .formField.invalid::after {
+  content: "\f00d";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #ff4136;
+}
+
+#container .left #formularioLogin .formField.focused {
+  border-color: #0049b7;
+}
+
+#container .left #formularioLogin .formField input {
+  font-family: "Nunito", sans-serif;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  width: 93%;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #272727;
+  outline: 0;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+}
+
+#container .left #formularioLogin .formField input::-webkit-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .left #formularioLogin .formField input:-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .left #formularioLogin .formField input::-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+#container .left #formularioLogin .formField input::placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+@media (max-width: 576px) {
+  #container .left #formularioLogin .formField input {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+#container .left #formularioLogin button[type="submit"] {
+  font-family: "Nunito", sans-serif;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  cursor: pointer;
+  background-color: #0049b7;
+  color: #ffffff;
+  border: none;
+  padding: 15px;
+  outline: 0;
+  border-radius: 3px;
+  margin-top: 20px;
+}
+
+#container .left #formularioLogin button[type="submit"] i {
+  margin-left: 10px;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+#container .left #formularioLogin button[type="submit"]:hover i {
+  margin-left: 20px;
+}
+
+#container .left #formularioLogin .loginOptions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 30px auto;
+}
+
+@media (max-width: 576px) {
+  #container .left #formularioLogin .loginOptions {
+    font-size: 12px;
+  }
+}
+
+#container .left #formularioLogin .loginOptions .keepSesion {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+
+#container .left #formularioLogin .loginOptions .keepSesion input {
+  margin-right: 10px;
+}
+
+#container .left #formularioLogin .loginOptions .keepSesion label {
+  cursor: pointer;
+}
+
+#container .left #formularioLogin .loginOptions a {
+  color: #272727;
+}
+
+#container .left .separator2 {
+  border: 0;
+  border-top: 1px solid #a9a9a9;
+  margin: 30px auto;
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  #container .left .separator2 {
+    width: 90%;
+    margin: 15px auto;
+  }
+}
+
+#container .left .linkRegistro {
+  color: #a9a9a9;
+  margin-bottom: 15px;
+}
+
+#container .left .linkRegistro a {
+  margin-left: 10px;
+  color: #0049b7;
+}
+
+@media (max-width: 768px) {
+  #container .left .linkRegistro {
+    font-size: 14px;
+  }
+}
+
+#container .right {
+  background: #e2f2ff;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  background-image: url("../../assets/images/4.svg");
+  background-size: 80%;
+  background-repeat: no-repeat;
+  background-position-y: 74%;
+  background-position-x: center;
+}
+
+@media (max-width: 1200px) {
+  #container .right {
+    display: none;
+  }
+}
+
+#container .right .text {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  margin: 40px 20px;
+}
+
+#container .right .text h3 {
+  color: #272727;
+}
+
+#container .right .text p {
+  max-width: 40%;
+  text-align: right;
+  color: #a9a9a9;
+  margin: 20px 0;
+}
+
+#container .right .text button {
+  width: 160px;
+  padding: 10px;
+  border: 1px solid #0049b7;
+  border-radius: 2px;
+  outline: 0;
+  background: none;
+  font-weight: bold;
+  font-family: "Nunito", sans-serif;
+  color: #272727;
+  cursor: pointer;
+}
+/*# sourceMappingURL=login.component.css.map */

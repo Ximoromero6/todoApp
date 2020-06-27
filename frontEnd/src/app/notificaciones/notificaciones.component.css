@@ -11,7 +11,7 @@
   border-radius: 4px;
   color: #611a15;
   background-color: #fdecea;
-  margin-top: 20px;
+  /* margin-top: 20px; */
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -21,6 +21,13 @@
   -webkit-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   font-weight: bold;
+  z-index: 99;
+  /* position: absolute;
+    top: 10px;
+    right: 25%;
+    transform: translateX(-50%); */
+  -webkit-animation-duration: 0.3s;
+          animation-duration: 0.3s;
 }
 
 .errorContainer .textError {
@@ -48,5 +55,6 @@
   margin-right: 0;
   color: #611a15;
   font-size: 15px;
+  cursor: pointer;
 }
 /*# sourceMappingURL=notificaciones.component.css.map */

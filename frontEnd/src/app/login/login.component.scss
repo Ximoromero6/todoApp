@@ -93,40 +93,70 @@ $whiteColor: #ffffff;
                 width: 90%;
             }
             .formField {
-                font-family: "Nunito", sans-serif;
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                padding: 15px;
+                justify-content: flex-start;
                 width: 100%;
                 border-radius: 2px;
-                border: 1px solid transparent;
                 background: $whiteColor;
-                font-weight: bold;
-                font-size: 15px;
-                outline: 0;
                 margin: 12px 0;
-                color: $textColor;
+                border: 1px solid transparent;
                 box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                 -webkit-appearance: none;
-                transition: all 0.1s;
-                &::placeholder {
-                    font-size: 14px;
-                    color: $textColor;
+                &.valid {
+                    border: 1px solid #2ecc40;
+                    &::after {
+                        content: "\f00c";
+                        font-family: "Font Awesome 5 Free";
+                        font-weight: 900;
+                        color: #2ecc40;
+                    }
                 }
-                @media (max-width: 576px) {
-                    padding: 12px;
-                    font-size: 14px;
+                &.invalid {
+                    border: 1px solid #ff4136;
+                    &::after {
+                        content: "\f00d";
+                        font-family: "Font Awesome 5 Free";
+                        font-weight: 900;
+                        color: #ff4136;
+                    }
                 }
-                &:focus {
+                &.focused {
                     border-color: $primaryColor;
+                }
+                input {
+                    font-family: "Nunito", sans-serif;
+                    background: transparent;
+                    border: none;
+                    border-radius: 2px;
+                    width: 93%;
+                    padding: 15px;
+                    font-weight: bold;
+                    font-size: 15px;
+                    color: $textColor;
+                    outline: 0;
+                    transition: all 0.1s;
+                    &::placeholder {
+                        font-size: 14px;
+                        color: $textColor;
+                    }
+                    @media (max-width: 576px) {
+                        padding: 12px;
+                        font-size: 14px;
+                    }
                 }
             }
             button[type="submit"] {
+                font-family: "Nunito", sans-serif;
+                justify-content: center;
                 cursor: pointer;
                 background-color: $primaryColor;
                 color: $whiteColor;
+                border: none;
+                padding: 15px;
+                outline: 0;
                 border-radius: 3px;
+                margin-top: 20px;
                 i {
                     margin-left: 10px;
                     transition: all 0.2s;
