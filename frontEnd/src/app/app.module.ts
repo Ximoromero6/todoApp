@@ -12,6 +12,7 @@ import { ActivateAccountComponent } from './activate-account/activate-account.co
 import { SendEmailComponent } from './send-email/send-email.component';
 import { HomeComponent } from './home/home.component';
 import { NotificacionesComponent } from './notificaciones/notificaciones.component';
+import { LoaderComponent } from './loader/loader.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { NotificacionesComponent } from './notificaciones/notificaciones.compone
     ActivateAccountComponent,
     SendEmailComponent,
     HomeComponent,
-    NotificacionesComponent
+    NotificacionesComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,

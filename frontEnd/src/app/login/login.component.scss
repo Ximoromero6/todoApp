@@ -1,9 +1,9 @@
 /* COLORS */
+
 $primaryColor: #0049b7;
 $textColor: #272727;
 $grayColor: #a9a9a9;
 $whiteColor: #ffffff;
-
 #container {
     /* max-width: 1200px; */
     margin: auto;
@@ -47,6 +47,7 @@ $whiteColor: #ffffff;
             outline: 0;
             color: $textColor;
             margin-top: 20px;
+            transition-duration: .2s;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             img {
                 width: 18px;
@@ -55,6 +56,9 @@ $whiteColor: #ffffff;
             }
             @media (max-width: 768px) {
                 width: 90%;
+            }
+            &:hover {
+                background: rgba(99, 99, 99, 0.1);
             }
         }
         .separator {
@@ -68,7 +72,6 @@ $whiteColor: #ffffff;
                 width: 90%;
                 margin: 30px auto;
             }
-
             hr {
                 width: 25%;
                 border: none;

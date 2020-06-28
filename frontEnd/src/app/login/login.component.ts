@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from './login.service';
 import { Router } from '@angular/router';
@@ -9,21 +9,29 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
+  @ViewChild('loginRef', { static: true }) loginElement: ElementRef;
+
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
   formularioLogin: FormGroup;
+  auth2: any;
+  showLoader: boolean = true;
+  autorizado: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
     private login: LoginService,
-    private ruta: Router
-  ) {}
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.formularioLogin = this.formBuilder.group({
       email: ['', Validators.required],
       clave: ['', Validators.required],
     });
+
+    //Google Login
+    this.googleSDK();
   }
 
   validarDatosLogin() {
@@ -44,10 +52,15 @@ export class LoginComponent implements OnInit {
         (response) => {
           console.log(response);
           if (response.status == 1) {
-            alert('LOGIN CORRECTO');
+            this.autorizado = true;
+            this.showLoader = false;
+            localStorage.setItem("userData", btoa(response.data));
+            /* alert('LOGIN CORRECTO'); */
+            this.router.navigate(['/home']);
             //Redireccionar a página verificar cuenta pero si hay un error se muestra
             // localStorage.setItem('userToken', response.data.token);
           } else {
+            this.autorizado = false;
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
           }
@@ -58,7 +71,52 @@ export class LoginComponent implements OnInit {
       );
   }
 
+  autorizadoFunction() {
+    return this.autorizado
+  }
+
   ocultarNotificacion(value: boolean) {
     this.mostrarNotificacion = value;
+  }
+
+  //Google Login
+  prepareLoginButton() {
+
+    this.auth2.attachClickHandler(this.loginElement.nativeElement, {},
+      (googleUser) => {
+
+        let profile = googleUser.getBasicProfile();
+        console.log('Token || ' + googleUser.getAuthResponse().id_token);
+        console.log('ID: ' + profile.getId());
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail());
+
+      }, (error) => {
+        console.log(JSON.stringify(error, undefined, 2));
+      });
+
+  }
+  googleSDK() {
+
+    window['googleSDKLoaded'] = () => {
+      window['gapi'].load('auth2', () => {
+        this.auth2 = window['gapi'].auth2.init({
+          client_id: '258969197256-8tgif55q63bf7hqkso8ftoleqgh1a6rt.apps.googleusercontent.com',
+          cookiepolicy: 'single_host_origin',
+          scope: 'profile email'
+        });
+        this.prepareLoginButton();
+      });
+    }
+
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) { return; }
+      js = d.createElement(s); js.id = id;
+      js.src = "https://apis.google.com/js/platform.js?onload=googleSDKLoaded";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'google-jssdk'));
+
   }
 }

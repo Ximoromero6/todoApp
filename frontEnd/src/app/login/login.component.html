@@ -1,74 +1,53 @@
+<app-loader [hidden]="showLoader"></app-loader>
 <div id="container">
-  <div class="left">
-    <app-notificaciones
-      [mensajeNotificacion]="mensajeNotificacion"
-      [hidden]="mostrarNotificacion"
-      (mostrarNotificacion)="ocultarNotificacion($event)"
-    >
-    </app-notificaciones>
-    <a routerLink="/" class="logo">HUBBET</a>
-    <h2 class="title">Bienvenido de nuevo</h2>
-    <button class="googleButton">
+    <div class="left">
+        <app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)">
+        </app-notificaciones>
+        <a routerLink="/" class="logo">HUBBET</a>
+        <h2 class="title">Bienvenido de nuevo</h2>
+        <button class="googleButton" #loginRef>
       <img src="../../assets/images/googleLogo.png" alt="" />Iniciar sesión con
       Google
     </button>
-    <div class="separator">
-      <hr />
-      <span>O inicia sesión con tu email</span>
-      <hr />
-    </div>
-    <form
-      id="formularioLogin"
-      [formGroup]="formularioLogin"
-      (ngSubmit)="validarDatosLogin()"
-    >
-      <div
-        class="formField"
-        [class.invalid]="
+        <div class="separator">
+            <hr />
+            <span>O inicia sesión con tu email</span>
+            <hr />
+        </div>
+        <form id="formularioLogin" [formGroup]="formularioLogin" (ngSubmit)="validarDatosLogin()">
+            <div class="formField" [class.invalid]="
           !formularioLogin.get('email').valid &&
           formularioLogin.get('email').dirty
-        "
-      >
-        <input
-          type="email"
-          placeholder="Tu Email o Usuario"
-          formControlName="email"
-        />
-      </div>
-      <div
-        class="formField"
-        [class.invalid]="
+        ">
+                <input type="email" placeholder="Tu Email o Usuario" formControlName="email" />
+            </div>
+            <div class="formField" [class.invalid]="
           !formularioLogin.get('clave').valid &&
           formularioLogin.get('clave').dirty
-        "
-      >
-        <input
-          type="password"
-          placeholder="Tu Contraseña"
-          formControlName="clave"
-        />
-      </div>
-      <div class="loginOptions">
-        <div class="keepSesion">
-          <input type="checkbox" id="mantenerSesion" />
-          <label for="mantenerSesion">Mantener sesión iniciada</label>
-        </div>
-        <a href="#0">¿Contraseña olvidada?</a>
-      </div>
-      <button type="submit" class="formField">
+        ">
+                <input type="password" placeholder="Tu Contraseña" formControlName="clave" />
+            </div>
+            <div class="loginOptions">
+                <div class="keepSesion">
+                    <input type="checkbox" id="mantenerSesion" />
+                    <label for="mantenerSesion">Mantener sesión iniciada</label>
+                </div>
+                <a href="#0">¿Contraseña olvidada?</a>
+            </div>
+            <button type="submit" class="formField">
         Iniciar sesión <i class="fas fa-long-arrow-alt-right"></i>
       </button>
-    </form>
-    <hr class="separator2" />
-    <p class="linkRegistro">
-      ¿Todavía no tienes cuenta?<a routerLink="/registro">Regístrate aquí</a>
-    </p>
-  </div>
-  <div class="right">
-    <div class="text">
-      <h3>Crea una nueva cuenta</h3>
-      <p>Hemos agregado algunas nuevas características increíbles</p>
-      <button>CREAR CUENTA</button>
+        </form>
+        <hr class="separator2" />
+        <p class="linkRegistro">
+            ¿Todavía no tienes cuenta?<a routerLink="/registro">Regístrate aquí</a>
+        </p>
     </div>
-  </div>
+    <div class="right">
+        <div class="text">
+            <h3>Crea una nueva cuenta</h3>
+            <p>Hemos agregado algunas nuevas características increíbles</p>
+            <button>CREAR CUENTA</button>
+        </div>
+    </div>
 </div>

@@ -1,3 +1,4 @@
+<app-loader [hidden]="showLoader"></app-loader>
 <div id="container">
     <div class="left">
         <div class="text">
@@ -7,29 +8,21 @@
         </div>
     </div>
     <div class="right">
-        <app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion"
-            (mostrarNotificacion)="ocultarNotificacion($event)">
+        <app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)">
         </app-notificaciones>
         <a routerLink="/" class="logo">HUBBET</a>
         <h2 class="title">Crear Nueva Cuenta</h2>
         <form id="formularioRegistro" [formGroup]="formularioRegistro" (ngSubmit)="validarDatosRegistro()">
-            <div class="formField"
-                [class.valid]="formularioRegistro.get('nombre').valid && formularioRegistro.get('nombre').value != ''">
+            <div class="formField" [class.valid]="formularioRegistro.get('nombre').valid && formularioRegistro.get('nombre').value != ''">
                 <input type="text" placeholder="Nombre" formControlName="nombre">
             </div>
-            <div class="formField"
-                [class.invalid]="!formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty"
-                [class.valid]="formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty">
+            <div class="formField" [class.invalid]="!formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty" [class.valid]="formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty">
                 <input type="text" placeholder="Usuario*" formControlName="usuario" required>
             </div>
-            <div class="formField"
-                [class.invalid]="!formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty"
-                [class.valid]="formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty">
+            <div class="formField" [class.invalid]="!formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty" [class.valid]="formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty">
                 <input type="email" placeholder="Email*" formControlName="email" required>
             </div>
-            <div class="formField"
-                [class.invalid]="!formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty"
-                [class.valid]="formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty">
+            <div class="formField" [class.invalid]="!formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty" [class.valid]="formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty">
                 <input type="password" placeholder="Contraseña*" formControlName="clave" required>
             </div>
             <span>* Campos obligatorios</span>

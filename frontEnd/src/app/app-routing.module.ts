@@ -5,7 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { ActivateAccountComponent } from './activate-account/activate-account.component';
 import { SendEmailComponent } from './send-email/send-email.component';
 import { HomeComponent } from './home/home.component';
-import { GuardianHomeGuard } from './home/guardian-home.guard';
+import { GuardianHomeGuard } from './guardian-home.guard';
 
 
 const routes: Routes = [
@@ -14,7 +14,8 @@ const routes: Routes = [
   { path: 'registro', component: RegistroComponent },
   { path: 'registroFinal', component: SendEmailComponent },
   { path: 'activateAccount/:token', component: ActivateAccountComponent },
-  { path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard] }
+  { path: 'home', component: HomeComponent/* , canActivate: [GuardianHomeGuard] */ },
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

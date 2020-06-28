@@ -13,12 +13,13 @@ export class RegistroComponent implements OnInit {
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
   formularioRegistro: FormGroup;
+  showLoader: boolean = true;
 
   constructor(
     private formBuilder: FormBuilder,
     private registro: RegistroService,
     private ruta: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.formularioRegistro = this.formBuilder.group({
@@ -45,7 +46,7 @@ export class RegistroComponent implements OnInit {
     }
 
     console.log(JSON.stringify(this.formularioRegistro.value));
-
+    this.showLoader = false;
     this.registro
       .registrarUsuario(
         this.formularioRegistro.value.nombre,
