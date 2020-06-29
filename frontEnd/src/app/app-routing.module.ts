@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'registro', component: RegistroComponent },
   { path: 'registroFinal', component: SendEmailComponent },
   { path: 'activateAccount/:token', component: ActivateAccountComponent },
-  { path: 'home', component: HomeComponent/* , canActivate: [GuardianHomeGuard] */ },
+  { path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard] },
   { path: '**', redirectTo: '' }
 ];
 

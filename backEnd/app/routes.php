@@ -55,6 +55,7 @@ return function (App $app) {
         $usuario = filter_var($postResponse['usuario'], FILTER_SANITIZE_STRING);
         $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
         $clave = filter_var($postResponse['clave'], FILTER_SANITIZE_STRING);
+        $encryptedClave = crypt($clave, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
             
         $arrayResponse = [
             "status" => '',
@@ -91,7 +92,7 @@ return function (App $app) {
                     "nombre" => $nombre,
                     "usuario" => $usuario,
                     "email" => $email,
-                    "clave" => $clave
+                    "clave" => $encryptedClave
                 ];
         
                 $query = "INSERT INTO usuarios (token, nombre, usuario, email, clave) VALUES (?, ?, ?, ?, ?)";
@@ -158,11 +159,11 @@ return function (App $app) {
                 $resultadoVerificar->bindparam(1, $token);
                 $resultadoVerificar->execute();
                 $arrayResponse['status'] = 1;
-                $arrayResponse['data'] = $resultadoToken->fetchAll(PDO::FETCH_ASSOC);
+                $arrayResponse['data'] = $resultadoToken->fetch(PDO::FETCH_ASSOC);
                 
             }else{
                 $arrayResponse['status'] = 0;
-                $arrayResponse['response'] = 'El usuario ya está verificado!';;
+                $arrayResponse['response'] = 'El usuario ya está verificado!';
             }
 
             }catch (Exception $e) {
@@ -180,6 +181,7 @@ $app->post('/validarLogin', function ($request, $response) {
     $postResponse = $request->getParsedBody();
     $email = filter_var($postResponse['email'], FILTER_SANITIZE_STRING);
     $clave = filter_var($postResponse['clave'], FILTER_SANITIZE_STRING);
+    $encryptedClave = crypt($clave, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
 
     $arrayResponse = [
         "status" => '',
@@ -201,14 +203,14 @@ $app->post('/validarLogin', function ($request, $response) {
             $resultadoLogin = $db->prepare($queryLogin);
             $resultadoLogin->bindparam(1, $email);
             $resultadoLogin->bindparam(2, $email);
-            $resultadoLogin->bindparam(3, $clave);
+            $resultadoLogin->bindparam(3, $encryptedClave);
             $resultadoLogin->execute();
 
         if($resultadoLogin->rowCount() === 1){
 
             //Si el login es correcto devolvemos los datos
             $arrayResponse['status'] = 1;
-            $arrayResponse['data'] = $resultadoLogin->fetchAll(PDO::FETCH_ASSOC);
+            $arrayResponse['data'] = $resultadoLogin->fetch(PDO::FETCH_ASSOC);
             
         }else{
             $arrayResponse['status'] = 0;
@@ -224,6 +226,53 @@ $app->post('/validarLogin', function ($request, $response) {
             $arrayResponse['status'] = 0;
             $arrayResponse['response'] = $e->getMessage();
         }
+    $response->getBody()->write(json_encode($arrayResponse));
+    return $response;
+});
+
+//Verificar que el usuario es el que dice ser en todo momento
+$app->post('/isLogged', function ($request, $response) {
+
+    $db = $this->get('db');
+    $postResponse = $request->getParsedBody();
+    $postData = json_decode($postResponse['userData']);
+
+    //Creamos las variables
+   
+    $usuario = $postData->usuario;
+    $token = $postData->token;
+    $nombre = $postData->nombre;
+    $email = $postData->email;
+    $verificado = $postData->verificado;
+
+    $arrayResponse = [
+        "status" => '',
+        "response" =>  ''
+    ];
+
+    try{
+        //Comprobamos que los datos que nos pasan coinciden con los de la BD
+        $queryValidaUser = "SELECT * FROM usuarios WHERE usuario = ? AND token = ? AND nombre = ? AND email = ? AND verificado = ?";
+        $resultadoValidaUser = $db->prepare($queryValidaUser);
+        $resultadoValidaUser->bindParam(1, $usuario);
+        $resultadoValidaUser->bindParam(2, $token);
+        $resultadoValidaUser->bindParam(3, $nombre);
+        $resultadoValidaUser->bindParam(4, $email);
+        $resultadoValidaUser->bindParam(5, $verificado);
+        $resultadoValidaUser->execute();
+
+        if($resultadoValidaUser->rowCount() === 1){
+            $arrayResponse['status'] = 1;
+            $arrayResponse['response'] = true;
+        }else{
+            $arrayResponse['status'] = 0;
+            $arrayResponse['response'] = false;
+        }
+
+    }catch (Exception $e) {
+        $arrayResponse['status'] = 0;
+        $arrayResponse['response'] = false;
+    }
     $response->getBody()->write(json_encode($arrayResponse));
     return $response;
 });

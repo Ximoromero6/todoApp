@@ -23,7 +23,6 @@ export class ActivateAccountComponent implements OnInit {
         this.servicio.activateAccount(this.token).subscribe(
           (response) => {
             console.log(response);
-
             localStorage.setItem("userData", btoa(response.data));
             /* console.log(btoa(response.data));
             console.log(atob(localStorage.getItem('userData'))); */

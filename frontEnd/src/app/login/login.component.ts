@@ -16,7 +16,6 @@ export class LoginComponent implements OnInit {
   formularioLogin: FormGroup;
   auth2: any;
   showLoader: boolean = true;
-  autorizado: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -50,17 +49,16 @@ export class LoginComponent implements OnInit {
       )
       .subscribe(
         (response) => {
-          console.log(response);
           if (response.status == 1) {
-            this.autorizado = true;
             this.showLoader = false;
-            localStorage.setItem("userData", btoa(response.data));
+            localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            console.log(response);
+
             /* alert('LOGIN CORRECTO'); */
             this.router.navigate(['/home']);
             //Redireccionar a página verificar cuenta pero si hay un error se muestra
             // localStorage.setItem('userToken', response.data.token);
           } else {
-            this.autorizado = false;
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
           }
@@ -69,10 +67,6 @@ export class LoginComponent implements OnInit {
           console.log(error);
         }
       );
-  }
-
-  autorizadoFunction() {
-    return this.autorizado
   }
 
   ocultarNotificacion(value: boolean) {

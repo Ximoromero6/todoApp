@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class LoginService {
   url: string = 'http://localhost:8080/';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   validarLogin(email, clave): Observable<any> {
     let headers = new HttpHeaders().set(
@@ -17,6 +17,17 @@ export class LoginService {
     );
     let body = 'email=' + email + '&clave=' + clave;
     return this.http.post(this.url + 'validarLogin', body, {
+      headers: headers,
+    });
+  }
+
+  isLogged(userData): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'userData=' + userData;
+    return this.http.post(this.url + 'isLogged', body, {
       headers: headers,
     });
   }
