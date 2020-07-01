@@ -1,0 +1,8 @@
+<h1>INTRODUCE TU EMAIL PARA RESTABLECER TU CONTRASEÑA</h1>
+
+<form [formGroup]="formularioResetClave" (ngSubmit)="validarDatosResetClave()">
+    <div class="formField" [class.invalid]="!formularioResetClave.get('email').valid && formularioResetClave.get('email').dirty">
+        <input type="email" placeholder="Introduce tu email" formControlName="email">
+    </div>
+    <button type="submit">Resetear Contraseña</button>
+</form>

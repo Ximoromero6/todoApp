@@ -53,11 +53,7 @@ export class LoginComponent implements OnInit {
             this.showLoader = false;
             localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
             console.log(response);
-
-            /* alert('LOGIN CORRECTO'); */
             this.router.navigate(['/home']);
-            //Redireccionar a página verificar cuenta pero si hay un error se muestra
-            // localStorage.setItem('userToken', response.data.token);
           } else {
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);

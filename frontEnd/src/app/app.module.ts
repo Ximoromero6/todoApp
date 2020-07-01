@@ -13,6 +13,7 @@ import { SendEmailComponent } from './send-email/send-email.component';
 import { HomeComponent } from './home/home.component';
 import { NotificacionesComponent } from './notificaciones/notificaciones.component';
 import { LoaderComponent } from './loader/loader.component';
+import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { LoaderComponent } from './loader/loader.component';
     SendEmailComponent,
     HomeComponent,
     NotificacionesComponent,
-    LoaderComponent
+    LoaderComponent,
+    CambiarClaveComponent
   ],
   imports: [
     BrowserModule,

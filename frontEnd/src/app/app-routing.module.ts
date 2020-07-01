@@ -6,6 +6,7 @@ import { ActivateAccountComponent } from './activate-account/activate-account.co
 import { SendEmailComponent } from './send-email/send-email.component';
 import { HomeComponent } from './home/home.component';
 import { GuardianHomeGuard } from './guardian-home.guard';
+import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
 
 
 const routes: Routes = [
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'registroFinal', component: SendEmailComponent },
   { path: 'activateAccount/:token', component: ActivateAccountComponent },
   { path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard] },
+  { path: 'cambiarClave', component: CambiarClaveComponent },
   { path: '**', redirectTo: '' }
 ];
 

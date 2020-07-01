@@ -1,0 +1,60 @@
+/* COLORS */
+
+$primaryColor: #0049b7;
+$textColor: #272727;
+$grayColor: #a9a9a9;
+$whiteColor: #ffffff;
+.formField {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    border-radius: 2px;
+    background: $whiteColor;
+    margin: 12px 0;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    -webkit-appearance: none;
+    &.valid {
+        border: 1px solid #2ecc40;
+        &::after {
+            content: "\f00c";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #2ecc40;
+        }
+    }
+    &.invalid {
+        border: 1px solid #ff4136;
+        &::after {
+            content: "\f00d";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #ff4136;
+        }
+    }
+    &.focused {
+        border-color: $primaryColor;
+    }
+    input {
+        font-family: "Nunito", sans-serif;
+        background: transparent;
+        border: none;
+        border-radius: 2px;
+        width: 93%;
+        padding: 15px;
+        font-weight: bold;
+        font-size: 15px;
+        color: $textColor;
+        outline: 0;
+        transition: all 0.1s;
+        &::placeholder {
+            font-size: 14px;
+            color: $textColor;
+        }
+        @media (max-width: 576px) {
+            padding: 12px;
+            font-size: 14px;
+        }
+    }
+}
