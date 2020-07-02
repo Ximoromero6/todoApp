@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RegistroService } from './registro.service';
 import { Router } from '@angular/router';
@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./registro.component.scss'],
 })
 export class RegistroComponent implements OnInit {
-  //@Output() notificacionHijo: EventEmitter<boolean> = new EventEmitter<boolean>();
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
   formularioRegistro: FormGroup;

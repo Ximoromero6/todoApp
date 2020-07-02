@@ -41,11 +41,12 @@ export class CambiarClaveComponent implements OnInit {
       .subscribe(
         (response) => {
           if (response.status == 1) {
-            console.log(response);
+            console.log(response.checkSendEmail);
 
             //Aquí ya se puede cerrar la página y verificar el email
             /*  this.router.navigate(['/home']); */
           } else {
+            console.log(response.checkSendEmail);
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
           }

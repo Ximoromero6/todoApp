@@ -1,0 +1,17 @@
+<app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)"></app-notificaciones>
+
+<div [hidden]="!flag">
+    <h1>Introduce tu nueva contraseña</h1>
+    <form [formGroup]="formularioResetClave" (ngSubmit)="validarClaveReset()">
+        <div class="formField" [class.invalid]="!formularioResetClave.get('clave').valid && formularioResetClave.get('clave').dirty">
+            <input type="password" formControlName="clave">
+        </div>
+        <div class="formField" [class.invalid]="!formularioResetClave.get('claveConfirm').valid && formularioResetClave.get('claveConfirm').dirty">
+            <input type="password" formControlName="claveConfirm">
+        </div>
+        <span *ngIf="formularioResetClave.hasError('notSame')">
+            Passwords do not match
+        </span>
+        <button type="submit" [disabled]="formularioResetClave.invalid">Cambiar clave</button>
+    </form>
+</div>

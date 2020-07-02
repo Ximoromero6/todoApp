@@ -14,6 +14,8 @@ import { HomeComponent } from './home/home.component';
 import { NotificacionesComponent } from './notificaciones/notificaciones.component';
 import { LoaderComponent } from './loader/loader.component';
 import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
+import { HeaderComponent } from './header/header.component';
+import { ResetComponent } from './reset/reset.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
     HomeComponent,
     NotificacionesComponent,
     LoaderComponent,
-    CambiarClaveComponent
+    CambiarClaveComponent,
+    HeaderComponent,
+    ResetComponent
   ],
   imports: [
     BrowserModule,

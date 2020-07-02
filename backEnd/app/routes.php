@@ -277,4 +277,199 @@ $app->post('/isLogged', function ($request, $response) {
     return $response;
 });
 
+//Enviar email para restablecer la contrasña
+$app->post('/resetClave', function ($request, $response) {
+    $db = $this->get('db');
+    $postResponse = $request->getParsedBody();
+
+    //$token = md5(uniqid(strval(rand()), true));
+    $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
+        
+    $arrayResponse = [
+        "status" => '',
+        "response" => '',
+        "checkSendEmail" => '',
+        "data" => ''
+    ];
+
+    try {
+        
+        //Comprobar si el email existe
+        $queryExisteEmail = "SELECT token FROM usuarios WHERE email = '$email'";
+        $resultadoExisteEmail = $db->prepare($queryExisteEmail);
+        $resultadoExisteEmail->execute();
+
+        if($resultadoExisteEmail->rowCount() !== 1){
+            $arrayResponse['response'] = 'Ups! El email introducido no existe...';
+            $arrayResponse['status'] = 0;
+        }else {
+            $arrayResponse['data'] = $resultadoExisteEmail->fetch(PDO::FETCH_ASSOC);
+            $tokenDate = strtotime("+1 day");
+            $token = base64_encode($arrayResponse['data']['token'].";".$tokenDate);
+
+            //Si el corrreo existe enviar un enlace junto con su token para restablecer la contraseña
+            $headers  = "From: HUBBET ADMIN <joaquinromeroesteve@gmail.com>\n";
+            $headers .= "Reply-To: joaquinromeroesteve@gmail.com\n";
+            $headers .= "Return-Path: joaquinromeroesteve@gmail.com\n";
+            $headers .= "MIME-Version: 1.0\n";
+            $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
+            $headers .= "X-Priority: 1 (Highest)\n";
+            $headers .= "X-MSMail-Priority: High\n";
+            $headers .= "Importance: High\n";
+            $body = '<h1>Haz click en el botón para cambiar tu contraseña</h1>'; /* file_get_contents( __DIR__ . "/template.html"); */
+            $body .= "<a href='http://localhost:4200/reset/" . $token . "'>Cambiar Contraseña</a>";
+            $arrayResponse['checkSendEmail'] = mail($email,"Cambio de contraseña", $body, $headers);
+        }
+    } catch (Exception $e) {
+        $arrayResponse['status'] = 'error';
+        $arrayResponse['response'] = $e->getMessage();
+    }
+    $response->getBody()->write(json_encode($arrayResponse));
+    return $response;
+});
+
+//
+//Cambio de contraseña con el token del usuario, y generar otro token
+$app->post('/verifyTokenReset', function ($request, $response) {
+    $db = $this->get('db');
+    $postResponse = $request->getParsedBody();
+
+    //$token = md5(uniqid(strval(rand()), true));
+    $tokenCodificado = $postResponse['token'];
+   
+    $arrayResponse = [
+        "status" => '',
+        "response" => '',
+        "errorCode"=> ''
+    ];
+
+    try {
+        //Decodificar el token y la fecha
+        $arrayToken = explode(';', base64_decode($tokenCodificado));
+
+       if(isset($arrayToken[0]) && isset($arrayToken[1])){
+        $tokenDecodificado = $arrayToken[0];
+        $fechaDecodificada = $arrayToken[1];
+        $fechaActual = strtotime("now");
+
+        //Verificar que el token existe
+        $queryExisteToken = "SELECT token FROM usuarios WHERE token = '$tokenDecodificado'";
+        $resultadoExisteToken = $db->prepare($queryExisteToken);
+        $resultadoExisteToken->execute();
+
+        if($resultadoExisteToken->rowCount() === 0){
+            $arrayResponse['response'] = "Token inválido!";
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['status'] = false;
+        }else{
+
+            //Verificar que el token no haya expirado (que la fecha es correcta)
+            if(date("m/d/Y h:i:s", intval($fechaDecodificada)) < date("m/d/Y h:i:s", $fechaActual)){
+                $arrayResponse['response'] = "Token inválido!";
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['status'] = false;
+            }else{
+                $arrayResponse['response'] = "Éxito";
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['status'] = true;
+            }
+        }
+       }else{
+        $arrayResponse['response'] = "Token inválido!";
+        $arrayResponse['errorCode'] = "1002";
+        $arrayResponse['status'] = false;
+       }
+
+    } catch (Exception $e) {
+        $arrayResponse['status'] = false;
+        $arrayResponse['errorCode'] = "1003";
+        $arrayResponse['response'] = $e->getMessage();
+    }
+    $response->getBody()->write(json_encode($arrayResponse));
+    return $response;
+});
+
+//Cambio de contraseña con el token del usuario, y generar otro token
+$app->post('/reset', function ($request, $response) {
+    $db = $this->get('db');
+    $postResponse = $request->getParsedBody();
+
+    $clave = filter_var($postResponse['clave'], FILTER_SANITIZE_STRING);
+    $claveConfirm = filter_var($postResponse['claveConfirm'], FILTER_SANITIZE_STRING);
+    $tokenCodificado = $postResponse['token'];
+    
+    $arrayResponse = [
+        "status" => '',
+        "response" => '',
+        "errorCode"=> ''
+    ];
+
+    try {
+        //Decodificar el token y la fecha
+        $arrayToken = explode(';', base64_decode($tokenCodificado));
+
+       if(isset($arrayToken[0]) && isset($arrayToken[1])){
+        $tokenDecodificado = $arrayToken[0];
+        $fechaDecodificada = $arrayToken[1];
+        $fechaActual = strtotime("now");
+
+        //Verificar que el token existe
+        $queryExisteToken = "SELECT id FROM usuarios WHERE token = '$tokenDecodificado'";
+        $resultadoExisteToken = $db->prepare($queryExisteToken);
+        $resultadoExisteToken->execute();
+        $data = $resultadoExisteToken->fetch(PDO::FETCH_ASSOC);
+        $id = $data['id'];
+
+        if($resultadoExisteToken->rowCount() === 0){
+            $arrayResponse['response'] = "Token inválido!";
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['status'] = false;
+        }else{
+
+            //Verificar que el token no haya expirado (que la fecha es correcta)
+            if(date("m/d/Y h:i:s", intval($fechaDecodificada)) < date("m/d/Y h:i:s", $fechaActual)){
+                $arrayResponse['response'] = "Token inválido!";
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['status'] = false;
+            }else{
+              if($clave != $claveConfirm){
+                $arrayResponse['response'] = "Las contraseñas no coinciden!";
+                $arrayResponse['errorCode'] = "1004";
+                $arrayResponse['status'] = false;
+              }else{
+                  $claveFinal = crypt($claveConfirm, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
+                  $token = md5(uniqid(strval(rand()), true));
+                  $queryChangePassword = "UPDATE usuarios SET clave = '$claveFinal', token = '$token' WHERE token = '$tokenDecodificado' AND id = '$id'";
+                  $resultadoQueryPassword = $db->prepare($queryChangePassword);
+                  $resultadoQueryPassword->execute();
+
+                  if($resultadoQueryPassword->rowCount() === 0){
+                    $arrayResponse['response'] = "Lo sentimos, ha ocurrido un error al cambiar la contraseña...";
+                    $arrayResponse['errorCode'] = "1005";
+                    $arrayResponse['status'] = false;
+                  }else{
+                    $arrayResponse['response'] = "Contraseña cambiada correctamente!";
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['status'] = true; 
+
+                  }
+              }
+            }
+        }
+       }else{
+        $arrayResponse['response'] = "Token inválido!";
+        $arrayResponse['errorCode'] = "1002";
+        $arrayResponse['status'] = false;
+       }
+
+    } catch (Exception $e) {
+        $arrayResponse['status'] = false;
+        $arrayResponse['errorCode'] = "1003";
+        $arrayResponse['response'] = $e->getMessage();
+    }
+
+    $response->getBody()->write(json_encode($arrayResponse));
+    return $response;
+});
+
 };

@@ -1,0 +1,214 @@
+$primaryColor: #0049b7;
+$textColor: #272727;
+$grayColor: #a9a9a9;
+$whiteColor: #ffffff;
+$azulOscuro: #0b0f32;
+$azulClaro: #e8f4fd;
+header {
+    min-height: 100vh;
+    max-width: 320px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background: $whiteColor;
+    transition: all .5s;
+    @media(max-width: 768px) {
+        max-width: 90px;
+    }
+    @media(max-width: 576px) {
+        max-width: 80px;
+    }
+    nav {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 100vh;
+        .topPart {
+            width: 90%;
+            .logoPart {
+                margin: 30px auto;
+                a {
+                    text-decoration: none;
+                    font-weight: 900;
+                    font-size: 28px;
+                    cursor: pointer;
+                    color: $azulOscuro;
+                    @media(max-width: 768px) {
+                        display: none;
+                    }
+                }
+                button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    margin: 20px auto;
+                    padding: 15px 10px;
+                    border: none;
+                    border-radius: 0 30px 30px 30px;
+                    font-family: 'Nunito', sans-serif;
+                    font-weight: bold;
+                    font-size: 17px;
+                    background: $azulClaro;
+                    color: $azulOscuro;
+                    cursor: pointer;
+                    outline: 0;
+                    transition: all .1s;
+                    @media(max-width: 768px) {
+                        width: 80%;
+                    }
+                    i {
+                        font-size: 20px;
+                        margin-right: 10px;
+                        @media(max-width: 768px) {
+                            margin: 0;
+                        }
+                    }
+                    &:hover {
+                        background: $primaryColor;
+                        color: $whiteColor;
+                    }
+                    label {
+                        cursor: pointer;
+                        @media(max-width: 768px) {
+                            display: none;
+                        }
+                    }
+                }
+            }
+            .menu {
+                ul {
+                    li {
+                        list-style: none;
+                        a {
+                            text-decoration: none;
+                            color: $azulOscuro;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-start;
+                            margin-top: 10px;
+                            width: 100%;
+                            padding: 20px 15px;
+                            border: none;
+                            border-radius: 5px;
+                            font-family: 'Nunito', sans-serif;
+                            font-weight: bold;
+                            font-size: 17px;
+                            transition: all .1s;
+                            position: relative;
+                            &.active {
+                                &::before {
+                                    content: '';
+                                    position: absolute;
+                                    left: 0;
+                                    top: 50%;
+                                    transform: translateY(-50%);
+                                    width: 4px;
+                                    height: 60%;
+                                    background: $azulOscuro;
+                                }
+                            }
+                            img {
+                                width: 25px;
+                                height: 25px;
+                                margin-right: 15px;
+                                @media(max-width: 768px) {
+                                    margin: 0;
+                                }
+                            }
+                            &:hover {
+                                background: $azulClaro;
+                                color: $primaryColor;
+                            }
+                            label {
+                                cursor: pointer;
+                                @media(max-width: 768px) {
+                                    display: none;
+                                }
+                            }
+                            label.taskCount {
+                                width: 25px;
+                                height: 25px;
+                                border-radius: 0 30px 30px 30px;
+                                color: $textColor;
+                                background: $azulClaro;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                transition: all .2s;
+                                @media(max-width: 768px) {
+                                    display: none;
+                                }
+                            }
+                            @media(max-width: 768px) {
+                                justify-content: center;
+                            }
+                        }
+                    }
+                    .misTareasButton {
+                        a {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            .left {
+                                display: flex;
+                                align-items: center;
+                            }
+                            @media(max-width: 768px) {
+                                justify-content: center;
+                            }
+                        }
+                        &:hover {
+                            label.taskCount {
+                                background: $azulOscuro;
+                                color: $whiteColor;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .bottomPart {
+            width: 100%;
+            margin: 0 15px;
+            hr {
+                border: none;
+                border-top: 1px solid #cccccc;
+            }
+            a {
+                text-decoration: none;
+                color: $azulOscuro;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                width: 100%;
+                padding: 20px 30px;
+                border: none;
+                border-radius: 5px;
+                font-family: 'Nunito', sans-serif;
+                font-weight: bold;
+                font-size: 16px;
+                transition: all .1s;
+                img {
+                    width: 25px;
+                    height: 25px;
+                    margin-right: 15px;
+                    @media(max-width: 768px) {
+                        width: 20px;
+                        height: 20px;
+                        margin: 0;
+                    }
+                }
+                &:hover {
+                    background: $azulClaro;
+                    color: $primaryColor;
+                }
+                label {
+                    cursor: pointer;
+                    @media(max-width: 768px) {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
