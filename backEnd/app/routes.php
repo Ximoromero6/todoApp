@@ -148,7 +148,7 @@ return function (App $app) {
 
         try{
 
-            $queryToken = "SELECT usuario, token, nombre, email, verificado FROM usuarios WHERE token = ? && verificado = 0";
+            $queryToken = "SELECT usuario, token, nombre, email, verificado, imagen FROM usuarios WHERE token = ? && verificado = 0";
             $resultadoToken = $db->prepare($queryToken);
             $resultadoToken->bindparam(1, $token);
             $resultadoToken->execute();
@@ -199,7 +199,7 @@ $app->post('/validarLogin', function ($request, $response) {
         if($resultadoExisteUser->rowCount() === 1){
 
             //Verrificamos login
-            $queryLogin = "SELECT usuario, token, nombre, email, verificado FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
+            $queryLogin = "SELECT usuario, token, nombre, email, verificado, imagen FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
             $resultadoLogin = $db->prepare($queryLogin);
             $resultadoLogin->bindparam(1, $email);
             $resultadoLogin->bindparam(2, $email);

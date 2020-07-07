@@ -16,7 +16,6 @@ export class HomeComponent implements OnInit {
   }
 
   cerrarSesion() {
-    alert('Works');
     localStorage.removeItem('userData');
     sessionStorage.removeItem('userData');
     this.router.navigate(['']);

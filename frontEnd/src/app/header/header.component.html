@@ -1,10 +1,10 @@
-<header>
+<header id="sideBarMenu">
     <nav>
         <div class="topPart">
             <div class="logoPart">
                 <a routerLink="/home">Hubbet</a>
                 <!-- <button><i class="fas fa-plus"></i><label>Añadir Tarea</label></button> -->
-                <a><img src="../../assets/images/menu.svg" alt=""></a>
+                <a id="closeMenuIcon"><img src="../../assets/images/menu.svg" alt=""></a>
             </div>
             <div class="menu">
                 <ul>
@@ -31,12 +31,37 @@
                     </li> -->
                 </ul>
             </div>
+            <!--  <img src="../../assets/images/invite_peeps.png" alt=""> -->
         </div>
         <div class="bottomPart">
             <hr>
             <!-- <a><img src="../../assets/images/configuraciones.svg" alt=""><label>Ajustes</label></a>
             <a><img src="../../assets/images/usuario.svg" alt=""><label>Mi Cuenta</label></a> -->
-            <button (click)="cerrarSesionFunction()">Cerrar Sesión</button>
+            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/apagar.svg" alt=""></button>
         </div>
     </nav>
 </header>
+<a id="openMenuIcon"><img src="../../assets/images/menu.svg" alt=""></a>
+
+<!-- Menú horizontal con el buscador y el perfil del usuario -->
+<nav id="horizontalMenu">
+    <ul>
+        <li>
+            <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt=""><input type="text" placeholder="Buscar"></div>
+        </li>
+        <li><a>{{ nombre }}<img [src]="imagen " alt=""></a></li>
+    </ul>
+    <div id="dropDownMenu">
+        <ul>
+            <li>
+                <a>Opción 1</a>
+            </li>
+            <li>
+                <a>Opción 2</a>
+            </li>
+            <li>
+                <a>Opción 3</a>
+            </li>
+        </ul>
+    </div>
+</nav>
