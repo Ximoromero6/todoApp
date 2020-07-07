@@ -13,11 +13,12 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
   }
 
   cerrarSesion() {
+    alert('Works');
     localStorage.removeItem('userData');
+    sessionStorage.removeItem('userData');
     this.router.navigate(['']);
   }
 

@@ -29,7 +29,7 @@
             </div>
             <div class="loginOptions">
                 <div class="keepSesion">
-                    <input type="checkbox" id="mantenerSesion" />
+                    <input type="checkbox" id="mantenerSesion" formControlName="keepSession" />
                     <label for="mantenerSesion">Mantener sesión iniciada</label>
                 </div>
                 <a routerLink="/cambiarClave">¿Contraseña olvidada?</a>
@@ -47,7 +47,7 @@
         <div class="text">
             <h3>Crea una nueva cuenta</h3>
             <p>Hemos agregado algunas nuevas características increíbles</p>
-            <button>CREAR CUENTA</button>
+            <a a routerLink="/registro"><button>CREAR CUENTA</button></a>
         </div>
     </div>
 </div>

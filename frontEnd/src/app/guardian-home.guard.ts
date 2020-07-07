@@ -17,7 +17,12 @@ export class GuardianHomeGuard implements CanActivate {
     // if (this.checkData()) data = JSON.parse(atob(localStorage.getItem('userData')));
 
     try {
-      userData = JSON.parse(atob(localStorage.getItem('userData')));
+      if (localStorage.getItem('userData') != null) {
+        userData = JSON.parse(atob(localStorage.getItem('userData')));
+      } else {
+        userData = JSON.parse(atob(sessionStorage.getItem('userData')));
+      }
+
       this.LoginService.isLogged(JSON.stringify(userData))
         .subscribe(
           (response) => {
@@ -94,5 +99,7 @@ export class GuardianHomeGuard implements CanActivate {
     }
     return true;
   }
+
+
 
 }

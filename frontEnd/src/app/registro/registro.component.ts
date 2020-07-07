@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RegistroService } from './registro.service';
 import { Router } from '@angular/router';
@@ -59,7 +59,7 @@ export class RegistroComponent implements OnInit {
           if (response.status == 1) {
             //Redireccionar a página verificar cuenta pero si hay un error se muestra
             localStorage.setItem('userToken', response.data.token);
-            this.ruta.navigate(['/registroFinal']);
+            this.ruta.navigateByUrl('/registroFinal', { state: {email: this.formularioRegistro.value.email} });
           } else {
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);

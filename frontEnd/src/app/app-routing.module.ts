@@ -8,17 +8,18 @@ import { HomeComponent } from './home/home.component';
 import { GuardianHomeGuard } from './guardian-home.guard';
 import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
 import { ResetComponent } from './reset/reset.component';
+import { GuardianLoginGuard } from './guardian-login.guard';
 
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'registro', component: RegistroComponent },
-  { path: 'registroFinal', component: SendEmailComponent },
-  { path: 'activateAccount/:token', component: ActivateAccountComponent },
+  { path: '', component: LoginComponent, canActivate: [GuardianLoginGuard] },
+  { path: 'login', component: LoginComponent, canActivate: [GuardianLoginGuard] },
+  { path: 'registro', component: RegistroComponent, canActivate: [GuardianLoginGuard] },
+  { path: 'registroFinal', component: SendEmailComponent, canActivate: [GuardianLoginGuard] },
+  { path: 'activateAccount/:token', component: ActivateAccountComponent, canActivate: [GuardianLoginGuard] },
   { path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard] },
-  { path: 'cambiarClave', component: CambiarClaveComponent },
-  { path: 'reset/:token', component: ResetComponent },
+  { path: 'cambiarClave', component: CambiarClaveComponent, canActivate: [GuardianLoginGuard] },
+  { path: 'reset/:token', component: ResetComponent, canActivate: [GuardianLoginGuard] },
   { path: '**', redirectTo: '' }
 ];
 

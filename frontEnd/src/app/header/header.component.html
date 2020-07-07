@@ -2,21 +2,22 @@
     <nav>
         <div class="topPart">
             <div class="logoPart">
-                <a routerLink="/home">HUBBET</a>
-                <button><i class="fas fa-plus"></i><label>Añadir Tarea</label></button>
+                <a routerLink="/home">Hubbet</a>
+                <!-- <button><i class="fas fa-plus"></i><label>Añadir Tarea</label></button> -->
+                <a><img src="../../assets/images/menu.svg" alt=""></a>
             </div>
             <div class="menu">
                 <ul>
                     <li>
-                        <a><img src="../../assets/images/shop.svg" alt=""> <label>Dashboard</label></a>
+                        <a class="active"><img src="../../assets/images/menu2.svg" alt=""> <label>Dashboard</label></a>
                     </li>
                     <li class="misTareasButton">
                         <a>
                             <div class="left">
-                                <img src="../../assets/images/list.svg" alt="">
+                                <img src="../../assets/images/lista.svg" alt="">
                                 <label>Mis Tareas</label>
                             </div>
-                            <label class="taskCount">4</label>
+                            <label class="taskCount">0</label>
                         </a>
                     </li>
                     <li>
@@ -33,8 +34,9 @@
         </div>
         <div class="bottomPart">
             <hr>
-            <a><img src="../../assets/images/configuraciones.svg" alt=""><label>Ajustes</label></a>
-            <a><img src="../../assets/images/usuario.svg" alt=""><label>Mi Cuenta</label></a>
+            <!-- <a><img src="../../assets/images/configuraciones.svg" alt=""><label>Ajustes</label></a>
+            <a><img src="../../assets/images/usuario.svg" alt=""><label>Mi Cuenta</label></a> -->
+            <button (click)="cerrarSesionFunction()">Cerrar Sesión</button>
         </div>
     </nav>
 </header>

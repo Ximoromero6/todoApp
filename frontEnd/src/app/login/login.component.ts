@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
     this.formularioLogin = this.formBuilder.group({
       email: ['', Validators.required],
       clave: ['', Validators.required],
+      keepSession: [true]
     });
 
     //Google Login
@@ -49,10 +50,14 @@ export class LoginComponent implements OnInit {
       )
       .subscribe(
         (response) => {
+          console.log(this.formularioLogin.value.keepSession);
           if (response.status == 1) {
             this.showLoader = false;
-            localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
-            console.log(response);
+            if (this.formularioLogin.value.keepSession === true) {
+              localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            } else {
+              sessionStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            }
             this.router.navigate(['/home']);
           } else {
             this.mensajeNotificacion = response.response;
@@ -81,6 +86,9 @@ export class LoginComponent implements OnInit {
         console.log('Name: ' + profile.getName());
         console.log('Image URL: ' + profile.getImageUrl());
         console.log('Email: ' + profile.getEmail());
+
+        //Comprobar si el usuario de Google existe y si no existe crear una cuenta
+
 
       }, (error) => {
         console.log(JSON.stringify(error, undefined, 2));

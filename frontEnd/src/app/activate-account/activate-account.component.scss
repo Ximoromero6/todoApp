@@ -1,0 +1,44 @@
+$primaryColor: #0049b7;
+.box {
+    width: 45%;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin: 50px auto;
+    @media(max-width: 768px) {
+        width: 100%;
+    }
+    img {
+        width: 50px;
+    }
+    h2 {
+        margin: 15px;
+    }
+    h4 {
+        max-width: 65%;
+        text-align: center;
+        font-weight: normal;
+        margin-bottom: 10px;
+        span {
+            font-weight: bold;
+        }
+        @media(max-width: 768px) {
+            max-width: 90%;
+        }
+    }
+    hr {
+        width: 80%;
+        margin: 20px auto;
+        border: none;
+        border-top: 1px solid #cccccc;
+    }
+    p {
+        margin: 20px;
+        a {
+            color: $primaryColor;
+        }
+    }
+}

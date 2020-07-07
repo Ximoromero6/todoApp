@@ -191,6 +191,8 @@ $whiteColor: #ffffff;
                 }
                 a {
                     color: $textColor;
+                    text-decoration: underline;
+                    cursor: pointer;
                 }
             }
         }
@@ -210,6 +212,8 @@ $whiteColor: #ffffff;
             a {
                 margin-left: 10px;
                 color: $primaryColor;
+                text-decoration: underline;
+                cursor: pointer;
             }
             @media (max-width: 768px) {
                 font-size: 14px;
