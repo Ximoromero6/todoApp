@@ -175,6 +175,21 @@ header {
                     }
                 }
             }
+            .preCloseSession {
+                position: absolute;
+                bottom: 70px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                img {
+                    width: 150px;
+                }
+                small {
+                    max-width: 85%;
+                    text-align: center;
+                    margin-top: 10px;
+                }
+            }
         }
         .bottomPart {
             width: 100%;
@@ -273,7 +288,7 @@ nav#horizontalMenu {
             }
             #inputSearch {
                 margin-right: 30px;
-                border: 1px solid $azulOscuro;
+                border: 1px solid #9ba1a3;
                 padding: 6px 0;
                 display: flex;
                 align-items: center;
@@ -295,7 +310,7 @@ nav#horizontalMenu {
                     padding-right: 12px;
                     &::placeholder {
                         font-family: 'Nunito', sans-serif;
-                        color: $azulOscuro;
+                        color: #9ba1a3;
                     }
                 }
                 border-radius: 20px;
@@ -310,10 +325,11 @@ nav#horizontalMenu {
         min-width: 250px;
         border-radius: 4px;
         margin-top: 8px;
-        //box-shadow: 0 0 0 1px rgba(111, 119, 130, .15), 0 5px 20px 0 rgba(21, 27, 38, .08);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        /*   pointer-events: none;
-        z-index: 9999; */
+        box-shadow: 0 0 0 1px rgba(111, 119, 130, .15), 0 5px 10px 0 rgba(21, 27, 38, .08);
+        //box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        //box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        user-select: none;
+        z-index: 9999;
         ul {
             display: flex;
             flex-direction: column;
@@ -321,21 +337,102 @@ nav#horizontalMenu {
             li {
                 list-style: none;
                 width: 100%;
-                border-top: 1px solid #cccccc;
+                border-top: 1px solid #e8ecee;
                 a {
                     text-decoration: none;
                     display: block;
                     padding: 6px 10px;
                     width: 100%;
                     font-size: 14px;
+                    font-weight: normal;
                     &:hover {
-                        background: #cccccc;
+                        background: #e8ecee;
                     }
                 }
                 &:first-child {
-                    /*   background: red; */
                     border: none !important;
                 }
+            }
+        }
+    }
+}
+
+
+/* Estilos popup ajustes perfil */
+
+div.overlayPopupProfileSettings {
+    display: none !important;
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(39, 50, 64, .6);
+    z-index: 999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    div#popupProfileSettings {
+        min-width: 500px;
+        background: $whiteColor;
+        margin-top: 60px;
+        border-radius: 5px;
+        min-height: 30px;
+        padding: 10px 0;
+        .top {
+            .close {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 25px;
+                margin: 0;
+                margin-bottom: 20px;
+                h2 {
+                    color: $azulOscuro;
+                }
+                i {
+                    font-size: 18px;
+                    cursor: pointer;
+                    color: $azulOscuro;
+                }
+            }
+            ul.menu {
+                display: flex;
+                justify-content: space-evenly;
+                width: 100%;
+                padding: 0 25px;
+                li {
+                    list-style: none;
+                    a {
+                        text-decoration: none;
+                        display: block;
+                        padding: 8px 0;
+                        margin-bottom: 8px;
+                        cursor: pointer;
+                        color: $azulOscuro;
+                        font-size: 14px;
+                        font-weight: 700;
+                        position: relative;
+                        /* border: 1px solid red; */
+                        &.active {
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 3px;
+                                background: $primaryColor;
+                                border-radius: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+            hr {
+                border: none;
+                border-top: 1px solid #e8ecee;
             }
         }
     }

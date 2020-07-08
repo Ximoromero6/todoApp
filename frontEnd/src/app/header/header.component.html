@@ -31,37 +31,69 @@
                     </li> -->
                 </ul>
             </div>
-            <!--  <img src="../../assets/images/invite_peeps.png" alt=""> -->
+            <div class="preCloseSession">
+                <img src="../../assets/images/checklist_.svg" alt="">
+                <small>¡Empieza ahora creando nuevas tareas!</small>
+            </div>
         </div>
         <div class="bottomPart">
             <hr>
-            <!-- <a><img src="../../assets/images/configuraciones.svg" alt=""><label>Ajustes</label></a>
-            <a><img src="../../assets/images/usuario.svg" alt=""><label>Mi Cuenta</label></a> -->
             <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/apagar.svg" alt=""></button>
         </div>
     </nav>
 </header>
 <a id="openMenuIcon"><img src="../../assets/images/menu.svg" alt=""></a>
 
-<!-- Menú horizontal con el buscador y el perfil del usuario -->
+<!-- Menú horizontal con el buscador y los ajustes del perfil del usuario -->
 <nav id="horizontalMenu">
     <ul>
         <li>
             <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt=""><input type="text" placeholder="Buscar"></div>
         </li>
-        <li><a>{{ nombre }}<img [src]="imagen " alt=""></a></li>
+        <li><a class="testElement" (click)="toggleDropDown = !toggleDropDown">{{ nombre }}<img [src]="imagen" alt=""></a></li>
     </ul>
-    <div id="dropDownMenu">
+    <div id="dropDownMenu" [hidden]="toggleDropDown">
         <ul>
             <li>
-                <a>Opción 1</a>
+                <a class="testElement">Opción 1</a>
             </li>
             <li>
-                <a>Opción 2</a>
+                <a class="testElement">Opción 2</a>
             </li>
             <li>
-                <a>Opción 3</a>
+                <a class="testElement">Ajustes de mi perfil...</a>
             </li>
         </ul>
     </div>
 </nav>
+<!-- FIN Menú horizontal con el buscador y los ajustes del perfil del usuario -->
+
+<!-- POPUP MENÚ DESPLEGABLE AJUSTES PERFIL USUARIO -->
+<div class="overlayPopupProfileSettings">
+    <div id="popupProfileSettings">
+        <div class="top">
+            <div class="close">
+                <h2>Ajustes de mi perfil</h2>
+                <i class="fas fa-times"></i>
+            </div>
+            <ul class="menu">
+                <li>
+                    <a class="active">Opción 1</a>
+                </li>
+                <li>
+                    <a>Opción 2</a>
+                </li>
+                <li>
+                    <a>Opción 3</a>
+                </li>
+                <li>
+                    <a>Opción 4</a>
+                </li>
+            </ul>
+            <hr>
+        </div>
+        <div class="middle"></div>
+        <div class="bottom"></div>
+    </div>
+</div>
+<!-- FIN POPUP MENÚ DESPLEGABLE AJUSTES PERFIL USUARIO -->
