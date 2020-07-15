@@ -1,5 +1,7 @@
 <h1>Introduce tu email para restablecer tu contraseña</h1>
-<app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)"></app-notificaciones>
+
+<!-- Llamamos al componente de notificaciones -->
+<app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="position: absolute; margin-top: 10px;"></app-notificaciones>
 
 <form [formGroup]="formularioResetClave" (ngSubmit)="validarDatosResetClave()">
     <div class="formField" [class.invalid]="!formularioResetClave.get('email').valid && formularioResetClave.get('email').dirty">

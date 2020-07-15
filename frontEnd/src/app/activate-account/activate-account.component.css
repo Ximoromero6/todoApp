@@ -1,1 +1,67 @@
-/* No CSS *//*# sourceMappingURL=activate-account.component.css.map */
+.box {
+  width: 45%;
+  border-radius: 4px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin: 50px auto;
+}
+
+@media (max-width: 768px) {
+  .box {
+    width: 100%;
+  }
+}
+
+.box img {
+  width: 50px;
+}
+
+.box h2 {
+  margin: 15px;
+}
+
+.box h4 {
+  max-width: 65%;
+  text-align: center;
+  font-weight: normal;
+  margin-bottom: 10px;
+}
+
+.box h4 span {
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .box h4 {
+    max-width: 90%;
+  }
+}
+
+.box hr {
+  width: 80%;
+  margin: 20px auto;
+  border: none;
+  border-top: 1px solid #cccccc;
+}
+
+.box p {
+  margin: 20px;
+}
+
+.box p a {
+  color: #0049b7;
+}
+/*# sourceMappingURL=activate-account.component.css.map */

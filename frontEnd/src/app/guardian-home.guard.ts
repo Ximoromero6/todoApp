@@ -33,24 +33,15 @@ export class GuardianHomeGuard implements CanActivate {
             }
           },
           (error) => {
-            console.log(error);
+            this.router.navigate(['']);
+            return false;
           }
         );
       return true;
-      /*  data = JSON.parse(atob(localStorage.getItem('userData')));
-       console.log(data); */
-
-      /*  if (!this.LoginService.isLogged(data)) {
-  
-      console.log('No estás logueado');
-      this.router.navigate(['']);
-      return false;
-    } */
 
     } catch (e) {
       this.router.navigate(['']);
       return false;
-      console.log(e);
     }
   }
 

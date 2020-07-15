@@ -1,7 +1,7 @@
-<div class="errorContainer animate__animated animate__slideInDown">
-    <div class="textError">
+<div class="container animate__animated animate__slideInDown {{ statusNotificacion }}">
+    <div class="text">
         <i class="{{iconoNotificacion}}"></i>
         <p>{{mensajeNotificacion}}</p>
     </div>
-    <div class="closeIcon"><i class="fas fa-times errorIconClose" (click)="ocultarNotificacion(true)"></i></div>
+    <div class="closeIcon"><i class="fas fa-times" (click)="ocultarNotificacion(true)"></i></div>
 </div>

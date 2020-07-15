@@ -11,10 +11,14 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 export class ResetComponent implements OnInit {
 
   formularioResetClave: FormGroup;
-  mensajeNotificacion: string;
-  mostrarNotificacion: boolean = true;
   token: string;
   flag: boolean = false;
+
+  //Notificaciones variables
+  statusNotificacion: string;
+  iconoNotificacion: string;
+  mensajeNotificacion: string;
+  mostrarNotificacion: boolean = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -73,8 +77,16 @@ export class ResetComponent implements OnInit {
         this.token
       ).subscribe(
         (response) => {
-          console.log(response);
-
+          if (response.status) {
+            this.statusNotificacion = 'success';
+            this.iconoNotificacion = 'fas fa-check-circle';
+            this.mensajeNotificacion = response.response;
+          } else {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.mensajeNotificacion = response.response;
+          }
+          this.ocultarNotificacion(false);
         },
         (error) => {
           console.log(error);

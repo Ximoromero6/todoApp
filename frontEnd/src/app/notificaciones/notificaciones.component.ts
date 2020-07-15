@@ -9,13 +9,13 @@ export class NotificacionesComponent implements OnInit {
 
   constructor() { }
 
-  @Input() mensajeNotificacion: string
-  @Output() mostrarNotificacion = new EventEmitter<boolean>();
-  iconoNotificacion: string
+  @Input() statusNotificacion: string; //error o success
+  @Input() mensajeNotificacion: string; //mensaje de error o éxito
+  @Input() iconoNotificacion: string; //Icono de éxito o error
 
-  ngOnInit(): void {
-    this.iconoNotificacion = 'fas fa-exclamation-circle';
-  }
+  @Output() mostrarNotificacion = new EventEmitter<boolean>();
+
+  ngOnInit(): void { }
 
   ocultarNotificacion(value: boolean) {
     this.mostrarNotificacion.emit(value);

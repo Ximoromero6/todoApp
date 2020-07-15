@@ -1,0 +1,89 @@
+/* COLORS */
+.formField {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  width: 100%;
+  border-radius: 2px;
+  background: #ffffff;
+  margin: 12px 0;
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  -webkit-appearance: none;
+}
+
+.formField.valid {
+  border: 1px solid #2ecc40;
+}
+
+.formField.valid::after {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #2ecc40;
+}
+
+.formField.invalid {
+  border: 1px solid #ff4136;
+}
+
+.formField.invalid::after {
+  content: "\f00d";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #ff4136;
+}
+
+.formField.focused {
+  border-color: #0049b7;
+}
+
+.formField input {
+  font-family: "Nunito", sans-serif;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  width: 93%;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #272727;
+  outline: 0;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+}
+
+.formField input::-webkit-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+.formField input:-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+.formField input::-ms-input-placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+.formField input::placeholder {
+  font-size: 14px;
+  color: #272727;
+}
+
+@media (max-width: 576px) {
+  .formField input {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+/*# sourceMappingURL=reset.component.css.map */

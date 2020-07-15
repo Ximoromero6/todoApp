@@ -40,7 +40,6 @@ export class GuardianLoginGuard implements CanActivate {
           );
         return true;
       } else {
-        console.log('A');
         return true;
       }
 

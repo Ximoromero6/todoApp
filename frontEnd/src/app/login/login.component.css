@@ -70,6 +70,8 @@
   outline: 0;
   color: #272727;
   margin-top: 20px;
+  -webkit-transition-duration: .2s;
+          transition-duration: .2s;
   -webkit-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -84,6 +86,10 @@
   #container .left .googleButton {
     width: 90%;
   }
+}
+
+#container .left .googleButton:hover {
+  background: rgba(99, 99, 99, 0.1);
 }
 
 #container .left .separator {
@@ -297,6 +303,8 @@
 
 #container .left #formularioLogin .loginOptions a {
   color: #272727;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 #container .left .separator2 {
@@ -321,6 +329,8 @@
 #container .left .linkRegistro a {
   margin-left: 10px;
   color: #0049b7;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {

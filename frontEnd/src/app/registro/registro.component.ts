@@ -9,8 +9,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./registro.component.scss'],
 })
 export class RegistroComponent implements OnInit {
+
+  //Notificaciones variables
+  statusNotificacion: string;
+  iconoNotificacion: string;
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
+
   formularioRegistro: FormGroup;
   showLoader: boolean = true;
 
@@ -42,10 +47,12 @@ export class RegistroComponent implements OnInit {
       this.formularioRegistro.get('email').markAsDirty();
       this.formularioRegistro.get('clave').markAsDirty();
       return;
+    } else {
+      this.showLoader = false;
     }
 
     console.log(JSON.stringify(this.formularioRegistro.value));
-    this.showLoader = false;
+
     this.registro
       .registrarUsuario(
         this.formularioRegistro.value.nombre,
@@ -59,8 +66,10 @@ export class RegistroComponent implements OnInit {
           if (response.status == 1) {
             //Redireccionar a página verificar cuenta pero si hay un error se muestra
             localStorage.setItem('userToken', response.data.token);
-            this.ruta.navigateByUrl('/registroFinal', { state: {email: this.formularioRegistro.value.email} });
+            this.ruta.navigateByUrl('/registroFinal', { state: { email: this.formularioRegistro.value.email } });
           } else {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
           }

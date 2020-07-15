@@ -50,18 +50,27 @@
         <li>
             <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt=""><input type="text" placeholder="Buscar"></div>
         </li>
-        <li><a class="testElement" (click)="toggleDropDown = !toggleDropDown">{{ nombre }}<img [src]="imagen" alt=""></a></li>
+        <li><a class="noClose">{{ nombre }}<img class="noClose" [src]="imagen" alt=""></a></li>
     </ul>
-    <div id="dropDownMenu" [hidden]="toggleDropDown">
+    <div id="dropDownMenu">
         <ul>
-            <li>
-                <a class="testElement">Opción 1</a>
+            <li class="noClose">
+                <a class="noClose">Opción 1</a>
+            </li>
+            <li class="noClose">
+                <a class="noClose">Opción 2</a>
+            </li>
+            <li class="noClose">
+                <a class="noClose">Opción 3</a>
+            </li>
+            <li class="noClose">
+                <a class="noClose">Opción 4</a>
+            </li>
+            <li class="noClose">
+                <a class="noClose">Opción 5</a>
             </li>
             <li>
-                <a class="testElement">Opción 2</a>
-            </li>
-            <li>
-                <a class="testElement">Ajustes de mi perfil...</a>
+                <a id="profileSettingsButton">Ajustes de mi perfil...</a>
             </li>
         </ul>
     </div>
@@ -70,30 +79,103 @@
 
 <!-- POPUP MENÚ DESPLEGABLE AJUSTES PERFIL USUARIO -->
 <div class="overlayPopupProfileSettings">
+
+    <!-- Llamamos al componente de notificaciones -->
+    <app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="position: absolute; margin-top: 10px;"></app-notificaciones>
+
     <div id="popupProfileSettings">
         <div class="top">
             <div class="close">
                 <h2>Ajustes de mi perfil</h2>
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" id="closeButtonOverlay"></i>
             </div>
             <ul class="menu">
                 <li>
-                    <a class="active">Opción 1</a>
+                    <a class="active tablink" (click)="openTab('tab1')">Perfil</a>
                 </li>
                 <li>
-                    <a>Opción 2</a>
+                    <a class="tablink" (click)="openTab('tab2')">Opción 2</a>
                 </li>
                 <li>
-                    <a>Opción 3</a>
+                    <a class="tablink" (click)="openTab('tab3')">Opción 3</a>
                 </li>
                 <li>
-                    <a>Opción 4</a>
+                    <a class="tablink" (click)="openTab('tab4')">Opción 4</a>
                 </li>
             </ul>
             <hr>
         </div>
-        <div class="middle"></div>
-        <div class="bottom"></div>
+        <div class="middle">
+            <div id="tab1" class="tabContent">
+                <div class="fotoPerfil">
+                    <p class="title">Tu foto</p>
+                    <form class="fotoform" method="POST" enctype="multipart/form-data" id="formCambiarFoto" [formGroup]="formGroup">
+                        <label for="fileField" id="fakeFotoLabel">
+                            <img [src]="imagen" alt="" id="profileFoto">
+
+                            <!-- Preloader -->
+                            <div class="pswp__preloader__icn" id="preloader">
+                                <div class="pswp__preloader__cut">
+                                    <div class="pswp__preloader__donut"></div>
+                                </div>
+                            </div>
+                        </label>
+                        <input type="file" name="fileField" id="fileField" (change)="onFileChange($event)">
+                        <div class="text">
+                            <div class="textDetail">
+                                <label for="fileField">
+                                    <a>Subir una foto nueva</a>
+                                </label>
+                                <div class="separator"></div>
+                                <a id="removeImage" (click)="eliminarImagen()">Quitar foto</a>
+                            </div>
+                            <p>Las fotos ayudan a que tus compañeros de equipo te reconozcan en Hubbet</p>
+                        </div>
+                    </form>
+                </div>
+
+                <form class="containerDatosPerfil" method="POST" [formGroup]="formularioDatosExtra" (ngSubmit)="validarDatosDatosExtra()">
+                    <div class="left">
+                        <div class="box">
+                            <p class="title">Tu nombre completo</p>
+                            <input type="text" formControlName="nombre">
+                        </div>
+                        <div class="box">
+                            <p class="title">Ubicación</p>
+                            <input type="text" id="ubicacionField" formControlName="ubicacion">
+                            <ul id="showData"></ul>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="box">
+                            <p class="title">Rol</p>
+                            <input type="text" formControlName="rol">
+                        </div>
+                        <div class="box">
+                            <p class="title">Departamento o equipo</p>
+                            <input type="text" formControlName="equipo">
+                        </div>
+                    </div>
+                    <div class="box description">
+                        <p class="title">Acerca de mí</p>
+                        <textarea formControlName="descripcion"></textarea>
+                    </div>
+                    <div class="bottom">
+                        <button type="submit">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+            <div id="tab2" class="tabContent">
+                <h1>SEGUNDA</h1>
+            </div>
+            <div id="tab3" class="tabContent">
+                <h1>TERCERA</h1>
+            </div>
+            <div id="tab4" class="tabContent">
+                <h1>CUARTA</h1>
+            </div>
+        </div>
+
     </div>
 </div>
 <!-- FIN POPUP MENÚ DESPLEGABLE AJUSTES PERFIL USUARIO -->

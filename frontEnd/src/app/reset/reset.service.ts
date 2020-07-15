@@ -24,12 +24,12 @@ export class ResetService {
     });
   }
 
-  reset(clave, claveConfirm, token) {
+  reset(clave, claveConfirm, token): Observable<any> {
     let headers = new HttpHeaders().set(
       'Content-Type',
       'application/x-www-form-urlencoded; charset=UTF-8'
     );
-    /* let body = `clave=${clave}&claveConfirm=${claveConfirm}&token=${token}`; */
+
     let body = 'clave=' + clave + '&claveConfirm=' + claveConfirm + '&token=' + token;
     return this.http.post(this.url + 'reset', body, {
       headers: headers

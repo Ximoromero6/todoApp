@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 export class CambiarClaveComponent implements OnInit {
 
   formularioResetClave: FormGroup;
+
+  //Notificaciones variables
+  statusNotificacion: string;
+  iconoNotificacion: string;
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
 
@@ -40,13 +44,14 @@ export class CambiarClaveComponent implements OnInit {
     )
       .subscribe(
         (response) => {
-          if (response.status == 1) {
-            console.log(response.checkSendEmail);
-
-            //Aquí ya se puede cerrar la página y verificar el email
-            /*  this.router.navigate(['/home']); */
+          if (response.status === 0) {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.mensajeNotificacion = response.response;
+            this.ocultarNotificacion(false);
           } else {
-            console.log(response.checkSendEmail);
+            this.statusNotificacion = 'success';
+            this.iconoNotificacion = 'fas fa-check-circle';
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
           }

@@ -8,8 +8,9 @@
         </div>
     </div>
     <div class="right">
-        <app-notificaciones [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)">
-        </app-notificaciones>
+        <!-- Llamamos al componente de notificaciones -->
+        <app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="margin-top: 10px;"></app-notificaciones>
+
         <a routerLink="/" class="logo">HUBBET</a>
         <h2 class="title">Crear Nueva Cuenta</h2>
         <form id="formularioRegistro" [formGroup]="formularioRegistro" (ngSubmit)="validarDatosRegistro()">

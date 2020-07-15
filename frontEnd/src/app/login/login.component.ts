@@ -11,8 +11,12 @@ import { Router } from '@angular/router';
 export class LoginComponent implements OnInit {
   @ViewChild('loginRef', { static: true }) loginElement: ElementRef;
 
+  //Notificaciones variables
+  statusNotificacion: string;
+  iconoNotificacion: string;
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
+
   formularioLogin: FormGroup;
   auth2: any;
   showLoader: boolean = true;
@@ -40,7 +44,6 @@ export class LoginComponent implements OnInit {
       this.formularioLogin.get('clave').markAsDirty();
       return;
     }
-    console.log(JSON.stringify(this.formularioLogin.value));
 
     //Función para ver si el usuario está logueado
     this.login
@@ -61,6 +64,8 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/home']);
           } else {
             this.mensajeNotificacion = response.response;
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.ocultarNotificacion(false);
           }
         },

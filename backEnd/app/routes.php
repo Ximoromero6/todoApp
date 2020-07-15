@@ -57,7 +57,7 @@ return function (App $app) {
         $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
         $clave = filter_var($postResponse['clave'], FILTER_SANITIZE_STRING);
         $encryptedClave = crypt($clave, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
-        $defaultImagen = 'user.svg';
+        $defaultImagen = "";
 
         $arrayResponse = [
             "status" => '',
@@ -199,7 +199,7 @@ return function (App $app) {
             if ($resultadoExisteUser->rowCount() === 1) {
 
                 //Verrificamos login
-                $queryLogin = "SELECT usuario, token, nombre, email, verificado, imagen FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
+                $queryLogin = "SELECT usuario, token, nombre, email, verificado, imagen, ubicacion, rol, equipo, descripcion FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
                 $resultadoLogin = $db->prepare($queryLogin);
                 $resultadoLogin->bindparam(1, $email);
                 $resultadoLogin->bindparam(2, $email);
@@ -235,7 +235,6 @@ return function (App $app) {
         $postData = json_decode($postResponse['userData']);
 
         //Creamos las variables
-
         $usuario = $postData->usuario;
         $token = $postData->token;
         $nombre = $postData->nombre;
@@ -302,6 +301,8 @@ return function (App $app) {
                 $arrayResponse['data'] = $resultadoExisteEmail->fetch(PDO::FETCH_ASSOC);
                 $tokenDate = strtotime("+1 day");
                 $token = base64_encode($arrayResponse['data']['token'] . ";" . $tokenDate);
+                $arrayResponse['response'] = 'Email envaido correctamente!';
+                $arrayResponse['status'] = 1;
 
                 //Si el corrreo existe enviar un enlace junto con su token para restablecer la contraseña
                 $headers  = "From: HUBBET ADMIN <joaquinromeroesteve@gmail.com>\n";
@@ -329,8 +330,6 @@ return function (App $app) {
     $app->post('/verifyTokenReset', function ($request, $response) {
         $db = $this->get('db');
         $postResponse = $request->getParsedBody();
-
-        //$token = md5(uniqid(strval(rand()), true));
         $tokenCodificado = $postResponse['token'];
 
         $arrayResponse = [
@@ -365,7 +364,7 @@ return function (App $app) {
                         $arrayResponse['errorCode'] = "1001";
                         $arrayResponse['status'] = false;
                     } else {
-                        $arrayResponse['response'] = "Éxito";
+                        $arrayResponse['response'] = "Contraseña cambiada correctamente!";
                         $arrayResponse['errorCode'] = "";
                         $arrayResponse['status'] = true;
                     }
@@ -458,6 +457,187 @@ return function (App $app) {
         } catch (Exception $e) {
             $arrayResponse['status'] = false;
             $arrayResponse['errorCode'] = "1003";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para cambiar la foto de perfil
+    $app->post('/cambiarFoto', function ($request, $response) {
+
+        $url = __DIR__ . "/../../frontEnd/src/assets/uploads/";
+        $arrayResponse = [
+            "status" => '',
+            "response" => '',
+            "errorCode" => ''
+        ];
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $postImgResponse = $request->getUploadedFiles();
+            $image = $postImgResponse['file'];
+            $postData = json_decode($postResponse['data']);
+            $folderName = $url . $postData->usuario . '/';
+            $token = $postData->token;
+
+            if (!file_exists($folderName)) {
+                mkdir($folderName, 0777, true);
+            }
+
+            if ($image->getError() === UPLOAD_ERR_OK) {
+
+                //Borramos todo lo que haya dentro para que siempre haya un solo archivo
+                $files = glob($folderName . '*');
+                foreach ($files as $file) {
+                    if (is_file($file))
+                        unlink($file);
+                }
+                //Si se mueve la imágen a la carpeta, se sube a la DB
+                if ($filename = moveUploadedFile($folderName, $image)) {
+
+                    $query = "UPDATE usuarios SET imagen = '$filename' WHERE token = '$token'";
+                    $resultadoQuery = $db->prepare($query);
+                    $resultadoQuery->execute();
+
+                    if ($resultadoQuery->rowCount() === 0) {
+                        $arrayResponse['status'] = false;
+                        $arrayResponse['errorCode'] = "1001";
+                        $arrayResponse['response'] = 'Error al subir la foto a la DB';
+                    } else {
+                        $postData->imagen = $filename;
+                        $arrayResponse['status'] = true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = $filename;
+                        $arrayResponse['data'] = $postData;
+                    }
+                }
+
+                // $arrayResponse['test'] = $folderName . $filename;
+            } else {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1000";
+                $arrayResponse['response'] = 'Error de server';
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  $folderName;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para eliminar la foto de perfil
+    $app->post('/eliminarFoto', function ($request, $response) {
+
+        $url = __DIR__ . "/../../frontEnd/src/assets/uploads/";
+        $arrayResponse = [
+            "status" => '',
+            "response" => '',
+            "errorCode" => ''
+        ];
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $image = "";
+            $postData = json_decode($postResponse['data']);
+            $folderName = $url . $postData->usuario . '/';
+            $token = $postData->token;
+
+            if (!file_exists($folderName)) {
+                mkdir($folderName, 0777, true);
+            }
+            //Borramos todo lo que haya dentro para que siempre haya un solo archivo
+            $files = glob($folderName . '*');
+            foreach ($files as $file) {
+                if (is_file($file))
+                    unlink($file);
+            }
+
+            $query = "UPDATE usuarios SET imagen = '' WHERE token = '$token'";
+            $resultadoQuery = $db->prepare($query);
+            $resultadoQuery->execute();
+
+            if ($resultadoQuery->rowCount() === 0) {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = 'Error al eliminar la foto!';
+            } else {
+                $postData->imagen = $image;
+                $arrayResponse['status'] = true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = $image;
+                $arrayResponse['data'] = $postData;
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  $folderName;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función move file
+    function moveUploadedFile($directory, $uploadedFile)
+    {
+        $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+        $basename = bin2hex(random_bytes(8));
+        $filename = sprintf('%s.%0.8s', $basename, $extension);
+        $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
+
+        return $filename;
+    }
+
+    //Función para actualizar los datos extra del usuario
+    $app->post('/updateDatosExtra', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "response" => '',
+            "errorCode" => '',
+            "data" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $postData = json_decode($postResponse['data']);
+
+            $token = filter_var($postData->token, FILTER_SANITIZE_STRING);
+            $nombre = filter_var($postData->nombre, FILTER_SANITIZE_STRING);
+            $ubicacion = filter_var($postData->ubicacion, FILTER_SANITIZE_STRING);
+            $rol = filter_var($postData->rol, FILTER_SANITIZE_STRING);
+            $equipo = filter_var($postData->equipo, FILTER_SANITIZE_STRING);
+            $descripcion = filter_var($postData->descripcion, FILTER_SANITIZE_STRING);
+
+            $query = "UPDATE usuarios SET nombre = ?, ubicacion = ?, rol = ?, equipo = ?, descripcion = ? WHERE token = '$token'";
+            $resultadoQuery = $db->prepare($query);
+            $resultadoQuery->bindParam(1, $nombre);
+            $resultadoQuery->bindParam(2, $ubicacion);
+            $resultadoQuery->bindParam(3, $rol);
+            $resultadoQuery->bindParam(4, $equipo);
+            $resultadoQuery->bindParam(5, $descripcion);
+
+            $resultadoQuery->execute();
+
+            if ($resultadoQuery->rowCount() === 0) {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = 'Error al actualizar los datos';
+            } else {
+                $arrayResponse['status'] = true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = 'Datos actualizados correctamente!';
+                $arrayResponse['data'] = $postData;
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
             $arrayResponse['response'] = $e->getMessage();
         }
 
