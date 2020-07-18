@@ -644,4 +644,46 @@ return function (App $app) {
         $response->getBody()->write(json_encode($arrayResponse));
         return $response;
     });
+
+    //Función para añadir un usuario a una tarea
+    $app->post('/getUserNote', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "response" => '',
+            "errorCode" => '',
+            "data" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
+            $sesionEmail = $postResponse['sesionEmail'];
+
+            $query = "SELECT usuario from usuarios WHERE email = ? AND email != '$sesionEmail'";
+            $resultadoQuery = $db->prepare($query);
+            $resultadoQuery->bindParam(1, $email);
+
+            $resultadoQuery->execute();
+
+            if ($resultadoQuery->rowCount() === 0) {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = 'No hemos podido encontrar ese email...';
+            } else {
+                $arrayResponse['status'] = true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = 'Email encontrado!';
+                $arrayResponse['data'] = $resultadoQuery->fetch(PDO::FETCH_ASSOC);
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
 };

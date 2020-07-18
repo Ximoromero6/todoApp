@@ -1,0 +1,12 @@
+#mainContainerHome {
+    width: 100%;
+    min-height: 100vh;
+    /*   border: 2px solid red; */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    left: 0;
+    /* padding-left: 250px; */
+    top: 60px;
+}

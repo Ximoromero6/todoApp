@@ -1,0 +1,37 @@
+<div class="containerTarea">
+    <div class="top">
+        <h2>Nueva Tarea</h2>
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="middle">
+        <div class="field">
+            <h4>Título de la tarea</h4>
+            <div class="containerField">
+                <!-- <i class="fab fa-slack-hash"></i> -->
+                <i class="fas fa-hashtag"></i>
+                <input type="text" placeholder="Introduce un título para la tarea" id="inputTitle">
+            </div>
+            <small>El título de una tarea no puede tener más de 32 carácteres</small>
+        </div>
+        <div class="field">
+            <h4>Descripción de la tarea</h4>
+            <textarea placeholder="Introduce una descripción" id="textareaField"></textarea>
+            <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small>
+        </div>
+        <div class="field">
+            <h4>Asignar tarea a personas</h4>
+            <div class="peopleContainer" id="peopleContainer">
+                <label class="sharePerson">Ximo Romero<i class="fas fa-times-circle"></i></label>
+                <!-- Popup agregar personas -->
+                <form id="popupAdd" method="POST" [formGroup]="formularioAddPerson" (ngSubmit)="validarDatosAddPerson()">
+                    <input type="email" placeholder="Introduce email" formControlName="email">
+                    <button type="submit">Agregar</button>
+                </form>
+                <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <button>Crear Tarea</button>
+    </div>
+</div>

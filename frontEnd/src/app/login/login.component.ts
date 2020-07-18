@@ -61,7 +61,9 @@ export class LoginComponent implements OnInit {
             } else {
               sessionStorage.setItem("userData", btoa(JSON.stringify(response.data)));
             }
-            this.router.navigate(['/home']);
+            setTimeout(() => {
+              this.router.navigate(['/home']);
+            }, 1000);
           } else {
             this.mensajeNotificacion = response.response;
             this.statusNotificacion = 'error';

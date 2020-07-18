@@ -17,7 +17,14 @@ const routes: Routes = [
   { path: 'registro', component: RegistroComponent, canActivate: [GuardianLoginGuard] },
   { path: 'registroFinal', component: SendEmailComponent, canActivate: [GuardianLoginGuard] },
   { path: 'activateAccount/:token', component: ActivateAccountComponent, canActivate: [GuardianLoginGuard] },
-  { path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard] },
+  {
+    path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard],
+    children: [
+      { path: 'home', redirectTo: 'dashboard', canActivate: [GuardianHomeGuard] }/* ,
+      { path: 'tareas', component: TareasComponent },
+      { path: 'completadas', component: CompletadasComponent } */
+    ]
+  },
   { path: 'cambiarClave', component: CambiarClaveComponent, canActivate: [GuardianLoginGuard] },
   { path: 'reset/:token', component: ResetComponent, canActivate: [GuardianLoginGuard] },
   { path: '**', redirectTo: '' }

@@ -1,7 +1,8 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Renderer2, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ServicioService } from './servicio.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +15,9 @@ export class HeaderComponent implements OnInit {
   constructor(
     private sanitizer: DomSanitizer,
     private servicio: ServicioService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    @Inject(DOCUMENT) private document: Document,
+    private renderer: Renderer2,
   ) {
     this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
   }
@@ -43,6 +46,7 @@ export class HeaderComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    //this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
     console.log(this.data);
 
     //Añadimos las variables

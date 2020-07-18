@@ -16,6 +16,8 @@ import { LoaderComponent } from './loader/loader.component';
 import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
 import { HeaderComponent } from './header/header.component';
 import { ResetComponent } from './reset/reset.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { NotaComponent } from './nota/nota.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import { ResetComponent } from './reset/reset.component';
     LoaderComponent,
     CambiarClaveComponent,
     HeaderComponent,
-    ResetComponent
+    ResetComponent,
+    DashboardComponent,
+    NotaComponent
   ],
   imports: [
     BrowserModule,
