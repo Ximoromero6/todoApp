@@ -1,5 +1,5 @@
 //Colores Light Theme
-$primaryColor: #0049b7;
+$primaryColor: #4f25f3;
 $textColor: #272727;
 $grayColor: #e8ecee;
 $whiteColor: #ffffff;
@@ -28,7 +28,7 @@ $cGrey:#cccccc;
     }
     .middle {
         .field {
-            margin: 10px 25px;
+            margin: 0px 25px;
             padding: 10px 0;
             .containerField {
                 width: 100%;
@@ -39,7 +39,7 @@ $cGrey:#cccccc;
                 border-radius: 6px;
                 transition: all .1s;
                 i {
-                    margin: 14px;
+                    margin: 10px;
                     background: #e8ecee;
                     color: $whiteColor;
                     padding: 4px;
@@ -53,7 +53,7 @@ $cGrey:#cccccc;
                     //font-weight: 700;
                     border: none;
                     outline: 0;
-                    padding: 15px 0;
+                    padding: 10px 0;
                     font-size: 15px;
                     color: #333333;
                     font-family: 'Nunito', sans-serif;
@@ -70,7 +70,7 @@ $cGrey:#cccccc;
             }
             textarea {
                 width: 100%;
-                height: 100px;
+                height: 80px;
                 background: transparent;
                 border: 1px solid #e8ecee;
                 color: #333333;
@@ -102,6 +102,7 @@ $cGrey:#cccccc;
                 align-items: center;
                 border: 1px solid #e8ecee;
                 width: 100%;
+                min-width: 320px;
                 padding: 10px;
                 border-radius: 6px;
                 overflow-x: auto;
@@ -161,11 +162,13 @@ $cGrey:#cccccc;
                     display: none;
                     position: absolute;
                     z-index: 99;
-                    left: 150px;
+                    left: 0;
+                    width: 100%;
                     border-radius: 4px;
                     padding: 6px;
+                    background: #ffffff;
                     input {
-                        width: 240px;
+                        flex: 1;
                         padding: 10px;
                         border-radius: 3px;
                         border: none;
@@ -174,14 +177,92 @@ $cGrey:#cccccc;
                         /* border: 1px solid #cccccc; */
                         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                     }
+                    button {
+                        background: #4f25f3;
+                        color: #ffffff;
+                    }
                 }
+            }
+            .dates {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                label {
+                    font-weight: 700;
+                    padding: 6px 15px;
+                    cursor: pointer;
+                    border-radius: 3px;
+                    margin-right: 10px;
+                    border: 1px solid #e8ecee;
+                    color: grey;
+                    transition: all .1s;
+                    i {
+                        margin-right: 10px;
+                        color: #cccccc;
+                    }
+                    &.active {
+                        border-color: $primaryColor;
+                        box-shadow: 0 1px 3px 0 rgba(92, 53, 250, 0.1), 1px 2px 3px 0 rgba(92, 53, 250, 0.06);
+                        color: $textColor;
+                        i {
+                            color: $primaryColor;
+                        }
+                        input {
+                            color: $textColor !important;
+                        }
+                    }
+                }
+                #todayDate,
+                #tomorrowDate,
+                #customDate {
+                    display: none;
+                }
+                #labelCustomDate {
+                    display: flex;
+                    align-items: center;
+                    input {
+                        border: none;
+                        background: transparent;
+                        outline: 0;
+                        font-weight: 700;
+                        color: grey;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+        .moreOptions {
+            display: flex;
+            align-items: center;
+            width: 50%;
+            margin: 15px 5px;
+            cursor: pointer;
+            i {
+                margin: 0 20px;
+                cursor: pointer;
+                transition: all .1s ease-in;
+                &.active {
+                    transform: rotate(180deg);
+                }
+            }
+            hr {
+                flex: 1;
+                border-top: 1px solid #cccccc;
+                margin-right: 20px;
+            }
+        }
+        .moreOptionsContainer {
+            display: none;
+            transition: all .2s;
+            &.active {
+                display: flex;
             }
         }
     }
     .bottom {
         display: flex;
         justify-content: flex-end;
-        padding: 15px 25px;
+        padding: 10px 25px;
         border: 1px solid #e8ecee;
         button {
             border: none;

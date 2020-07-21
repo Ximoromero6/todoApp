@@ -16,6 +16,8 @@ export class HeaderComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private servicio: ServicioService,
     private formBuilder: FormBuilder,
+
+    //Esto es para el tema oscuro, REVISAR!!
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
   ) {
@@ -104,7 +106,6 @@ export class HeaderComponent implements OnInit {
 
       if (e.srcElement.className.includes("overlayPopupProfileSettings")) {
         hideOverlay.classList.remove('open');
-        this.ocultarNotificacion(true);
       }
     }
 
@@ -114,7 +115,6 @@ export class HeaderComponent implements OnInit {
 
     document.getElementById('closeButtonOverlay').addEventListener('click', () => {
       hideOverlay.classList.remove('open');
-      this.ocultarNotificacion(true);
     });
 
     let el = document.querySelectorAll('.tablink');
@@ -241,6 +241,9 @@ export class HeaderComponent implements OnInit {
             this.iconoNotificacion = 'fas fa-check-circle';
           }
           this.ocultarNotificacion(false);
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
         },
         (error) => {
           console.log(error);
@@ -250,6 +253,9 @@ export class HeaderComponent implements OnInit {
       this.statusNotificacion = 'error';
       this.iconoNotificacion = 'fas fa-exclamation-circle';
       this.ocultarNotificacion(false);
+      setTimeout(() => {
+        this.ocultarNotificacion(true);
+      }, 5000);
     }
   }
 
@@ -278,6 +284,9 @@ export class HeaderComponent implements OnInit {
           this.statusNotificacion = 'error';
           this.iconoNotificacion = 'fas fa-exclamation-circle';
           this.ocultarNotificacion(false);
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
         }
       }, (error) => {
         document.getElementById('preloader').style.display = "none";
@@ -287,7 +296,6 @@ export class HeaderComponent implements OnInit {
       this.mensajeNotificacion = 'No hay ninguna foto para eliminar...';
       this.statusNotificacion = 'error';
       this.iconoNotificacion = 'fas fa-exclamation-circle';
-      this.ocultarNotificacion(false);
     }
   }
 

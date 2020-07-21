@@ -1,37 +1,68 @@
-<div class="containerTarea">
-    <div class="top">
-        <h2>Nueva Tarea</h2>
-        <i class="fas fa-times"></i>
-    </div>
-    <div class="middle">
-        <div class="field">
-            <h4>Título de la tarea</h4>
-            <div class="containerField">
-                <!-- <i class="fab fa-slack-hash"></i> -->
-                <i class="fas fa-hashtag"></i>
-                <input type="text" placeholder="Introduce un título para la tarea" id="inputTitle">
+<!-- Llamamos al componente de notificaciones -->
+<app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="position: absolute; left: 50%; transform: translateX(-50%); top: -65px;"></app-notificaciones>
+
+<form method="POST" [formGroup]="formularioAddTarea">
+    <div class="containerTarea">
+        <div class="top">
+            <h2>Nueva Tarea</h2>
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="middle">
+            <div class="field">
+                <h4>Título de la tarea</h4>
+                <div class="containerField">
+                    <!-- <i class="fab fa-slack-hash"></i> -->
+                    <i class="fas fa-hashtag"></i>
+                    <input type="text" maxlength="32" placeholder="Introduce un título para la tarea" id="inputTitle" formControlName="titulo" #inputTitle>
+                </div>
+                <small>El título de una tarea no puede tener más de 32 carácteres</small>
             </div>
-            <small>El título de una tarea no puede tener más de 32 carácteres</small>
-        </div>
-        <div class="field">
-            <h4>Descripción de la tarea</h4>
-            <textarea placeholder="Introduce una descripción" id="textareaField"></textarea>
-            <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small>
-        </div>
-        <div class="field">
-            <h4>Asignar tarea a personas</h4>
-            <div class="peopleContainer" id="peopleContainer">
-                <label class="sharePerson">Ximo Romero<i class="fas fa-times-circle"></i></label>
-                <!-- Popup agregar personas -->
-                <form id="popupAdd" method="POST" [formGroup]="formularioAddPerson" (ngSubmit)="validarDatosAddPerson()">
-                    <input type="email" placeholder="Introduce email" formControlName="email">
-                    <button type="submit">Agregar</button>
-                </form>
-                <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>
+            <div class="field">
+                <h4>Fecha de la tarea</h4>
+                <div class="dates">
+                    <input type="radio" id="todayDate" name="date" checked>
+                    <label for="todayDate" class="active" id="labelTodayDate">
+                    <i class="fas fa-calendar-day"></i>Hoy
+                </label>
+                    <input type="radio" id="tomorrowDate" name="date">
+                    <label for="tomorrowDate" id="labelTomorrowDate">
+                    <i class="fas fa-sun"></i>Mañana
+                </label>
+                    <input type="radio" id="customDate" name="date">
+                    <label for="customDate" id="labelCustomDate">
+                    <i class="fas fa-clock"></i>
+                    <!-- <input value="28/06/2020" id="customDateField"> -->
+                   Custom
+                </label>
+                </div>
+                <!--  <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small> -->
+            </div>
+            <div class="field">
+                <h4>Descripción de la tarea</h4>
+                <textarea placeholder="Introduce una descripción" id="textareaField" formControlName="descripcion"></textarea>
+                <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small>
+            </div>
+            <div class="moreOptions">
+                <i class="fas fa-chevron-down"></i>
+                <span>Mostrar más opciones</span>
+            </div>
+            <div class="moreOptionsContainer">
+                <div class="field">
+                    <h4>Asignar tarea a personas</h4>
+                    <div class="peopleContainer" id="peopleContainer">
+                        <label class="sharePerson">Ximo Romero<i class="fas fa-times-circle"></i></label>
+                        <!-- Popup agregar personas -->
+                        <form id="popupAdd" method="POST" [formGroup]="formularioAddPerson" (ngSubmit)="validarDatosAddPerson()">
+                            <input type="email" placeholder="Introduce email" formControlName="email" #test>
+                            <button type="submit">Agregar</button>
+                        </form>
+                        <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="bottom">
+            <button id="crearTareaButton">Crear Tarea</button>
+        </div>
     </div>
-    <div class="bottom">
-        <button>Crear Tarea</button>
-    </div>
-</div>
+</form>

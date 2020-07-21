@@ -72,6 +72,9 @@ export class RegistroComponent implements OnInit {
             this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
+            setTimeout(() => {
+              this.ocultarNotificacion(true);
+            }, 5000);
           }
         },
         (error) => {

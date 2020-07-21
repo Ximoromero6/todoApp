@@ -69,6 +69,9 @@ export class LoginComponent implements OnInit {
             this.statusNotificacion = 'error';
             this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.ocultarNotificacion(false);
+            setTimeout(() => {
+              this.ocultarNotificacion(true);
+            }, 5000);
           }
         },
         (error) => {
