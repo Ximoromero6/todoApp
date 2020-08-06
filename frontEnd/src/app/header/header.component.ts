@@ -49,7 +49,6 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     //this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
-    console.log(this.data);
 
     //Añadimos las variables
     this.nombre = this.data.nombre != '' ? this.data.nombre : this.data.usuario;
@@ -74,15 +73,28 @@ export class HeaderComponent implements OnInit {
       descripcion: [this.descripcion],
     });
 
+    /* Funcionalidad de recordar el estado del menú (open / close) con LocalStorage */
+    if (localStorage.getItem('menu') === 'close') {
+      document.getElementById('sideBarMenu').classList.add('active');
+      document.getElementById('openMenuIcon').style.marginLeft = '30px';
+      document.getElementById('mainContainerHome').style.paddingLeft = '0';
+    } else {
+      document.getElementById('sideBarMenu').classList.remove('active');
+    }
+
     //Menú cerrar
     document.getElementById('closeMenuIcon').addEventListener('click', () => {
+      localStorage.setItem('menu', 'close');
       document.getElementById('sideBarMenu').classList.add('active');
-      document.getElementById('openMenuIcon').style.marginLeft = '20px';
+      document.getElementById('openMenuIcon').style.marginLeft = '30px';
+      document.getElementById('mainContainerHome').style.paddingLeft = '0';
     });
 
     //Menú abrir
     document.getElementById('openMenuIcon').addEventListener('click', () => {
+      localStorage.setItem('menu', 'open');
       document.getElementById('sideBarMenu').classList.remove('active');
+      document.getElementById('mainContainerHome').style.paddingLeft = '250px';
     });
 
     //Input search

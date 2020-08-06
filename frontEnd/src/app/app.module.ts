@@ -18,6 +18,7 @@ import { HeaderComponent } from './header/header.component';
 import { ResetComponent } from './reset/reset.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NotaComponent } from './nota/nota.component';
+import { SortablejsModule } from 'ngx-sortablejs';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,11 @@ import { NotaComponent } from './nota/nota.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    SortablejsModule.forRoot({ handle: '.draggableIcon', animation: 150 })
+    /*  SortablejsModule.forRoot({
+       animation: 200,
+     }) */
   ],
   providers: [
     RegistroService,

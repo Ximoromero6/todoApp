@@ -1,12 +1,548 @@
-#mainContainerHome {
-    width: 100%;
-    min-height: 100vh;
-    /*   border: 2px solid red; */
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    left: 0;
-    /* padding-left: 250px; */
-    top: 80px;
-}
+                                            $fuschia: #00bf9c;
+                                            $button-bg: $fuschia;
+                                            $button-text-color: #fff;
+                                            #mainContainerHome {
+                                                width: 100%;
+                                                min-height: 100vh;
+                                                /*   border: 2px solid red; */
+                                                /*  transform: translateX(250px); */
+                                                position: absolute;
+                                                //border: 2px solid red;
+                                                /*  display: flex;
+    justify-content: flex-start;
+    align-items: flex-start; */
+                                                left: 0;
+                                                padding-left: 250px;
+                                                top: 80px;
+                                                transition: padding-left 240ms ease-out, transform 240ms ease-out;
+                                                .topPart {
+                                                    display: flex;
+                                                    align-items: center;
+                                                    justify-content: space-between;
+                                                    max-width: 1740px;
+                                                    margin: 10px 30px;
+                                                    @media(min-width: 1600px) {
+                                                        margin: 30px auto;
+                                                    }
+                                                    button#addTareaButton {
+                                                        border: none;
+                                                        background: #5C35FA;
+                                                        color: #ffffff;
+                                                        border-radius: 5px;
+                                                        cursor: pointer;
+                                                        box-shadow: 0 0 8px rgba(59, 43, 91, 0.3);
+                                                        outline: 0;
+                                                        padding: 10px 25px;
+                                                        font-weight: 700;
+                                                        margin-left: 20px;
+                                                        &:hover {
+                                                            background: #4f25f3;
+                                                        }
+                                                        i {
+                                                            margin-right: 10px;
+                                                        }
+                                                    }
+                                                }
+                                                .taskContainer {
+                                                    max-width: 100%;
+                                                    padding: 0 30px;
+                                                    margin: 20px auto;
+                                                    .top {
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: flex-start;
+                                                        padding: 10px 0;
+                                                        border-bottom: 1px solid #e8ecee;
+                                                        cursor: pointer;
+                                                        i {
+                                                            font-size: 15px;
+                                                            cursor: pointer;
+                                                            margin-right: 10px;
+                                                            transition: all .1s;
+                                                            color: #666666;
+                                                            &.active {
+                                                                transform: rotate(90deg);
+                                                            }
+                                                        }
+                                                        p,
+                                                        span {
+                                                            font-size: 15px;
+                                                            font-weight: 700;
+                                                            margin-right: 5px;
+                                                            cursor: pointer;
+                                                        }
+                                                        span {
+                                                            font-size: 15px;
+                                                            color: #666666;
+                                                        }
+                                                    }
+                                                    .bottom {
+                                                        margin: 10px 0;
+                                                        max-height: 280px;
+                                                        display: none;
+                                                        flex-direction: column;
+                                                        overflow-x: auto;
+                                                        &::-webkit-scrollbar {
+                                                            width: 10px;
+                                                        }
+                                                        &::-webkit-scrollbar-thumb {
+                                                            background-color: #555555;
+                                                            background-clip: padding-box;
+                                                            border: 2px solid #242d4200;
+                                                            border-radius: 30px;
+                                                        }
+                                                        &.active {
+                                                            display: flex;
+                                                        }
+                                                        //Clases para la preview de la tarea
+                                                        .task {
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: space-between;
+                                                            padding: 6px 12px;
+                                                            border-radius: 5px;
+                                                            margin: 5px 0;
+                                                            margin-right: 5px;
+                                                            transition: all .1s;
+                                                            cursor: pointer;
+                                                            border: 1px solid transparent;
+                                                            &:hover {
+                                                                background: #f6f8f9;
+                                                                border-color: #e8ecee;
+                                                            }
+                                                            &.active {
+                                                                background: #e8f4fd;
+                                                            }
+                                                            &.completed {
+                                                                animation: completedAnimation .3s;
+                                                            }
+                                                            .left {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                i {
+                                                                    font-size: 16px;
+                                                                    transition: all .1s;
+                                                                    margin-right: 10px;
+                                                                    color: #777777;
+                                                                    &:hover {
+                                                                        color: #25e8c8;
+                                                                    }
+                                                                }
+                                                                i.draggableIcon {
+                                                                    color: #ccc;
+                                                                    font-size: 16px;
+                                                                    margin-right: 10px;
+                                                                    cursor: move;
+                                                                    &:hover {
+                                                                        color: #444444;
+                                                                    }
+                                                                }
+                                                                h4 {
+                                                                    font-size: 16px;
+                                                                    color: #555555;
+                                                                }
+                                                            }
+                                                            .right {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                font-size: 14px;
+                                                                .idNota {
+                                                                    margin-right: 30px;
+                                                                    color: #00a3f0;
+                                                                    font-weight: 700;
+                                                                }
+                                                                .dateTask {
+                                                                    display: flex;
+                                                                    align-items: center;
+                                                                    margin-right: 30px;
+                                                                    font-weight: 700;
+                                                                    color: #555555;
+                                                                    i {
+                                                                        margin: 0 8px;
+                                                                        color: #777777;
+                                                                    }
+                                                                }
+                                                                .imageUser {
+                                                                    width: 30px;
+                                                                    height: 30px;
+                                                                    border-radius: 50%;
+                                                                    object-fit: cover;
+                                                                    margin-right: 10px;
+                                                                }
+                                                            }
+                                                        }
+                                                        @keyframes completedAnimation {
+                                                            0% {
+                                                                display: inline-flex;
+                                                                opacity: 1;
+                                                                transform: scale(1);
+                                                                -webkit-transform: scale(1);
+                                                            }
+                                                            99% {
+                                                                display: inline-flex;
+                                                                opacity: 0;
+                                                                transform: scale(0);
+                                                                -webkit-transform: scale(0);
+                                                            }
+                                                            100% {
+                                                                display: none;
+                                                                opacity: 0;
+                                                                transform: scale(0);
+                                                                -webkit-transform: scale(0);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                #allTasks {
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    display: flex;
+                                                    justify-content: space-between;
+                                                    margin: auto;
+                                                    max-width: 1800px;
+                                                    /*  border: 2px solid red; */
+                                                    .containerTasks {
+                                                        flex: 1.5;
+                                                        /* flex-basis: 100%; */
+                                                        transition: flex-basis 500ms ease;
+                                                    }
+                                                    .containerViewTask {
+                                                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                                                        border: 1px solid #f6f8f9;
+                                                        border-radius: 4px;
+                                                        flex: 1;
+                                                        margin-right: 30px;
+                                                        max-width: 600px;
+                                                        max-height: 500px;
+                                                        display: flex;
+                                                        flex-direction: column;
+                                                        justify-content: space-between;
+                                                        position: relative;
+                                                        .top {
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: space-between;
+                                                            padding: 10px 20px;
+                                                            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                                                            .right {
+                                                                #eliminarTarea {
+                                                                    color: #FF4136;
+                                                                    font-size: 14px;
+                                                                    padding: 7px;
+                                                                    border-radius: 4px;
+                                                                    transition: all .1s;
+                                                                    &:hover {
+                                                                        background: #ffcfcf;
+                                                                    }
+                                                                }
+                                                                i {
+                                                                    margin: 0 10px;
+                                                                    color: #555555;
+                                                                    cursor: pointer;
+                                                                    font-size: 18px;
+                                                                }
+                                                            }
+                                                            button {
+                                                                display: inline-block;
+                                                                font-size: 13px;
+                                                                padding: 4px 10px;
+                                                                -webkit-appearance: none;
+                                                                appearance: none;
+                                                                background: transparent;
+                                                                color: #777777;
+                                                                position: relative;
+                                                                border-radius: 4px;
+                                                                border: 1px solid #777777;
+                                                                cursor: pointer;
+                                                                transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
+                                                                i {
+                                                                    margin: 0 4px;
+                                                                    font-size: 13px;
+                                                                }
+                                                                &:hover {
+                                                                    background-color: #25e8c8;
+                                                                    color: $button-text-color;
+                                                                    box-shadow: 0 2px 25px rgba(0, 191, 156, 0.5);
+                                                                    border: 1px solid transparent;
+                                                                }
+                                                                &:focus {
+                                                                    outline: 0;
+                                                                }
+                                                                &:before,
+                                                                &:after {
+                                                                    position: absolute;
+                                                                    content: '';
+                                                                    display: block;
+                                                                    width: 140%;
+                                                                    height: 100%;
+                                                                    left: -20%;
+                                                                    z-index: -1000;
+                                                                    transition: all ease-in-out 0.5s;
+                                                                    background-repeat: no-repeat;
+                                                                }
+                                                                &:before {
+                                                                    display: none;
+                                                                    top: -75%;
+                                                                    background-image: radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, transparent 20%, $button-bg 20%, transparent 30%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, transparent 10%, $button-bg 15%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%);
+                                                                    background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
+                                                                    //background-position: 0% 80%, -5% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%, 50% 50%, 65% 20%, 85% 30%;
+                                                                }
+                                                                &:after {
+                                                                    display: none;
+                                                                    bottom: -75%;
+                                                                    background-image: radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, transparent 10%, $button-bg 15%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%), radial-gradient(circle, $button-bg 20%, transparent 20%);
+                                                                    background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
+                                                                    //background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%, 40% 90%, 55% 90%, 70% 90%;
+                                                                }
+                                                                &:active {
+                                                                    transform: scale(0.9);
+                                                                    background-color: darken($button-bg, 5%);
+                                                                    box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
+                                                                }
+                                                                &.animate {
+                                                                    &:before {
+                                                                        display: block;
+                                                                        animation: topBubbles ease-in-out 0.75s forwards;
+                                                                    }
+                                                                    &:after {
+                                                                        display: block;
+                                                                        animation: bottomBubbles ease-in-out 0.75s forwards;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        .middle {
+                                                            padding: 10px 20px;
+                                                            overflow-y: scroll;
+                                                            max-height: 400px;
+                                                            &::-webkit-scrollbar {
+                                                                width: 10px;
+                                                            }
+                                                            &::-webkit-scrollbar-thumb {
+                                                                background-color: #464d61;
+                                                                background-clip: padding-box;
+                                                                border: 2px solid #242d4200;
+                                                                border-radius: 30px;
+                                                            }
+                                                            .top {
+                                                                display: flex;
+                                                                flex-direction: column;
+                                                                justify-content: center;
+                                                                align-items: flex-start;
+                                                                padding: 0;
+                                                                box-shadow: none;
+                                                                margin-bottom: 5px;
+                                                                p {
+                                                                    color: #00bf9c;
+                                                                    font-weight: 700;
+                                                                }
+                                                                h2 {
+                                                                    border: 1px solid transparent;
+                                                                    margin: 8px 0;
+                                                                    padding: 0 5px;
+                                                                    border-radius: 3px;
+                                                                    &:hover {
+                                                                        border: 1px solid #777777;
+                                                                    }
+                                                                }
+                                                            }
+                                                            .creadorContainer {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                p {
+                                                                    font-weight: 700;
+                                                                    margin-right: 10px;
+                                                                    font-size: 14px;
+                                                                }
+                                                                .creador {
+                                                                    display: flex;
+                                                                    align-items: center;
+                                                                    border: 1px solid transparent;
+                                                                    border-radius: 3px;
+                                                                    padding: 5px;
+                                                                    img {
+                                                                        width: 30px;
+                                                                        height: 30px;
+                                                                        border-radius: 50%;
+                                                                        object-fit: cover;
+                                                                        margin-right: 6px;
+                                                                    }
+                                                                    p {
+                                                                        font-weight: normal;
+                                                                        margin-right: 6px;
+                                                                    }
+                                                                    &:hover {
+                                                                        border: 1px solid #777777;
+                                                                    }
+                                                                }
+                                                            }
+                                                            .contenedorAsignadas {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                height: 40px;
+                                                                margin: 20px 0;
+                                                                p {
+                                                                    margin-right: 10px;
+                                                                    font-weight: 700;
+                                                                    font-size: 14px;
+                                                                }
+                                                                .personasAsignadas {
+                                                                    height: 45px;
+                                                                    display: flex;
+                                                                    justify-content: flex-start;
+                                                                    border: 1px solid transparent;
+                                                                    border-radius: 3px;
+                                                                    .asignada {
+                                                                        display: flex;
+                                                                        align-items: center;
+                                                                        margin: 6px;
+                                                                        img {
+                                                                            width: 30px;
+                                                                            height: 30px;
+                                                                            border-radius: 50%;
+                                                                            object-fit: cover;
+                                                                        }
+                                                                        p {
+                                                                            font-weight: normal;
+                                                                        }
+                                                                    }
+                                                                    &:hover {
+                                                                        border: 1px solid #777777;
+                                                                    }
+                                                                }
+                                                            }
+                                                            .descripcion {
+                                                                display: flex;
+                                                                align-items: center;
+                                                                margin: 10px 0;
+                                                                p {
+                                                                    font-weight: 700;
+                                                                    font-size: 14px;
+                                                                    margin-bottom: 5px;
+                                                                }
+                                                                p#descripcionTarea {
+                                                                    border: 1px solid transparent;
+                                                                    min-width: 100px;
+                                                                    min-width: 60px;
+                                                                    padding: 6px;
+                                                                    border-radius: 3px;
+                                                                    font-weight: normal;
+                                                                    &:hover {
+                                                                        border: 1px solid #777777;
+                                                                    }
+                                                                }
+                                                            }
+                                                            .comentarios {
+                                                                .comentario {
+                                                                    display: flex;
+                                                                    flex-direction: column;
+                                                                    align-items: flex-start;
+                                                                    padding: 8px;
+                                                                    border-radius: 3px;
+                                                                    margin-top: 20px;
+                                                                    background: #f6f8f9;
+                                                                    .top {
+                                                                        width: 100%;
+                                                                        display: flex;
+                                                                        flex-direction: row;
+                                                                        align-items: center;
+                                                                        justify-content: space-between;
+                                                                        div {
+                                                                            display: flex;
+                                                                            align-items: center;
+                                                                            img {
+                                                                                width: 30px;
+                                                                                height: 30px;
+                                                                                border-radius: 50%;
+                                                                                object-fit: cover;
+                                                                                margin-right: 10px;
+                                                                            }
+                                                                        }
+                                                                        .right {
+                                                                            display: flex;
+                                                                            align-items: center;
+                                                                            p {
+                                                                                font-size: 15px;
+                                                                                color: #444444;
+                                                                            }
+                                                                            span {
+                                                                                font-size: 13px;
+                                                                                color: #888888;
+                                                                                margin-left: 10px;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    p {
+                                                                        font-size: 14px;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        .bottom {
+                                                            border-top: 1px solid #f6f8f9;
+                                                            background: #f6f8f9;
+                                                            width: 100%;
+                                                            box-shadow: 0 -1px 3px 0 rgba(21, 27, 38, .15);
+                                                            display: flex;
+                                                            align-items: center;
+                                                            form.formularioAddComentario {
+                                                                margin: 10px;
+                                                                width: 100%;
+                                                                display: flex;
+                                                                align-items: center;
+                                                                justify-content: space-around;
+                                                                textarea {
+                                                                    width: 70%;
+                                                                    padding: 5px 10px;
+                                                                    height: 30px;
+                                                                    border: 1px solid #cbd4db;
+                                                                    border-radius: 3px;
+                                                                    outline: 0;
+                                                                    resize: none;
+                                                                    box-shadow: inset 0 1px #e8ecee;
+                                                                    transition: height .2s ease;
+                                                                    &:focus {
+                                                                        height: 100px;
+                                                                    }
+                                                                }
+                                                                button {
+                                                                    width: 25%;
+                                                                    padding: 7px 10px;
+                                                                    border: none;
+                                                                    border-radius: 4px;
+                                                                    outline: 0;
+                                                                    cursor: pointer;
+                                                                    color: #ffffff;
+                                                                    background: #5C35FA;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            @keyframes topBubbles {
+                                                0% {
+                                                    background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%, 40% 90%, 55% 90%, 70% 90%;
+                                                }
+                                                50% {
+                                                    background-position: 0% 80%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%, 50% 50%, 65% 20%, 90% 30%;
+                                                }
+                                                100% {
+                                                    background-position: 0% 70%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%, 50% 40%, 65% 10%, 90% 20%;
+                                                    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+                                                }
+                                            }
+                                            
+                                            @keyframes bottomBubbles {
+                                                0% {
+                                                    background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%, 70% -10%, 70% 0%;
+                                                }
+                                                50% {
+                                                    background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%, 105% 0%;
+                                                }
+                                                100% {
+                                                    background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%, 110% 10%;
+                                                    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+                                                }
+                                            }

@@ -1,4 +1,159 @@
 <!-- Página de home -->
+<!-- Color acento: #009688 -->
 <main id="mainContainerHome">
-    <app-nota></app-nota>
+    <app-nota (evento)="obtenerTareas($event)"></app-nota>
+
+    <div class="topPart">
+        <h2>Todas las tareas</h2>
+        <button id="addTareaButton"><i class="fas fa-plus"></i>Añadir Tarea</button>
+    </div>
+
+    <div id="allTasks">
+        <div class="containerTasks">
+            <!-- Contenedor tareas de hoy -->
+            <div class="taskContainer" id="today">
+                <div class="top">
+                    <i class="fas fa-caret-right active"></i>
+                    <p>Hoy</p>
+                    <span id="todayTaskCount">(0)</span>
+                </div>
+                <div class="bottom active" [sortablejs]="listaTareasToday">
+                    <div *ngFor="let todayTask of listaTareasToday" (click)="ampliarTarea(todayTask)" class="task">
+                        <div class="left">
+                            <i class="fas fa-grip-vertical draggableIcon"></i>
+                            <i class="far fa-check-circle"></i>
+                            <h4>{{ todayTask.titulo }}</h4>
+                        </div>
+                        <div class="right">
+                            <span class="idNota">#{{ todayTask.id }}</span>
+                            <div class="dateTask">
+                                <p>{{ todayTask.creacion | date }}</p>
+                                <i class="far fa-calendar"></i>
+                            </div>
+                            <img src="../../assets/uploads/{{ todayTask.usuario }}/{{ todayTask.imagen }}" alt="" class="imageUser">
+                            <i class="fas fa-angle-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor tareas de mañana -->
+            <div class="taskContainer" id="tomorrow">
+                <div class="top">
+                    <i class="fas fa-chevron-right"></i>
+                    <p>Mañana</p>
+                    <span id="tomorrowTaskCount">(0)</span>
+                </div>
+                <div class="bottom">
+                    <div *ngFor="let tomorrowTask of listaTareasTomorrow" (click)="ampliarTarea(tomorrowTask)" class="task">
+                        <div class="left">
+                            <i class="fas fa-grip-vertical draggableIcon"></i>
+                            <i class="far fa-check-circle"></i>
+                            <h4>{{ tomorrowTask.titulo }}</h4>
+                        </div>
+                        <div class="right">
+                            <span class="idNota">#{{ tomorrowTask.id }}</span>
+                            <div class="dateTask">
+                                <p>{{ tomorrowTask.creacion | date }}</p>
+                                <i class="far fa-calendar"></i>
+                            </div>
+                            <img src="../../assets/uploads/{{ tomorrowTask.usuario }}/{{ tomorrowTask.imagen }}" alt="" class="imageUser">
+                            <i class="fas fa-angle-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor de próximas tareas -->
+            <div class="taskContainer" id="next">
+                <div class="top">
+                    <i class="fas fa-chevron-right"></i>
+                    <p>Próximas tareas</p>
+                    <span id="tomorrowTaskCount">(0)</span>
+                </div>
+                <div class="bottom"></div>
+            </div>
+        </div>
+
+        <!-- Contenedor para ver las tareas en detalle -->
+        <div class="containerViewTask" *ngIf="show">
+            <div class="top">
+                <button class="completedButton" id="completedButton" (click)="completed()">Completar <i class="fas fa-check"></i></button>
+                <div class="right">
+                    <i class="far fa-trash-alt" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(data['token'], tareaSeleccionada['id'])"></i>
+                    <i class="fas fa-times" (click)="show = !show"></i>
+                </div>
+            </div>
+            <div class="middle">
+                <div class="top">
+                    <!--   <p>#108</p> -->
+                    <h2 contenteditable="true">{{ tareaSeleccionada.titulo }}</h2>
+                </div>
+                <div class="creadorContainer">
+                    <p>Responsable</p>
+                    <div class="creador">
+                        <img src="../../assets/uploads/{{ tareaSeleccionada.usuario }}/{{ tareaSeleccionada.imagen }}" alt="">
+                        <p>{{ tareaSeleccionada.usuario }} <i class="fas fa-times-circle"></i></p>
+                    </div>
+                </div>
+                <div class="contenedorAsignadas">
+                    <p>Participantes</p>
+                    <div class="personasAsignadas">
+                        <div class="asignada">
+                            <img src="../../assets/uploads/test/f17583ece9ae6bdf.jpg" alt="">
+                        </div>
+                        <div class="asignada">
+                            <img src="../../assets/uploads/viva/0d3c561ecb34506e.jpg" alt="">
+                        </div>
+                        <div class="asignada">
+                            <img src="../../assets/uploads/viva/0d3c561ecb34506e.jpg" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="descripcion">
+                    <p>Descripción</p>
+                    <p contenteditable="true" id="descripcionTarea">{{ tareaSeleccionada.descripcion }}</p>
+                    <a (click)="setUrl()"><i class="fa fa-link fa-fw"></i></a>
+                </div>
+                <div class="comentarios">
+                    <div class="comentario">
+                        <div class="top">
+                            <div>
+                                <img src="../../assets/uploads/test/f17583ece9ae6bdf.jpg" alt="">
+                                <div class="right">
+                                    <p>Ximo Romero</p>
+                                    <span>Hace 2 días</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-angle-down"></i>
+                        </div>
+                        <p>
+                            Lorem ipsum dolor sit amet, illum repellendus voluptatem esse est, provident, ducimus fugiat!
+                        </p>
+                    </div>
+                    <div class="comentario">
+                        <div class="top">
+                            <div>
+                                <img src="../../assets/uploads/test/f17583ece9ae6bdf.jpg" alt="">
+                                <div class="right">
+                                    <p>Ximo Romero</p>
+                                    <span>Hace 2 días</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-angle-down"></i>
+                        </div>
+                        <p>
+                            Esto es un comentario de prueba!!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom">
+                <form method="POST" class="formularioAddComentario">
+                    <textarea placeholder="Realiza un comentario"></textarea>
+                    <button type="submit">Comentar</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>

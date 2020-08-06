@@ -25,7 +25,7 @@ header {
     min-height: 100vh;
     width: 250px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    background: $whiteColor;
+    background: #151b26;
     transition: margin-left 240ms ease-out, transform 240ms ease-out;
     z-index: 999;
     position: relative;
@@ -56,7 +56,7 @@ header {
                     font-size: 24px;
                     font-weight: bold;
                     cursor: pointer;
-                    color: $azulOscuro;
+                    color: $whiteColor;
                     @media(max-width: 768px) {
                         display: none;
                     }
@@ -110,7 +110,7 @@ header {
                         list-style: none;
                         a {
                             text-decoration: none;
-                            color: $azulOscuro;
+                            color: $whiteColor;
                             display: flex;
                             align-items: center;
                             justify-content: flex-start;
@@ -120,13 +120,13 @@ header {
                             border: none;
                             border-radius: 5px;
                             font-family: 'Nunito', sans-serif;
-                            font-weight: bold;
-                            font-size: 15px;
+                            //font-weight: bold;
+                            font-size: 14px;
                             transition: all .07s;
                             position: relative;
                             cursor: pointer;
                             &.active {
-                                background: $azulClaro;
+                                background: rgba(255, 255, 255, .16);
                             }
                             img {
                                 width: 20px;
@@ -137,8 +137,7 @@ header {
                                 }
                             }
                             &:hover {
-                                background: $azulClaro;
-                                color: $primaryColor;
+                                background-color: rgba(255, 255, 255, .08);
                             }
                             label {
                                 cursor: pointer;
@@ -205,6 +204,7 @@ header {
                     max-width: 85%;
                     text-align: center;
                     margin-top: 10px;
+                    color: $whiteColor;
                     @media(max-width: 768px) {
                         display: none;
                     }
@@ -221,20 +221,20 @@ header {
                 border-top: 1px solid $cGrey;
             }
             button {
-                border: 1px solid $azulOscuro;
+                border: 1px solid $whiteColor;
                 padding: 6px 15px;
                 background: none;
                 border-radius: 4px;
                 margin: 10px;
                 cursor: pointer;
                 transition: all .1s;
-                color: $azulOscuro;
+                color: $whiteColor;
                 outline: 0;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 &:hover {
-                    background-color: rgb(253, 236, 234);
+                    background-color: rgba(255, 255, 255, .08);
                 }
                 label {
                     cursor: pointer;
@@ -265,7 +265,7 @@ header {
 a#openMenuIcon {
     position: absolute;
     top: 37px;
-    margin-left: -20px;
+    margin-left: -30px;
     cursor: pointer;
     img {
         width: 20px;
@@ -275,15 +275,13 @@ a#openMenuIcon {
 nav#horizontalMenu {
     position: absolute;
     top: 30px;
-    right: 10px;
-    /* background: tomato; */
+    right: 30px;
     width: 83%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-end;
     ul {
-        /*  background: blue; */
         display: flex;
         align-items: center;
         li {
@@ -310,12 +308,14 @@ nav#horizontalMenu {
                 }
             }
             #inputSearch {
+                width: 210px;
                 margin-right: 30px;
                 border: 1px solid #9ba1a3;
                 padding: 6px 0;
                 display: flex;
                 align-items: center;
-                transition: margin-left 250ms ease-out, transform 250ms ease-out;
+                transition: all .2s ease-in-out;
+                border-radius: 8px;
                 img {
                     width: 16px;
                     height: 16px;
@@ -336,10 +336,9 @@ nav#horizontalMenu {
                         color: #9ba1a3;
                     }
                 }
-                border-radius: 20px;
                 &.active {
                     width: 400px;
-                    transition: all 1s;
+                    border-color: #373737;
                 }
             }
         }
@@ -419,7 +418,6 @@ div.overlayPopupProfileSettings {
                 padding: 0 25px;
                 margin: 0;
                 margin-bottom: 15px;
-                /* background: green; */
                 h2 {
                     color: $azulOscuro;
                 }
@@ -438,10 +436,8 @@ div.overlayPopupProfileSettings {
                 width: 100%;
                 /* padding: 0 25px; */
                 margin-left: 25px;
-                /* border: 2px solid greenyellow; */
                 li {
                     list-style: none;
-                    /*  border: 1px solid yellow; */
                     a {
                         text-decoration: none;
                         display: block;
@@ -453,7 +449,6 @@ div.overlayPopupProfileSettings {
                         position: relative;
                         transition: all .1s;
                         margin-right: 30px;
-                        /*  border: 1px solid red; */
                         border-bottom: 2px solid transparent;
                         &.active {
                             border-bottom: 2px solid $primaryColor;

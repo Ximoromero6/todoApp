@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ServicioService } from './servicio.service';
 
@@ -22,8 +22,14 @@ export class NotaComponent implements OnInit {
   userdata;
   users = [];
 
-  @ViewChild('test') test: ElementRef;
+  @ViewChild('inputAdd') inputAdd: ElementRef;
   @ViewChild('inputTitle') inputTitle: ElementRef;
+
+  @Output() evento = new EventEmitter<string>();
+
+  getDatos(token): void {
+    this.evento.next(token);
+  }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -32,7 +38,7 @@ export class NotaComponent implements OnInit {
 
   ngOnInit(): void {
     this.userdata = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
-    this.users.push(this.userdata.usuario);
+    this.users.push(this.userdata.token);
     this.formularioAddPerson = this.formBuilder.group({
       email: ['', Validators.required],
       clave: ['', Validators.required]
@@ -45,16 +51,16 @@ export class NotaComponent implements OnInit {
       titulo: ['', Validators.required],
       descripcion: ['', Validators.required]
     });
-
-    /* this.inputTitle.nativeElement.focus(); */
     this.notaFuncion();
+    /*     this.inputTitle.nativeElement.focus(); */
     // this.removeItem();
 
     //Obtener fecha seleccionada
     let todayDate: any = document.getElementById('todayDate');
     let tomorrowDate: any = document.getElementById('tomorrowDate');
     let customDate: any = document.getElementById('customDate');
-    let customDateField: any = document.getElementById('customDateField');
+    let noneDate: any = document.getElementById('noneDate');
+    let customDataField: any = document.getElementById('customDataField');
 
     let today: any = new Date();
     let dd: number = today.getDate();
@@ -64,10 +70,11 @@ export class NotaComponent implements OnInit {
     this.finalData = `${yyyy}/${mm}/${dd}`;
 
     todayDate.addEventListener('click', () => {
-      if (todayDate.checked && !tomorrowDate.checked && !customDate.checked) {
+      if (todayDate.checked && !tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.add('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        document.getElementById('labelCustomDate').classList.remove('active');
+        document.getElementById('customDataField').classList.remove('active');
+        document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Today: ${yyyy}/${mm}/${dd}`);
         this.finalData = `${yyyy}/${mm}/${dd}`;
       } else {
@@ -76,10 +83,11 @@ export class NotaComponent implements OnInit {
     });
 
     tomorrowDate.addEventListener('click', () => {
-      if (!todayDate.checked && tomorrowDate.checked && !customDate.checked) {
+      if (!todayDate.checked && tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.add('active');
-        document.getElementById('labelCustomDate').classList.remove('active');
+        document.getElementById('customDataField').classList.remove('active');
+        document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Tomorrow: ${yyyy}/${mm}/${dd + 1}`);
         this.finalData = `${yyyy}/${mm}/${dd + 1}`;
       } else {
@@ -88,16 +96,25 @@ export class NotaComponent implements OnInit {
     });
 
     customDate.addEventListener('click', () => {
-      if (!todayDate.checked && !tomorrowDate.checked && customDate.checked) {
-        document.getElementById('labelCustomDate').classList.add('active');
+      if (!todayDate.checked && !tomorrowDate.checked && customDate.checked && !noneDate.checked) {
+        document.getElementById('customDataField').classList.add('active');
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        document.getElementById('labelCustomDate').classList.add('active');
-        console.log(`Custom date: `);
-        //  finalData = `${customDateField.value}`;
-        this.finalData = "Custom";
+        document.getElementById('labelNoneDate').classList.remove('active');
+        this.finalData = `${customDataField.value}`;
       } else {
-        document.getElementById('labelCustomDate').classList.remove('active');
+        document.getElementById('customDataField').classList.remove('active');
+      }
+    });
+    noneDate.addEventListener('click', () => {
+      if (!todayDate.checked && !tomorrowDate.checked && !customDate.checked && noneDate.checked) {
+        document.getElementById('labelNoneDate').classList.add('active');
+        document.getElementById('labelTodayDate').classList.remove('active');
+        document.getElementById('labelTomorrowDate').classList.remove('active');
+        document.getElementById('customDataField').classList.remove('active');
+        this.finalData = '';
+      } else {
+        document.getElementById('labelNoneDate').classList.remove('active');
       }
     });
 
@@ -107,20 +124,30 @@ export class NotaComponent implements OnInit {
   notaFuncion() {
     document.getElementById('inputTitle').addEventListener('focus', () => {
       document.querySelector('.containerField').classList.add('active');
+      document.getElementById('hashtagIcon').classList.add('active');
     });
 
     document.getElementById('inputTitle').addEventListener('focusout', () => {
       document.querySelector('.containerField').classList.remove('active');
+      document.getElementById('hashtagIcon').classList.remove('active');
     });
 
     document.getElementById('addPersonButton').addEventListener('click', () => {
       document.getElementById('popupAdd').style.display = 'flex';
-      this.test.nativeElement.focus();
+      this.inputAdd.nativeElement.focus();
+    });
+
+    document.getElementById('addPerson').addEventListener('focusout', () => {
+      document.getElementById('popupAdd').style.display = 'none';
     });
 
     document.querySelector('.moreOptions').addEventListener('click', () => {
       document.querySelector('.moreOptions > i').classList.toggle('active');
       document.querySelector('.moreOptionsContainer').classList.toggle('active');
+
+      let texto = document.querySelector('.moreOptions > span');
+      texto.textContent === 'Mostrar más opciones' ? texto.textContent = 'Mostrar menos opciones' : texto.textContent = 'Mostrar más opciones';
+
     });
   }
 
@@ -132,6 +159,11 @@ export class NotaComponent implements OnInit {
         parentNode.remove();
       });
     });
+
+    /* let index = this.users.indexOf(token);
+    if (index > -1) {
+      this.users.splice(index, 1);
+    } */
   }
 
   validarDatosAddPerson() {
@@ -152,10 +184,16 @@ export class NotaComponent implements OnInit {
             if (flag) {
               document.getElementById('popupAdd').style.display = 'none';
               let contenedor = document.getElementById('peopleContainer');
+
               let item = document.createElement('label');
               item.classList.add('sharePerson');
               item.appendChild(document.createTextNode(response.data.usuario));
-              item.style.cssText = "min-width: fit-content; display: flex; align-items: center; font-size: 14px; margin-right: 10px; border: none; background: #70769C; color: #ffffff; border-radius: 5px; cursor: pointer; outline: 0; padding: 8px 12px;";
+              item.style.cssText = "min-width: fit-content; display: flex; align-items: center; font-size: 14px; margin-right: 10px; border: none; background: #70769C; color: #ffffff; border-radius: 30px; cursor: pointer; outline: 0; padding: 3px 6px 3px 4px;";
+
+              let image = document.createElement('img');
+              image.style.cssText = " width: 30px; height: 30px; border-radius: 50%; object - fit: cover; margin-right: 6px;";
+              image.src = `assets/uploads/${response.data.usuario}/${response.data.imagen}`;
+              item.insertBefore(image, item.childNodes[0]);
 
               let icon = document.createElement('i');
               icon.classList.add('fas', 'fa-times-circle');
@@ -164,6 +202,7 @@ export class NotaComponent implements OnInit {
 
               contenedor.insertBefore(item, contenedor.childNodes[0]);
               this.removeItem();
+
 
               /* Limpiamos el field */
               this.formularioAddPerson.reset();
@@ -187,7 +226,7 @@ export class NotaComponent implements OnInit {
             }, 5000);
           }
 
-          this.users.push(response.data.usuario);
+          this.users.push(response.data.token);
         },
         (error) => {
           console.log(error);
@@ -215,12 +254,12 @@ export class NotaComponent implements OnInit {
   }
 
   removeFocus(item) {
-    var element = document.getElementById(item);
+    let element = document.getElementById(item);
 
     document.onclick = function (e) {
 
-      var target = (e && e.target) || (event && event.srcElement);
-      var display = 'none';
+      let target = (e && e.target) || (event && event.srcElement);
+      let display = 'none';
 
       while ((<HTMLElement>(<HTMLElement>e.target).parentNode)) {
 
@@ -235,16 +274,70 @@ export class NotaComponent implements OnInit {
 
     }
   }
-  //Función crear tareaw
+
+  //Función crear tarea
   addTarea() {
-    let formData: FormData = new FormData();
+    this.servicio.addTarea(
+      this.formularioAddTarea.value.titulo,
+      this.finalData,
+      this.formularioAddTarea.value.descripcion,
+      this.users
+    ).subscribe(
+      (response) => {
+        console.log(response);
+        if (response.status === true) {
+          let parent = document.querySelector('#peopleContainer');
+          let children = Array.from(document.getElementById('peopleContainer').children);
 
-    formData.append('titulo', this.formularioAddTarea.value.titulo);
-    formData.append('fecha', this.finalData);
-    formData.append('descripcion', this.formularioAddTarea.value.descripcion);
-    formData.append('usuarios', JSON.stringify(this.users));
+          children.forEach(element => {
+            if (element.classList.contains('sharePerson')) {
+              parent.removeChild(element);
+            }
+          });
+          this.formularioAddTarea.reset();
+          document.querySelector('.overlayPopupTask').classList.remove('open');
 
-    //Llamar al servicio (CREAR SERVICIO NOTA)
+          //Eliminamos las tareas que hayan antes
+          let tareas = document.querySelectorAll('.task');
 
+          for (let i = tareas.length - 1; i >= 0; --i) {
+            tareas[i].remove();
+          }
+
+          this.getDatos(this.userdata.token);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    )
   }
+
+  //Esconder tarea 
+  hideTask() {
+    let hideOverlay = document.querySelector('.overlayPopupTask');
+
+    window.onclick = function (e) {
+      /* if (e.srcElement.className !== "noClose") {
+        hideDrop.classList.remove('open');
+      } else {
+        hideDrop.classList.add('open');
+      } */
+
+      if (e.srcElement.className.includes("overlayPopupTask")) {
+        hideOverlay.classList.remove('open');
+      }
+    }
+
+    document.getElementById('closeTaskButton').addEventListener('click', () => {
+      hideOverlay.classList.remove('open');
+    });
+  }
+
+  //Mostrar tarea
+  showTask() {
+    let hideOverlay = document.querySelector('.overlayPopupTask');
+    hideOverlay.classList.add('open');
+  }
+
 }

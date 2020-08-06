@@ -33,6 +33,7 @@ $container->set('db', function (ContainerInterface $c) {
     $db = new PDO('mysql:host=' . $config['dbHost'] . ';dbname=' . $config['dbName'] . '', $config['dbUser'], $config['dbPwd']);
     $db->exec("SET NAMES UTF-8");
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
     return $db;
 });
 
@@ -513,8 +514,6 @@ return function (App $app) {
                         $arrayResponse['data'] = $postData;
                     }
                 }
-
-                // $arrayResponse['test'] = $folderName . $filename;
             } else {
                 $arrayResponse['status'] = false;
                 $arrayResponse['errorCode'] = "1000";
@@ -661,7 +660,7 @@ return function (App $app) {
             $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
             $sesionEmail = $postResponse['sesionEmail'];
 
-            $query = "SELECT usuario from usuarios WHERE email = ? AND email != '$sesionEmail'";
+            $query = "SELECT token, usuario, imagen from usuarios WHERE email = ? AND email != '$sesionEmail'";
             $resultadoQuery = $db->prepare($query);
             $resultadoQuery->bindParam(1, $email);
 
@@ -676,6 +675,159 @@ return function (App $app) {
                 $arrayResponse['errorCode'] = "";
                 $arrayResponse['response'] = 'Email encontrado!';
                 $arrayResponse['data'] = $resultadoQuery->fetch(PDO::FETCH_ASSOC);
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para crear una tarea
+    $app->post('/addTarea', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "response" => '',
+            "errorCode" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+
+            $titulo = filter_var($postResponse['titulo'], FILTER_SANITIZE_STRING);
+            $fecha = filter_var($postResponse['fecha'], FILTER_SANITIZE_STRING);
+            $descripcion = filter_var($postResponse['descripcion'], FILTER_SANITIZE_STRING);
+            $now = date("Y-m-d H:i:s");
+            $usuarios = $postResponse['usuarios'];
+            $userList = explode(',', $usuarios);
+            $asignada = $userList[0];
+
+            foreach ($userList as $key) {
+                $query = "INSERT INTO tareas (tokenUsuario, asignada, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?, ?)";
+                $resultadoQuery = $db->prepare($query);
+                $resultadoQuery->bindParam(1, $key);
+                $resultadoQuery->bindParam(2, $asignada);
+                $resultadoQuery->bindParam(3, $titulo);
+                $resultadoQuery->bindParam(4, $fecha);
+                $resultadoQuery->bindParam(5, $descripcion);
+                $resultadoQuery->bindParam(6, $now);
+
+                $resultadoQuery->execute();
+
+                if ($resultadoQuery->rowCount() === 1) {
+                    $arrayResponse['status'] = true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['response'] = 'Tarea insertada correctamente!';
+                } else {
+                    $arrayResponse['status'] = false;
+                    $arrayResponse['errorCode'] = "1001";
+                    $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
+                    $arrayResponse['usuarios'] = $usuarios;
+                }
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para crear una tarea
+    $app->post('/obtenerTareas', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => '',
+            "todayTasks" => '',
+            "todayCount" => '',
+            "tomorrowTasks" => '',
+            "tomorrowCount" => ''/* ,
+            "customTasks" => '',
+            "noneTasks" => '', */
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $userToken = $postResponse['userToken'];
+
+            $today = date('Y-m-d');
+            $tomorrow = date('Y-m-d', strtotime($today . ' + 1 days'));
+            //falta añadir fechas pasadas y futuras
+
+            //Get today tasks
+            $queryAsignedTasks = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.asignada = usuarios.token AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC";
+            $resultadoQuery = $db->prepare($queryAsignedTasks);
+            $resultadoQuery->execute();
+
+            //Get tomorrow tasks
+            $tomorrow = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.asignada = usuarios.token AND tareas.fecha = '$tomorrow' AND tareas.completada = 0 ORDER BY creacion DESC";
+            $resultadoTomorrow = $db->prepare($tomorrow);
+            $resultadoTomorrow->execute();
+
+            if ($resultadoQuery->rowCount() > 0) {
+                $arrayResponse['status'] = true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = 'Tareas obtenidas correctamente!';
+                $arrayResponse['todayTasks'] = $resultadoQuery->fetchAll(PDO::FETCH_ASSOC);
+                $arrayResponse['todayCount'] = $resultadoQuery->rowCount();
+
+                $arrayResponse['tomorrowTasks'] = $resultadoTomorrow->fetchAll(PDO::FETCH_ASSOC);
+                $arrayResponse['tomorrowCount'] = $resultadoTomorrow->rowCount();
+            } else {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = 'Vaya! Parece que no tienes ninguna tarea para hoy...';
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+
+    //Función para eliminar una tarea
+    $app->post('/eliminarTarea', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenUsuario = $postResponse['tokenUsuario'];
+            $idTarea = $postResponse['idTarea'];
+
+            $query = "DELETE FROM tareas WHERE id = '$idTarea' AND tokenUsuario = '$tokenUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() == 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Tarea eliminada correctamente!";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Se ha producido un error al eliminar la tarea";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
