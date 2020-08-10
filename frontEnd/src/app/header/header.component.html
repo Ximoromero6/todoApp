@@ -38,7 +38,7 @@
         </div>
         <div class="bottomPart">
             <hr>
-            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/apagar.svg" alt=""></button>
+            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/close.svg" alt=""></button>
         </div>
     </nav>
 </header>
@@ -91,10 +91,10 @@
             </div>
             <ul class="menu">
                 <li>
-                    <a class="active tablink" (click)="openTab('tab1')">Perfil</a>
+                    <a class="tablink active" (click)="openTab('tab1')">Perfil</a>
                 </li>
                 <li>
-                    <a class="tablink" (click)="openTab('tab2')">Opción 2</a>
+                    <a class="tablink" (click)="openTab('tab2')">Seguridad</a>
                 </li>
                 <li>
                     <a class="tablink" (click)="openTab('tab3')">Opción 3</a>
@@ -166,7 +166,30 @@
                 </form>
             </div>
             <div id="tab2" class="tabContent">
-                <h1>SEGUNDA</h1>
+                <form class="cambiarClaveForm" method="POST" [formGroup]="formularioCambiarClave" (ngSubmit)="validarDatosCambiarClave()" autocomplete="off">
+                    <div class="container">
+                        <p>Contraseña</p>
+                        <div class="box">
+                            <p class="title">Contraseña actual</p>
+                            <input type="password" formControlName="claveActual">
+                        </div>
+                        <div class="box">
+                            <p class="title">Nueva contraseña</p>
+                            <input type="password" formControlName="claveNueva" [class.invalid]="!formularioCambiarClave.get('claveNueva').valid && formularioCambiarClave.get('claveNueva').dirty">
+                        </div>
+                        <div class="box">
+                            <p class="title">Confirma nueva contraseña</p>
+                            <input type="password" formControlName="claveNuevaDos" [class.invalid]="!formularioCambiarClave.get('claveNuevaDos').valid && formularioCambiarClave.get('claveNuevaDos').dirty">
+                        </div>
+                    </div>
+                    <span *ngIf="formularioCambiarClave.hasError('notSame')">
+                        Las contraseñas no coinciden!
+                    </span>
+                    <div class="bottom">
+
+                        <button type="submit" [disabled]="formularioCambiarClave.invalid">Actualizar contraseña</button>
+                    </div>
+                </form>
             </div>
             <div id="tab3" class="tabContent">
                 <h1>TERCERA</h1>

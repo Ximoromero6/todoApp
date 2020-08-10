@@ -18,14 +18,17 @@ export class HeaderComponent implements OnInit {
     private formBuilder: FormBuilder,
 
     //Esto es para el tema oscuro, REVISAR!!
-    @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2,
+    /* @Inject(DOCUMENT) private document: Document,
+    private renderer: Renderer2 */
   ) {
     this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
   }
 
   //Formulario datos extra
   formularioDatosExtra: FormGroup;
+
+  //Formulario para cambiar la contraseña
+  formularioCambiarClave: FormGroup;
 
   //Datos del usuario
   data: any
@@ -42,6 +45,9 @@ export class HeaderComponent implements OnInit {
   iconoNotificacion: string;
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
+
+  //
+  flag: boolean = true;
 
   public formGroup = this.formBuilder.group({
     file: [null, Validators.required]
@@ -181,6 +187,22 @@ export class HeaderComponent implements OnInit {
         });
     });
 
+    //Comprobar que las dos claves coinciden
+    this.formularioCambiarClave = this.formBuilder.group({
+      claveActual: [
+        '',
+        Validators.required,
+      ],
+      claveNueva: [
+        '',
+        Validators.compose([Validators.minLength(6), Validators.required]),
+      ],
+      claveNuevaDos: [
+        '',
+        Validators.compose([Validators.minLength(6), Validators.required]),
+      ]
+    }, { validator: this.checkPasswords });
+
   } /* Fin ngOnInit */
 
   //Función get file
@@ -209,6 +231,14 @@ export class HeaderComponent implements OnInit {
         }
       );
     }
+  }
+
+  //Función que comprueba si dos claves coinciden
+  checkPasswords(group: FormGroup) {
+    let pass = group.get('claveNueva').value;
+    let confirmPass = group.get('claveNuevaDos').value;
+
+    return pass === confirmPass ? null : { notSame: true }
   }
 
   //Función para mostrar/ocultar las tabs
@@ -311,4 +341,39 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  //Función validar contraseña internamente para poder cambiarla
+  validarDatosCambiarClave() {
+    if (this.flag) {
+      if (this.formularioCambiarClave.invalid) {
+        this.formularioCambiarClave.get('claveActual').markAsDirty();
+        this.formularioCambiarClave.get('claveNueva').markAsDirty();
+        this.formularioCambiarClave.get('claveNuevaDos').markAsDirty();
+        return;
+      }
+
+      this.servicio.cambiarClave(
+        this.data.token, this.formularioCambiarClave.get('claveActual').value, this.formularioCambiarClave.get('claveNuevaDos').value
+      ).subscribe(
+        (response) => {
+          if (response.status) {
+            this.statusNotificacion = 'success';
+            this.iconoNotificacion = 'fas fa-check-circle';
+            this.mensajeNotificacion = response.response;
+            this.formularioCambiarClave.reset();
+          } else {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.mensajeNotificacion = response.response;
+          }
+          this.ocultarNotificacion(false);
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
 }

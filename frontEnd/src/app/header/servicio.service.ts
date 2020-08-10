@@ -37,4 +37,16 @@ export class ServicioService {
     formData.append('data', JSON.stringify(data));
     return this.http.post(this.url + 'updateDatosExtra', formData);
   }
+
+  //Método para cambiar la contraseña desde dentro
+  cambiarClave(tokenUsuario, claveActual, claveNueva): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'tokenUsuario=' + tokenUsuario + '&claveActual=' + claveActual + '&claveNueva=' + claveNueva;
+    return this.http.post(this.url + 'cambiarClave', body, {
+      headers: headers,
+    });
+  }
 }

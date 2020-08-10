@@ -708,28 +708,26 @@ return function (App $app) {
             $userList = explode(',', $usuarios);
             $asignada = $userList[0];
 
-            foreach ($userList as $key) {
-                $query = "INSERT INTO tareas (tokenUsuario, asignada, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?, ?)";
-                $resultadoQuery = $db->prepare($query);
-                $resultadoQuery->bindParam(1, $key);
-                $resultadoQuery->bindParam(2, $asignada);
-                $resultadoQuery->bindParam(3, $titulo);
-                $resultadoQuery->bindParam(4, $fecha);
-                $resultadoQuery->bindParam(5, $descripcion);
-                $resultadoQuery->bindParam(6, $now);
+            $query = "INSERT INTO tareas (tokenUsuario, usuarios, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?, ?)";
+            $resultadoQuery = $db->prepare($query);
+            $resultadoQuery->bindParam(1, $asignada);
+            $resultadoQuery->bindParam(2, $usuarios);
+            $resultadoQuery->bindParam(3, $titulo);
+            $resultadoQuery->bindParam(4, $fecha);
+            $resultadoQuery->bindParam(5, $descripcion);
+            $resultadoQuery->bindParam(6, $now);
 
-                $resultadoQuery->execute();
+            $resultadoQuery->execute();
 
-                if ($resultadoQuery->rowCount() === 1) {
-                    $arrayResponse['status'] = true;
-                    $arrayResponse['errorCode'] = "";
-                    $arrayResponse['response'] = 'Tarea insertada correctamente!';
-                } else {
-                    $arrayResponse['status'] = false;
-                    $arrayResponse['errorCode'] = "1001";
-                    $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
-                    $arrayResponse['usuarios'] = $usuarios;
-                }
+            if ($resultadoQuery->rowCount() === 1) {
+                $arrayResponse['status'] = true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = 'Tarea insertada correctamente!';
+            } else {
+                $arrayResponse['status'] = false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
+                $arrayResponse['usuarios'] = $usuarios;
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -766,12 +764,13 @@ return function (App $app) {
             //falta añadir fechas pasadas y futuras
 
             //Get today tasks
-            $queryAsignedTasks = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.asignada = usuarios.token AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC";
+            // $queryAsignedTasks = "SELECT usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (usuarios.token != tareas.asignada) AND (usuarios.token = tareas.tokenUsuario) AND tareas.completada = 0 ORDER BY creacion DESC";
+            $queryAsignedTasks = "SELECT DISTINCT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, tareas.usuarios, usuarios.usuario, usuarios.imagen FROM tareas JOIN usuarios ON FIND_IN_SET(usuarios.token, tareas.usuarios) AND tareas.tokenUsuario = '$userToken' AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC";
             $resultadoQuery = $db->prepare($queryAsignedTasks);
             $resultadoQuery->execute();
 
             //Get tomorrow tasks
-            $tomorrow = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.asignada = usuarios.token AND tareas.fecha = '$tomorrow' AND tareas.completada = 0 ORDER BY creacion DESC";
+            $tomorrow = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.fecha = '$tomorrow' AND tareas.completada = 0 ORDER BY creacion DESC";
             $resultadoTomorrow = $db->prepare($tomorrow);
             $resultadoTomorrow->execute();
 
@@ -787,7 +786,7 @@ return function (App $app) {
             } else {
                 $arrayResponse['status'] = false;
                 $arrayResponse['errorCode'] = "1001";
-                $arrayResponse['response'] = 'Vaya! Parece que no tienes ninguna tarea para hoy...';
+                $arrayResponse['response'] = '';
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -828,6 +827,58 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "Se ha producido un error al eliminar la tarea";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para cambiar la contraseña desde dentro
+    $app->post('/cambiarClave', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenUsuario = $postResponse['tokenUsuario'];
+            $claveActual = $postResponse['claveActual'];
+            $claveNueva = $postResponse['claveNueva'];
+
+            $actual = crypt($claveActual, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
+            $encryptedClave = crypt($claveNueva, 'Sc2dgcK39Zspr7nUKdnV28xfwFUaP2Sx4vnVxHzhyRwzzujVyx');
+
+            $query1 = "SELECT * FROM usuarios WHERE token = '$tokenUsuario' AND clave = '$actual'";
+            $resultado1 = $db->prepare($query1);
+            $resultado1->execute();
+
+            if ($resultado1->rowCount() == 1) {
+                $query2 = "UPDATE usuarios SET clave = '$encryptedClave' WHERE token = '$tokenUsuario' AND clave = '$actual'";
+                $resultado2 = $db->prepare($query2);
+                $resultado2->execute();
+                if ($resultado2->rowCount() == 1) {
+                    $arrayResponse['status'] =  true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['response'] = "Contraseña actualizada correctamente!";
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "No se ha podido actualizar tu contraseña";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "La contraseña actual es incorrecta";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

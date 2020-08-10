@@ -30,6 +30,9 @@
                                 <p>{{ todayTask.creacion | date }}</p>
                                 <i class="far fa-calendar"></i>
                             </div>
+                            <!--  <div class="tooltip">Hover over me
+                                <span class="tooltiptext">Tooltip text</span>
+                            </div> -->
                             <img src="../../assets/uploads/{{ todayTask.usuario }}/{{ todayTask.imagen }}" alt="" class="imageUser">
                             <i class="fas fa-angle-right"></i>
                         </div>
@@ -40,7 +43,7 @@
             <!-- Contenedor tareas de mañana -->
             <div class="taskContainer" id="tomorrow">
                 <div class="top">
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-caret-right"></i>
                     <p>Mañana</p>
                     <span id="tomorrowTaskCount">(0)</span>
                 </div>
@@ -67,7 +70,7 @@
             <!-- Contenedor de próximas tareas -->
             <div class="taskContainer" id="next">
                 <div class="top">
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-caret-right"></i>
                     <p>Próximas tareas</p>
                     <span id="tomorrowTaskCount">(0)</span>
                 </div>
@@ -77,7 +80,7 @@
 
         <!-- Contenedor para ver las tareas en detalle -->
         <div class="containerViewTask" *ngIf="show">
-            <div class="top">
+            <div class="topNote">
                 <button class="completedButton" id="completedButton" (click)="completed()">Completar <i class="fas fa-check"></i></button>
                 <div class="right">
                     <i class="far fa-trash-alt" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(data['token'], tareaSeleccionada['id'])"></i>
@@ -93,7 +96,8 @@
                     <p>Responsable</p>
                     <div class="creador">
                         <img src="../../assets/uploads/{{ tareaSeleccionada.usuario }}/{{ tareaSeleccionada.imagen }}" alt="">
-                        <p>{{ tareaSeleccionada.usuario }} <i class="fas fa-times-circle"></i></p>
+                        <p>{{ tareaSeleccionada.usuario }}</p>
+                        <i class="fas fa-times-circle"></i>
                     </div>
                 </div>
                 <div class="contenedorAsignadas">
@@ -113,7 +117,7 @@
                 <div class="descripcion">
                     <p>Descripción</p>
                     <p contenteditable="true" id="descripcionTarea">{{ tareaSeleccionada.descripcion }}</p>
-                    <a (click)="setUrl()"><i class="fa fa-link fa-fw"></i></a>
+                    <!-- <a (click)="setUrl()"><i class="fa fa-link fa-fw"></i></a> -->
                 </div>
                 <div class="comentarios">
                     <div class="comentario">
@@ -151,7 +155,15 @@
             <div class="bottom">
                 <form method="POST" class="formularioAddComentario">
                     <textarea placeholder="Realiza un comentario"></textarea>
-                    <button type="submit">Comentar</button>
+                    <div class="right">
+                        <button type="submit">Comentar</button>
+                        <div class="textEditor">
+                            <i class="fas fa-link"></i>
+                            <i class="fas fa-bold"></i>
+                            <i class="fas fa-underline"></i>
+                            <i class="fas fa-italic"></i>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
