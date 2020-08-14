@@ -46,7 +46,68 @@ export class ServicioService {
     );
     let body = 'tokenUsuario=' + tokenUsuario + '&claveActual=' + claveActual + '&claveNueva=' + claveNueva;
     return this.http.post(this.url + 'cambiarClave', body, {
-      headers: headers,
+      headers: headers
     });
   }
+
+  //Método para cambiar la contraseña desde dentro
+  crearEquipo(tokenUsuario, nombre): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'tokenUsuario=' + tokenUsuario + '&nombre=' + nombre;
+    return this.http.post(this.url + 'crearEquipo', body, {
+      headers: headers
+    });
+  }
+
+  //Función para obtener los datos del equipo del usuario en sesión
+  obtenerDatosEquipo(tokenUsuario): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'tokenUsuario=' + tokenUsuario;
+    return this.http.post(this.url + 'obtenerDatosEquipo', body, {
+      headers: headers
+    });
+  }
+
+  //Función para obtener los datos del equipo del usuario en sesión
+  abandonarEquipo(tokenUsuario): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'tokenUsuario=' + tokenUsuario;
+    return this.http.post(this.url + 'abandonarEquipo', body, {
+      headers: headers
+    });
+  }
+
+  //Función para buscar equipos
+  buscarEquipo(value): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'value=' + value;
+    return this.http.post(this.url + 'buscarEquipo', body, {
+      headers: headers
+    });
+  }
+
+  //Función para entrar en un equipo
+  unirseEquipo(token, idGrupo, nombreGrupo): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'token=' + token + '&idGrupo=' + idGrupo + '&nombreGrupo=' + nombreGrupo;
+    return this.http.post(this.url + 'unirseEquipo', body, {
+      headers: headers
+    });
+  }
+
 }

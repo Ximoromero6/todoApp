@@ -199,8 +199,12 @@ return function (App $app) {
 
             if ($resultadoExisteUser->rowCount() === 1) {
 
+                $queryLogin =  "SELECT usuario, token, usuarios.nombre AS 'nombre', email, verificado, usuarios.imagen, ubicacion, rol, equipos.nombre AS 'equipo', usuarios.descripcion FROM usuarios 
+                LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario 
+                LEFT JOIN equipos ON usuarios_equipos.id_equipo = equipos.id 
+                WHERE ((email = ? || usuario = ?) && clave = ?) && verificado = 1";
+
                 //Verrificamos login
-                $queryLogin = "SELECT usuario, token, nombre, email, verificado, imagen, ubicacion, rol, equipo, descripcion FROM usuarios WHERE ((email = ? || usuario = ?) && clave = ?)  && verificado = 1";
                 $resultadoLogin = $db->prepare($queryLogin);
                 $resultadoLogin->bindparam(1, $email);
                 $resultadoLogin->bindparam(2, $email);
@@ -487,40 +491,53 @@ return function (App $app) {
                 mkdir($folderName, 0777, true);
             }
 
-            if ($image->getError() === UPLOAD_ERR_OK) {
+            //Array con extensiones válidas
+            $extensionesValidas = array('png', 'jpeg', 'jpg');
 
-                //Borramos todo lo que haya dentro para que siempre haya un solo archivo
-                $files = glob($folderName . '*');
-                foreach ($files as $file) {
-                    if (is_file($file))
-                        unlink($file);
-                }
-                //Si se mueve la imágen a la carpeta, se sube a la DB
-                if ($filename = moveUploadedFile($folderName, $image)) {
+            //Validar extensión
+            $extension = pathinfo($folderName . '/' . $image->getClientFilename(), PATHINFO_EXTENSION);
+            $extension = strtolower($extension);
 
-                    $query = "UPDATE usuarios SET imagen = '$filename' WHERE token = '$token'";
-                    $resultadoQuery = $db->prepare($query);
-                    $resultadoQuery->execute();
+            if (in_array($extension, $extensionesValidas)) {
+                if ($image->getError() === UPLOAD_ERR_OK) {
 
-                    if ($resultadoQuery->rowCount() === 0) {
-                        $arrayResponse['status'] = false;
-                        $arrayResponse['errorCode'] = "1001";
-                        $arrayResponse['response'] = 'Error al subir la foto a la DB';
-                    } else {
-                        $postData->imagen = $filename;
-                        $arrayResponse['status'] = true;
-                        $arrayResponse['errorCode'] = "";
-                        $arrayResponse['response'] = $filename;
-                        $arrayResponse['data'] = $postData;
+                    //Borramos todo lo que haya dentro para que siempre haya un solo archivo
+                    $files = glob($folderName . '*');
+                    foreach ($files as $file) {
+                        if (is_file($file))
+                            unlink($file);
                     }
+
+                    //Si se mueve la imágen a la carpeta, se sube a la DB
+                    if ($filename = moveUploadedFile($folderName, $image)) {
+                        $query = "UPDATE usuarios SET imagen = '$filename' WHERE token = '$token'";
+                        $resultadoQuery = $db->prepare($query);
+                        $resultadoQuery->execute();
+
+                        if ($resultadoQuery->rowCount() === 1) {
+                            $postData->imagen = $filename;
+                            $arrayResponse['status'] = true;
+                            $arrayResponse['errorCode'] = "";
+                            $arrayResponse['response'] = $filename;
+                            $arrayResponse['data'] = $postData;
+                        } else {
+                            $arrayResponse['status'] = false;
+                            $arrayResponse['errorCode'] = "1001";
+                            $arrayResponse['response'] = 'Ha ocurrido un problema al subir la foto';
+                        }
+                    }
+                } else {
+                    $arrayResponse['status'] = false;
+                    $arrayResponse['errorCode'] = "1000";
+                    $arrayResponse['response'] = 'Error de server';
                 }
             } else {
-                $arrayResponse['status'] = false;
+                $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1000";
-                $arrayResponse['response'] = 'Error de server';
+                $arrayResponse['response'] = "Formato de imágen no admitido";
             }
         } catch (Exception $e) {
-            $arrayResponse['status'] =  $folderName;
+            $arrayResponse['status'] = false;
             $arrayResponse['errorCode'] = "1000";
             $arrayResponse['response'] = $e->getMessage();
         }
@@ -589,7 +606,26 @@ return function (App $app) {
         $filename = sprintf('%s.%0.8s', $basename, $extension);
         $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
 
+        comprimirImagen($directory . DIRECTORY_SEPARATOR . $filename, $directory . DIRECTORY_SEPARATOR . $filename, 40);
+
         return $filename;
+    }
+
+    //Función para comprimir imágenes
+    function comprimirImagen($recurso, $destino, $calidad)
+    {
+        $info = getimagesize($recurso);
+
+        if ($info['mime'] == 'image/jpeg')
+            $image = imagecreatefromjpeg($recurso);
+
+        elseif ($info['mime'] == 'image/gif')
+            $image = imagecreatefromgif($recurso);
+
+        elseif ($info['mime'] == 'image/png')
+            $image = imagecreatefrompng($recurso);
+
+        imagejpeg($image, $destino, $calidad);
     }
 
     //Función para actualizar los datos extra del usuario
@@ -611,16 +647,15 @@ return function (App $app) {
             $nombre = filter_var($postData->nombre, FILTER_SANITIZE_STRING);
             $ubicacion = filter_var($postData->ubicacion, FILTER_SANITIZE_STRING);
             $rol = filter_var($postData->rol, FILTER_SANITIZE_STRING);
-            $equipo = filter_var($postData->equipo, FILTER_SANITIZE_STRING);
+            // $equipo = filter_var($postData->equipo, FILTER_SANITIZE_STRING);
             $descripcion = filter_var($postData->descripcion, FILTER_SANITIZE_STRING);
 
-            $query = "UPDATE usuarios SET nombre = ?, ubicacion = ?, rol = ?, equipo = ?, descripcion = ? WHERE token = '$token'";
+            $query = "UPDATE usuarios SET nombre = ?, ubicacion = ?, rol = ?, descripcion = ? WHERE token = '$token'";
             $resultadoQuery = $db->prepare($query);
             $resultadoQuery->bindParam(1, $nombre);
             $resultadoQuery->bindParam(2, $ubicacion);
             $resultadoQuery->bindParam(3, $rol);
-            $resultadoQuery->bindParam(4, $equipo);
-            $resultadoQuery->bindParam(5, $descripcion);
+            $resultadoQuery->bindParam(4, $descripcion);
 
             $resultadoQuery->execute();
 
@@ -699,24 +734,19 @@ return function (App $app) {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
 
-
+            $token = $postResponse['token'];
             $titulo = filter_var($postResponse['titulo'], FILTER_SANITIZE_STRING);
             $fecha = filter_var($postResponse['fecha'], FILTER_SANITIZE_STRING);
             $descripcion = filter_var($postResponse['descripcion'], FILTER_SANITIZE_STRING);
             $now = date("Y-m-d H:i:s");
-            $usuarios = $postResponse['usuarios'];
-            $userList = explode(',', $usuarios);
-            $asignada = $userList[0];
 
-            $query = "INSERT INTO tareas (tokenUsuario, usuarios, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO tareas (tokenUsuario, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?)";
             $resultadoQuery = $db->prepare($query);
-            $resultadoQuery->bindParam(1, $asignada);
-            $resultadoQuery->bindParam(2, $usuarios);
-            $resultadoQuery->bindParam(3, $titulo);
-            $resultadoQuery->bindParam(4, $fecha);
-            $resultadoQuery->bindParam(5, $descripcion);
-            $resultadoQuery->bindParam(6, $now);
-
+            $resultadoQuery->bindParam(1, $token);
+            $resultadoQuery->bindParam(2, $titulo);
+            $resultadoQuery->bindParam(3, $fecha);
+            $resultadoQuery->bindParam(4, $descripcion);
+            $resultadoQuery->bindParam(5, $now);
             $resultadoQuery->execute();
 
             if ($resultadoQuery->rowCount() === 1) {
@@ -727,7 +757,6 @@ return function (App $app) {
                 $arrayResponse['status'] = false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
-                $arrayResponse['usuarios'] = $usuarios;
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -749,9 +778,7 @@ return function (App $app) {
             "todayTasks" => '',
             "todayCount" => '',
             "tomorrowTasks" => '',
-            "tomorrowCount" => ''/* ,
-            "customTasks" => '',
-            "noneTasks" => '', */
+            "tomorrowCount" => ''
         ];
 
         try {
@@ -764,8 +791,9 @@ return function (App $app) {
             //falta añadir fechas pasadas y futuras
 
             //Get today tasks
-            // $queryAsignedTasks = "SELECT usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (usuarios.token != tareas.asignada) AND (usuarios.token = tareas.tokenUsuario) AND tareas.completada = 0 ORDER BY creacion DESC";
-            $queryAsignedTasks = "SELECT DISTINCT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, tareas.usuarios, usuarios.usuario, usuarios.imagen FROM tareas JOIN usuarios ON FIND_IN_SET(usuarios.token, tareas.usuarios) AND tareas.tokenUsuario = '$userToken' AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC";
+            /*  AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC */
+
+            $queryAsignedTasks = "";
             $resultadoQuery = $db->prepare($queryAsignedTasks);
             $resultadoQuery->execute();
 
@@ -879,6 +907,299 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "La contraseña actual es incorrecta";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para crear equipos
+    $app->post('/crearEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $url = "default2.jpg";
+
+            $nombre = $postResponse['nombre'];
+            $tokenUsuario = $postResponse['tokenUsuario'];
+
+            //Comprobar si tiene equipo
+            $queryUserHasTeam = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
+
+            $resultadoUserHasTeam = $db->prepare($queryUserHasTeam);
+            $resultadoUserHasTeam->execute();
+            $resultado = $resultadoUserHasTeam->fetch(PDO::FETCH_ASSOC);
+
+            if ($resultado['id_equipo'] == NULL) {
+                $idUser = $resultado['id'];
+                //Comprobar si el nombre existe
+                /* $queryExisteEquipo = "SELECT nombre FROM equipos WHERE nombre = '$nombre'";
+                $resultadoExisteEquipo = $db->prepare($queryExisteEquipo);
+                $resultadoExisteEquipo->execute();
+
+                if ($resultadoExisteEquipo->rowCount() == 1) {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Ya existe un equipo con ese nombre...";
+                } else { */
+                $now = date("Y-m-d H:i:s");
+                $query = "INSERT INTO equipos (nombre, creador, creacion, imagen) VALUES (?, ?, ?, ?)";
+                $resultado = $db->prepare($query);
+                $resultado->bindParam(1, $nombre);
+                $resultado->bindParam(2, $idUser);
+                $resultado->bindParam(3, $now);
+                $resultado->bindParam(4, $url);
+
+                $resultado->execute();
+                $idEquipo = $db->lastInsertId();
+
+                if ($resultado->rowCount() == 1) {
+                    $query = "INSERT INTO usuarios_equipos (id_usuario, id_equipo) VALUES (?, ?)";
+                    $resultado = $db->prepare($query);
+                    $resultado->bindParam(1, $idUser);
+                    $resultado->bindParam(2, $idEquipo);
+                    $resultado->execute();
+                    if ($resultado->rowCount() == 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = "Equipo creado correctamente!";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1001";
+                        $arrayResponse['response'] = "Se ha producido un error al crear el equipo";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Se ha producido un error al crear el equipo";
+                }
+                /*  } */
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Abandona el grupo actual para crear uno nuevo";
+                /*  $arrayResponse['dataTeam'] = $resultadoUserHasTeam->fetchAll(PDO::FETCH_ASSOC); */
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para obtener los datos del eequipo
+    $app->post('/obtenerDatosEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $tokenUsuario = $postResponse['tokenUsuario'];
+
+            $queryUserHasTeam = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
+
+            $resultadoUserHasTeam = $db->prepare($queryUserHasTeam);
+            $resultadoUserHasTeam->execute();
+            $resultado = $resultadoUserHasTeam->fetch(PDO::FETCH_ASSOC);
+            if ($resultado['id_equipo'] !== NULL) {
+                $idUsuario = $resultado['id'];
+                $idEquipo = $resultado['id_equipo'];
+
+                $query = "SELECT equipos.id, equipos.nombre, equipos.creador, equipos.imagen, equipos.descripcion, equipos.creacion FROM equipos INNER JOIN usuarios_equipos ON usuarios_equipos.id_equipo = equipos.id AND usuarios_equipos.id_usuario = '$idUsuario'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $arrayResponse['status'] =  true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['response'] = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                    $query = "SELECT usuarios.imagen, usuarios.usuario, usuarios.email FROM usuarios INNER JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario AND usuarios_equipos.id_equipo = '$idEquipo'";
+                    $resultado = $db->prepare($query);
+                    $resultado->execute();
+                    $arrayResponse['response']['usersData'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    $arrayResponse['response']['usersCount'] = $resultado->rowCount();
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Ha ocurrido un problema al obtener los datos del equipo";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Este usuario no tiene equipo";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para abandonar un grupo
+    $app->post('/abandonarEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $tokenUsuario = $postResponse['tokenUsuario'];
+
+            $queryUserHasTeam = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios 
+            LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
+            $resultadoUserHasTeam = $db->prepare($queryUserHasTeam);
+            $resultadoUserHasTeam->execute();
+            $resultado = $resultadoUserHasTeam->fetch(PDO::FETCH_ASSOC);
+
+            if ($resultado['id'] != NULL && $resultado['id_equipo'] != NULL) {
+                $idUsuario = $resultado['id'];
+                $idEquipo = $resultado['id_equipo'];
+
+                $query = "DELETE FROM usuarios_equipos WHERE id_usuario = '$idUsuario' AND id_equipo = '$idEquipo'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $arrayResponse['status'] =  true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['response'] = "Saliste del grupo";
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Fallo al salir del grupo";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Este usuario no tiene equipo";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para abandonar un grupo
+    $app->post('/buscarEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $value = $postResponse['value'];
+
+            $query = "SELECT id, nombre, imagen FROM equipos WHERE nombre LIKE '$value%' OR nombre LIKE '%$value%' OR nombre LIKE '%$value'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() > 0) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "No hemos encontrado ningún equipo...";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para unirse a un grupo
+    $app->post('/unirseEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $token = $postResponse['token'];
+            $idGrupo = $postResponse['idGrupo'];
+            $nombreGrupo = $postResponse['nombreGrupo'];
+
+            //Comprobar si el equipo existe
+            $query = "SELECT * FROM equipos WHERE nombre = '$nombreGrupo' AND id = '$idGrupo'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                //Obtener el id del usuario que queremos insertar
+                $queryGetUserId = "SELECT id FROM usuarios WHERE token = '$token'";
+                $resultado = $db->prepare($queryGetUserId);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $id = $resultado['id'];
+                    $query = "INSERT INTO usuarios_equipos (id_usuario, id_equipo) VALUES ('$id', '$idGrupo')";
+                    $resultado = $db->prepare($query);
+                    $resultado->execute();
+                    if ($resultado->rowCount() === 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = "Te has unido al grupo correctamente!";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "No se ha podido unir al grupo, inténtalo más tarde";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Se ha producido un error";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "El equipo introducido no existe";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

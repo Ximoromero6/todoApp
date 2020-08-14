@@ -278,10 +278,10 @@ export class NotaComponent implements OnInit {
   //Función crear tarea
   addTarea() {
     this.servicio.addTarea(
+      this.userdata.token,
       this.formularioAddTarea.value.titulo,
       this.finalData,
-      this.formularioAddTarea.value.descripcion,
-      this.users
+      this.formularioAddTarea.value.descripcion
     ).subscribe(
       (response) => {
         console.log(response);

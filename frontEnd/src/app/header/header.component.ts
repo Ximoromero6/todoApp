@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Renderer2, Inject } from '@ang
 import { DomSanitizer } from '@angular/platform-browser';
 import { ServicioService } from './servicio.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-header',
@@ -30,6 +30,12 @@ export class HeaderComponent implements OnInit {
   //Formulario para cambiar la contraseña
   formularioCambiarClave: FormGroup;
 
+  //Formulario para crear un equipo
+  formularioCrearEquipo: FormGroup;
+
+  //Formulario para unirse a un equipo
+  formularioUnirseEquipo: FormGroup;
+
   //Datos del usuario
   data: any
   nombre: string
@@ -46,8 +52,13 @@ export class HeaderComponent implements OnInit {
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
 
-  //
   flag: boolean = true;
+
+  //Datos del equipo
+  datosEquipo;
+
+  //Para unirse a equipo
+  idEquipoHidden;
 
   public formGroup = this.formBuilder.group({
     file: [null, Validators.required]
@@ -55,6 +66,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     //this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
+    this.obtenerDatosEquipo(this.data.token);
 
     //Añadimos las variables
     this.nombre = this.data.nombre != '' ? this.data.nombre : this.data.usuario;
@@ -203,6 +215,16 @@ export class HeaderComponent implements OnInit {
       ]
     }, { validator: this.checkPasswords });
 
+    //Formulario Crear equipo
+    this.formularioCrearEquipo = this.formBuilder.group({
+      crearEquipoField: ['', Validators.required]
+    });
+
+    //Formulario unirse a un equipo
+    this.formularioUnirseEquipo = this.formBuilder.group({
+      unirseEquipoField: ['', Validators.required]
+    });
+
   } /* Fin ngOnInit */
 
   //Función get file
@@ -216,15 +238,26 @@ export class HeaderComponent implements OnInit {
         this.data
       ).subscribe(
         (response) => {
-          console.log(response);
           document.getElementById('preloader').style.display = "none";
-          if (localStorage.getItem('userData') != null) {
-            localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+          if (response.status) {
+            if (localStorage.getItem('userData') != null) {
+              localStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            } else {
+              sessionStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            }
+            this.data.imagen = response.data.imagen;
+            this.imagen = this.sanitizer.bypassSecurityTrustUrl(`${window.location.origin}/assets/uploads/${this.data.usuario}/${response.data.imagen}`);
+
           } else {
-            sessionStorage.setItem("userData", btoa(JSON.stringify(response.data)));
+            this.mensajeNotificacion = response.response;
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.ocultarNotificacion(false);
           }
-          this.data.imagen = response.data.imagen;
-          this.imagen = this.sanitizer.bypassSecurityTrustUrl(`${window.location.origin}/assets/uploads/${this.data.usuario}/${response.data.imagen}`);
+
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
         },
         (error) => {
           console.log(error);
@@ -376,4 +409,201 @@ export class HeaderComponent implements OnInit {
       );
     }
   }
+
+  openTabTeam(tab) {
+    document.querySelector('#tab3 .container .bottom').classList.add('visible');
+    let i: any;
+    let x: any = document.getElementsByClassName("tab");
+    for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+    }
+    document.getElementById(tab).style.display = "flex";
+  }
+
+  validarDatosCrearEquipo() {
+    if (this.formularioCrearEquipo.get('crearEquipoField').value) {
+      this.servicio.crearEquipo(this.data.token, this.formularioCrearEquipo.get('crearEquipoField').value).subscribe(
+        (response) => {
+          console.log(response);
+          if (response.status) {
+
+            let equipo = this.formularioCrearEquipo.get('crearEquipoField').value;
+
+            this.statusNotificacion = 'success';
+            this.iconoNotificacion = 'fas fa-check-circle';
+            this.mensajeNotificacion = response.response;
+            this.data.equipo = equipo;
+            this.equipo = equipo;
+            this.formularioDatosExtra.get('equipo').setValue(equipo);
+            this.updateLocal(this.data);
+            this.formularioCrearEquipo.reset();
+            this.obtenerDatosEquipo(this.data.token);
+          } else {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.mensajeNotificacion = response.response;
+          }
+          this.ocultarNotificacion(false);
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
+        },
+        (error) => {
+          console.log(error);
+        })
+    }
+  }
+
+  //Get team data
+  obtenerDatosEquipo(token) {
+    //Función para obtener los datos del equipo de la BD
+    this.servicio.obtenerDatosEquipo(token).subscribe(
+      (response) => {
+        console.log(response);
+        if (response.status) {
+          this.datosEquipo = response.response;
+        }
+      },
+      (error) => {
+        console.log(error);
+      });
+  }
+
+  //Método para actualizar el localStorage
+  updateLocal(value) {
+    localStorage.setItem("userData", btoa(JSON.stringify(value)));
+  }
+
+  //Función para abandonar un grupo
+  abandonarEquipo(token) {
+    this.servicio.abandonarEquipo(token).subscribe(
+      (response) => {
+        if (response.status) {
+          this.statusNotificacion = 'success';
+          this.iconoNotificacion = 'fas fa-check-circle';
+          this.mensajeNotificacion = response.response;
+          this.data.equipo = "";
+          this.equipo = "";
+          this.formularioDatosExtra.get('equipo').setValue("");
+          this.updateLocal(this.data);
+        }
+        this.ocultarNotificacion(false);
+        setTimeout(() => {
+          this.ocultarNotificacion(true);
+        }, 5000);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  //Función para buscar un equipo
+  buscarEquipo() {
+    this.servicio.buscarEquipo(this.formularioUnirseEquipo.get('unirseEquipoField').value).subscribe(
+      (response) => {
+        console.log(response);
+        document.getElementById("dropDownSearchTeam").style.display = 'block';
+        if (response.status) {
+          document.getElementById('dropDownSearchTeam').textContent = "";
+          for (let r of response.response) {
+            let element = document.createElement('li');
+            element.setAttribute('data-id', r.id);
+            element.classList.add('listItemTeam');
+
+            let stylesLi = {
+              background: '#e8ecee',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '6px',
+              listStyle: 'none',
+              borderTop: '1px solid #ccc',
+              borderBottom: '1px solid #ccc',
+              cursor: 'pointer'
+            };
+            Object.assign(element.style, stylesLi);
+
+            let img = document.createElement('img');
+            img.src = `../../assets/teams/${r.imagen}`;
+
+            let stylesImg = {
+              borderRadius: '50%',
+              width: '30px',
+              height: '30px',
+              objectFit: 'cover',
+              marginRight: '10px'
+            };
+
+            Object.assign(img.style, stylesImg);
+            element.insertBefore(img, element.childNodes[0]);
+
+            let text = document.createTextNode(r.nombre);
+            element.appendChild(text);
+            document.getElementById('dropDownSearchTeam').appendChild(element);
+          }
+
+          let liItems: any = document.getElementsByClassName('listItemTeam');
+          let buttonJoin: any = document.querySelector('#joinTeam .inline button');
+          for (let item of liItems) {
+            item.addEventListener('mouseover', () => {
+              item.style.background = "#dee1e3";
+            });
+            item.addEventListener('mouseout', () => {
+              item.style.background = "#e8ecee";
+            });
+            item.addEventListener('click', (e) => {
+              this.formularioUnirseEquipo.get('unirseEquipoField').setValue(e.target.textContent);
+              this.idEquipoHidden = e.target.getAttribute('data-id');
+              document.getElementById("dropDownSearchTeam").style.display = 'none';
+              buttonJoin.classList.remove('disabled');
+              buttonJoin.disabled = false;
+            });
+          }
+          if (this.formularioUnirseEquipo.get('unirseEquipoField').value == '') {
+            buttonJoin.classList.add('disabled');
+            buttonJoin.disabled = true;
+            document.getElementById("dropDownSearchTeam").style.display = 'none';
+          }
+
+        } else {
+          document.getElementById("dropDownSearchTeam").style.display = 'none';
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  //Función para unirse a un equipo
+  unirseEquipo() {
+    this.servicio.unirseEquipo(this.data.token, this.idEquipoHidden, this.formularioUnirseEquipo.get('unirseEquipoField').value).subscribe(
+      (response) => {
+        if (response.status) {
+          this.statusNotificacion = 'success';
+          this.iconoNotificacion = 'fas fa-check-circle';
+          this.mensajeNotificacion = response.response;
+          let updated = this.formularioUnirseEquipo.get('unirseEquipoField').value;
+          this.data.equipo = updated;
+          this.equipo = updated;
+          this.formularioDatosExtra.get('equipo').setValue(updated);
+          this.updateLocal(this.data);
+          this.obtenerDatosEquipo(this.data.token);
+          this.formularioUnirseEquipo.reset();
+        } else {
+          this.statusNotificacion = 'error';
+          this.iconoNotificacion = 'fas fa-exclamation-circle';
+          this.mensajeNotificacion = response.response;
+        }
+        this.ocultarNotificacion(false);
+        setTimeout(() => {
+          this.ocultarNotificacion(true);
+        }, 5000);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }
+
 }
