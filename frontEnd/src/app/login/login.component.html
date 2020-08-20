@@ -2,12 +2,12 @@
 <div id="container">
     <div class="left">
         <!-- Llamamos al componente de notificaciones -->
-        <app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="margin-top: 10px;"></app-notificaciones>
+        <app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="margin-bottom: 20px;"></app-notificaciones>
 
-        <a routerLink="/" class="logo">HUBBET</a>
+        <!--  <a routerLink="/" class="logo">HUBBET</a> -->
         <h2 class="title">Bienvenido de nuevo</h2>
         <button class="googleButton" #loginRef>
-      <img src="../../assets/images/googleLogo.png" alt="" />Iniciar sesión con
+      <img src="../../assets/images/googleLogo.png" alt="" />Inicia sesión con
       Google
     </button>
         <div class="separator">
@@ -16,17 +16,17 @@
             <hr />
         </div>
         <form id="formularioLogin" [formGroup]="formularioLogin" (ngSubmit)="validarDatosLogin()">
-            <div class="formField" [class.invalid]="
+            <div id="formField1" class="formField" [class.invalid]="
           !formularioLogin.get('email').valid &&
           formularioLogin.get('email').dirty
         ">
-                <input type="email" placeholder="Tu Email o Usuario" formControlName="email" />
+                <input type="email" placeholder="Tu Email o Usuario" formControlName="email" class="field1" />
             </div>
-            <div class="formField" [class.invalid]="
+            <div id="formField2" class="formField" [class.invalid]="
           !formularioLogin.get('clave').valid &&
           formularioLogin.get('clave').dirty
         ">
-                <input type="password" placeholder="Tu Contraseña" formControlName="clave" />
+                <input type="password" placeholder="Tu Contraseña" formControlName="clave" class="field2" />
             </div>
             <div class="loginOptions">
                 <div class="keepSesion">
@@ -45,10 +45,15 @@
         </p>
     </div>
     <div class="right">
-        <div class="text">
+        <!-- <div class="text">
             <h3>Crea una nueva cuenta</h3>
             <p>Hemos agregado algunas nuevas características increíbles</p>
-            <a a routerLink="/registro"><button>CREAR CUENTA</button></a>
+            <a routerLink="/registro"><button>CREAR CUENTA</button></a>
+        </div> -->
+        <div class="container">
+            <h1>Lorem ipsum dolor sit amet dolor</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat quod eligendi obcaecati adipisicing dolorum maxime.</p>
+            <a routerLink="/registro">Empieza ahora!</a>
         </div>
     </div>
 </div>

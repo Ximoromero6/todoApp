@@ -20,7 +20,7 @@ export class NotaComponent implements OnInit {
   formularioAddTarea: FormGroup;
   finalData;
   userdata;
-  users = [];
+  users: any = [];
 
   @ViewChild('inputAdd') inputAdd: ElementRef;
   @ViewChild('inputTitle') inputTitle: ElementRef;
@@ -38,7 +38,6 @@ export class NotaComponent implements OnInit {
 
   ngOnInit(): void {
     this.userdata = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
-    this.users.push(this.userdata.token);
     this.formularioAddPerson = this.formBuilder.group({
       email: ['', Validators.required],
       clave: ['', Validators.required]
@@ -138,7 +137,12 @@ export class NotaComponent implements OnInit {
     });
 
     document.getElementById('addPerson').addEventListener('focusout', () => {
-      document.getElementById('popupAdd').style.display = 'none';
+      document.addEventListener('click', (e) => {
+        let el: any = e.target;
+        if (el.classList !== 'agregarPersonaButton') {
+          document.getElementById('popupAdd').style.display = 'none';
+        }
+      });
     });
 
     document.querySelector('.moreOptions').addEventListener('click', () => {
@@ -146,7 +150,11 @@ export class NotaComponent implements OnInit {
       document.querySelector('.moreOptionsContainer').classList.toggle('active');
 
       let texto = document.querySelector('.moreOptions > span');
-      texto.textContent === 'Mostrar más opciones' ? texto.textContent = 'Mostrar menos opciones' : texto.textContent = 'Mostrar más opciones';
+      if (texto.textContent === 'Mostrar más opciones') {
+        texto.textContent = 'Mostrar menos opciones'
+      } else {
+        texto.textContent = 'Mostrar más opciones'
+      }
 
     });
   }
@@ -159,11 +167,6 @@ export class NotaComponent implements OnInit {
         parentNode.remove();
       });
     });
-
-    /* let index = this.users.indexOf(token);
-    if (index > -1) {
-      this.users.splice(index, 1);
-    } */
   }
 
   validarDatosAddPerson() {
@@ -172,7 +175,7 @@ export class NotaComponent implements OnInit {
     if (this.validateEmail(this.formularioAddPerson.value.email)) {
       this.servicio.getUserNote(
         this.formularioAddPerson.value.email,
-        JSON.parse(atob(localStorage.getItem('userData'))).email
+        JSON.parse(atob(localStorage.getItem('userData'))).token
       ).subscribe(
         (response) => {
           if (response.status) {
@@ -191,7 +194,7 @@ export class NotaComponent implements OnInit {
               item.style.cssText = "min-width: fit-content; display: flex; align-items: center; font-size: 14px; margin-right: 10px; border: none; background: #70769C; color: #ffffff; border-radius: 30px; cursor: pointer; outline: 0; padding: 3px 6px 3px 4px;";
 
               let image = document.createElement('img');
-              image.style.cssText = " width: 30px; height: 30px; border-radius: 50%; object - fit: cover; margin-right: 6px;";
+              image.style.cssText = " width: 30px; height: 30px; border-radius: 50%; object - fit: cover; margin-right: 6px; object-fit: cover;";
               image.src = `assets/uploads/${response.data.usuario}/${response.data.imagen}`;
               item.insertBefore(image, item.childNodes[0]);
 
@@ -202,9 +205,7 @@ export class NotaComponent implements OnInit {
 
               contenedor.insertBefore(item, contenedor.childNodes[0]);
               this.removeItem();
-
-
-              /* Limpiamos el field */
+              this.users.push(response.data.id);
               this.formularioAddPerson.reset();
             } else {
               this.mensajeNotificacion = 'Vaya! Parece que ya has añadido ese email';
@@ -225,8 +226,6 @@ export class NotaComponent implements OnInit {
               this.ocultarNotificacion(true);
             }, 5000);
           }
-
-          this.users.push(response.data.token);
         },
         (error) => {
           console.log(error);
@@ -281,7 +280,8 @@ export class NotaComponent implements OnInit {
       this.userdata.token,
       this.formularioAddTarea.value.titulo,
       this.finalData,
-      this.formularioAddTarea.value.descripcion
+      this.formularioAddTarea.value.descripcion,
+      this.users
     ).subscribe(
       (response) => {
         console.log(response);

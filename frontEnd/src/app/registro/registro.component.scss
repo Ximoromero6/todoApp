@@ -46,22 +46,22 @@ $whiteColor: #ffffff;
                 border-radius: 2px;
                 background: $whiteColor;
                 margin: 12px 0;
-                border: 1px solid transparent;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                border: 1px solid #e5e8ed;
+                //  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                 -webkit-appearance: none;
                 &.valid {
-                    border: 1px solid #2ecc40;
+                    border: 1px solid #2ecc40 !important;
                     &::after {
-                        content: "\f00c";
+                        content: "\f058";
                         font-family: "Font Awesome 5 Free";
                         font-weight: 900;
                         color: #2ecc40;
                     }
                 }
                 &.invalid {
-                    border: 1px solid #ff4136;
+                    border: 1px solid #ff4136 !important;
                     &::after {
-                        content: "\f00d";
+                        content: "\f06a";
                         font-family: "Font Awesome 5 Free";
                         font-weight: 900;
                         color: #ff4136;
@@ -69,6 +69,11 @@ $whiteColor: #ffffff;
                 }
                 &.focused {
                     border-color: $primaryColor;
+                    input {
+                        &::placeholder {
+                            color: $textColor;
+                        }
+                    }
                 }
                 input {
                     font-family: "Nunito", sans-serif;
@@ -100,10 +105,14 @@ $whiteColor: #ffffff;
                 color: $whiteColor;
                 border: none;
                 padding: 15px;
+                font-size: 15px;
                 outline: 0;
-                border-radius: 5px;
+                border-radius: 4px;
                 margin-top: 20px;
                 box-shadow: 0 0 8px rgba(59, 43, 91, 0.3);
+                &:hover {
+                    background: #4016e7;
+                }
             }
             span {
                 color: $grayColor;
@@ -125,6 +134,10 @@ $whiteColor: #ffffff;
             a {
                 margin-left: 10px;
                 color: $primaryColor;
+                text-decoration: none;
+                &:hover {
+                    color: #4016e7;
+                }
             }
             @media (max-width: 768px) {
                 font-size: 14px;
@@ -134,7 +147,7 @@ $whiteColor: #ffffff;
     .left {
         background: #e2f2ff;
         flex: 1;
-        background-image: url("../../assets/images/3.svg");
+        background-image: url("../../assets/images/2.svg");
         background-size: 70%;
         background-repeat: no-repeat;
         background-position-y: 70%;

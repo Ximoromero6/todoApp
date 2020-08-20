@@ -300,11 +300,11 @@ return function (App $app) {
             $resultadoExisteEmail->execute();
 
             if ($resultadoExisteEmail->rowCount() !== 1) {
-                $arrayResponse['response'] = 'Ups! El email introducido no existe...';
+                $arrayResponse['response'] = 'Ups! Parece que el email introducido no existe...';
                 $arrayResponse['status'] = 0;
             } else {
                 $arrayResponse['data'] = $resultadoExisteEmail->fetch(PDO::FETCH_ASSOC);
-                $tokenDate = strtotime("+1 day");
+                $tokenDate = strtotime("+2 hour");
                 $token = base64_encode($arrayResponse['data']['token'] . ";" . $tokenDate);
                 $arrayResponse['response'] = 'Email envaido correctamente!';
                 $arrayResponse['status'] = 1;
@@ -693,23 +693,83 @@ return function (App $app) {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
             $email = filter_var($postResponse['email'], FILTER_SANITIZE_EMAIL);
-            $sesionEmail = $postResponse['sesionEmail'];
+            $token = $postResponse['token'];
 
-            $query = "SELECT token, usuario, imagen from usuarios WHERE email = ? AND email != '$sesionEmail'";
-            $resultadoQuery = $db->prepare($query);
-            $resultadoQuery->bindParam(1, $email);
+            //Obtener el id del usuario en sesión
+            $queryGetUserId = "SELECT id, email FROM usuarios WHERE token = '$token'";
+            $resultado = $db->prepare($queryGetUserId);
+            $resultado->execute();
 
-            $resultadoQuery->execute();
+            //Obtener el id del email que buscamos para comprobar si son del mismo equipo
+            $queryGetUserId2 = "SELECT id, email FROM usuarios WHERE email = '$email'";
+            $resultado2 = $db->prepare($queryGetUserId2);
+            $resultado2->execute();
 
-            if ($resultadoQuery->rowCount() === 0) {
-                $arrayResponse['status'] = false;
-                $arrayResponse['errorCode'] = "1001";
-                $arrayResponse['response'] = 'No hemos podido encontrar ese email...';
+            if ($resultado->rowCount() === 1 && $resultado2->rowCount() === 1) {
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+                $data2 = $resultado2->fetch(PDO::FETCH_ASSOC);
+
+                //Id y email de usuario en sesión
+                $id = $data['id'];
+                $email = $data['email'];
+
+                //Id del usuario buscado por email, para obtener el id del equipo en el que está
+                $id2 = $data2['id'];
+                $email2 = $data2['email'];
+
+                //Obtener el id de equipo del usuario en sesión
+                $query = "SELECT id_equipo FROM usuarios_equipos WHERE id_usuario = '$id'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                //Obtener el id de equipo del usuario buscado
+                $query2 = "SELECT id_equipo FROM usuarios_equipos WHERE id_usuario = '$id2'";
+                $resultado2 = $db->prepare($query2);
+                $resultado2->execute();
+
+                if ($resultado->rowCount() === 1 && $resultado2->rowCount() === 1) {
+                    $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $resultado2 = $resultado2->fetch(PDO::FETCH_ASSOC);
+
+                    //Id equipo usuario sesión
+                    $id_equipo = $resultado['id_equipo'];
+
+                    //Id del equipo del usuario buscado
+                    $id_equipo2 = $resultado2['id_equipo'];
+
+                    //Comprobamos si son iguales
+                    if ($id_equipo === $id_equipo2) {
+
+                        //Si están en el mismo equipo lo puede añadir
+                        $query = "SELECT id, token, usuario, imagen from usuarios WHERE email = ? AND email != '$email'";
+                        $resultadoQuery = $db->prepare($query);
+                        $resultadoQuery->bindParam(1, $email2);
+                        $resultadoQuery->execute();
+
+                        if ($resultadoQuery->rowCount() === 0) {
+                            $arrayResponse['status'] = false;
+                            $arrayResponse['errorCode'] = "1004";
+                            $arrayResponse['response'] = 'No hemos podido encontrar ese email...';
+                        } else {
+                            $arrayResponse['status'] = true;
+                            $arrayResponse['errorCode'] = "";
+                            $arrayResponse['response'] = 'Email encontrado!';
+                            $arrayResponse['data'] = $resultadoQuery->fetch(PDO::FETCH_ASSOC);
+                        }
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "Este usuario no está en tu equipo";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Ambas personas debéis pertenecer al mismo grupo";
+                }
             } else {
-                $arrayResponse['status'] = true;
-                $arrayResponse['errorCode'] = "";
-                $arrayResponse['response'] = 'Email encontrado!';
-                $arrayResponse['data'] = $resultadoQuery->fetch(PDO::FETCH_ASSOC);
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Se ha producido un error, inténtalo más tarde...";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -739,24 +799,63 @@ return function (App $app) {
             $fecha = filter_var($postResponse['fecha'], FILTER_SANITIZE_STRING);
             $descripcion = filter_var($postResponse['descripcion'], FILTER_SANITIZE_STRING);
             $now = date("Y-m-d H:i:s");
-
-            $query = "INSERT INTO tareas (tokenUsuario, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?)";
-            $resultadoQuery = $db->prepare($query);
-            $resultadoQuery->bindParam(1, $token);
-            $resultadoQuery->bindParam(2, $titulo);
-            $resultadoQuery->bindParam(3, $fecha);
-            $resultadoQuery->bindParam(4, $descripcion);
-            $resultadoQuery->bindParam(5, $now);
-            $resultadoQuery->execute();
-
-            if ($resultadoQuery->rowCount() === 1) {
-                $arrayResponse['status'] = true;
-                $arrayResponse['errorCode'] = "";
-                $arrayResponse['response'] = 'Tarea insertada correctamente!';
+            
+            if ($postResponse['usuarios'] == "") {
+                $usuarios = array();
             } else {
-                $arrayResponse['status'] = false;
-                $arrayResponse['errorCode'] = "1001";
-                $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
+                $usuarios[] = $postResponse['usuarios'];
+            }
+
+            $query = "SELECT usuarios.id FROM usuarios WHERE usuarios.token = '$token'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() > 0) {
+                $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                //Obtenemos el id del usuario que crea la tarea
+                $idUser = $resultado['id'];
+                array_push($usuarios, $idUser);
+
+                $query = "INSERT INTO tareas (idUsuario, titulo, fecha, descripcion, creacion) VALUES (?, ?, ?, ?, ?)";
+                $resultadoQuery = $db->prepare($query);
+                $resultadoQuery->bindParam(1, $idUser);
+                $resultadoQuery->bindParam(2, $titulo);
+                $resultadoQuery->bindParam(3, $fecha);
+                $resultadoQuery->bindParam(4, $descripcion);
+                $resultadoQuery->bindParam(5, $now);
+                $resultadoQuery->execute();
+
+                $idTarea = $db->lastInsertId();
+
+                if ($resultadoQuery->rowCount() === 1) {
+                    
+                    for ($i = 0; $i < count($usuarios); $i++) {
+
+                        //Si la tearea se inserta correctamente, insertamos un registro en la tabla usuarios_tareas con el id usuario y el id de la tarea que acabamos de crear
+                        $query = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES (?, ?)";
+                        $resultado = $db->prepare($query);
+                        $resultado->bindParam(1, $usuarios[$i]);
+                        $resultado->bindParam(2, $idTarea);
+                        $resultado->execute();
+                        
+                    }
+
+                    if ($resultado->rowCount() == 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = "Tarea insertada correctamente!";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1001";
+                        $arrayResponse['response'] = "Se ha producido un error, inténtalo más tarde";
+                    }
+
+                } else {
+                    $arrayResponse['status'] = false;
+                    $arrayResponse['errorCode'] = "1001";
+                    $arrayResponse['response'] = 'Se ha producido un error al insertar la tarea...';
+                }
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -768,49 +867,114 @@ return function (App $app) {
         return $response;
     });
 
-    //Función para crear una tarea
+    //Función para obtener todas las tareas
     $app->post('/obtenerTareas', function ($request, $response) {
 
         $arrayResponse = [
             "status" => '',
-            "errorCode" => '',
-            "response" => '',
-            "todayTasks" => '',
-            "todayCount" => '',
-            "tomorrowTasks" => '',
-            "tomorrowCount" => ''
+            "errorCode" => ''
         ];
 
         try {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
             $userToken = $postResponse['userToken'];
-
             $today = date('Y-m-d');
             $tomorrow = date('Y-m-d', strtotime($today . ' + 1 days'));
-            //falta añadir fechas pasadas y futuras
 
-            //Get today tasks
-            /*  AND tareas.fecha = '$today' AND tareas.completada = 0 ORDER BY creacion DESC */
+            $query = "SELECT usuarios.id, usuarios_tareas.id_tarea FROM usuarios LEFT JOIN usuarios_tareas ON usuarios.id = usuarios_tareas.id_usuario WHERE usuarios.token = '$userToken'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
 
-            $queryAsignedTasks = "";
-            $resultadoQuery = $db->prepare($queryAsignedTasks);
-            $resultadoQuery->execute();
+            if ($resultado->rowCount() > 0) {
+                $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                $idUsuario = $resultado['id'];
+                $idTarea = $resultado['id_tarea'];
 
-            //Get tomorrow tasks
-            $tomorrow = "SELECT tareas.id, tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.completada, usuarios.usuario, usuarios.imagen FROM tareas INNER JOIN usuarios WHERE (tareas.tokenUsuario = '$userToken') AND tareas.fecha = '$tomorrow' AND tareas.completada = 0 ORDER BY creacion DESC";
-            $resultadoTomorrow = $db->prepare($tomorrow);
-            $resultadoTomorrow->execute();
+                //Obtener todas las tareas de hoy
+                $query = "SELECT usuarios.id AS 'userID', usuarios.usuario, usuarios.imagen, tareas.id AS 'tareasID', tareas.titulo, tareas.fecha, 
+                tareas.descripcion, tareas.creacion, tareas.idUsuario, comentarios.comentario, comentarios.id AS 'comentarioID', comentarios.fecha AS 'comentariosFecha' 
+                FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id 
+                INNER JOIN usuarios ON usuarios_tareas.id_usuario = usuarios.id 
+                LEFT JOIN comentarios ON comentarios.id_tarea = tareas.id AND usuarios.id = comentarios.id_usuario 
+                WHERE (usuarios_tareas.id_usuario = '$idUsuario' OR usuarios_tareas.id_tarea IN (SELECT tareas.id FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id WHERE usuarios_tareas.id_usuario = '$idUsuario') ) 
+                AND tareas.completada = 0 ORDER BY creacion DESC";
 
-            if ($resultadoQuery->rowCount() > 0) {
-                $arrayResponse['status'] = true;
-                $arrayResponse['errorCode'] = "";
-                $arrayResponse['response'] = 'Tareas obtenidas correctamente!';
-                $arrayResponse['todayTasks'] = $resultadoQuery->fetchAll(PDO::FETCH_ASSOC);
-                $arrayResponse['todayCount'] = $resultadoQuery->rowCount();
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+                $res = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                if ($resultado->rowCount() > 0) {
 
-                $arrayResponse['tomorrowTasks'] = $resultadoTomorrow->fetchAll(PDO::FETCH_ASSOC);
-                $arrayResponse['tomorrowCount'] = $resultadoTomorrow->rowCount();
+                    $arrayTasks = array();
+                    $contador = 0;
+
+                    //Insertar Tareas
+                    for ($i = 0; $i < count($res); $i++) {
+
+                        $key = array_search($res[$i]['tareasID'], array_column($arrayTasks, 'id'));
+
+                        if ($res[$i]['idUsuario'] == $res[$i]['userID'] && !$key) {
+                            $arrayTasks[$contador]['id'] = $res[$i]['tareasID'];
+                            $arrayTasks[$contador]['titulo'] = $res[$i]['titulo'];
+                            $arrayTasks[$contador]['fecha'] = $res[$i]['fecha'];
+                            $arrayTasks[$contador]['descripcion'] = $res[$i]['descripcion'];
+                            $arrayTasks[$contador]['creacion'] = $res[$i]['creacion'];
+                            $arrayTasks[$contador]['usuario'] = $res[$i]['usuario'];
+                            $arrayTasks[$contador]['imagen'] = $res[$i]['imagen'];
+                            $arrayTasks[$contador]['colaboradores'] = array();
+                            $arrayTasks[$contador]['comentarios'] = array();
+                            $contador++;
+                        };
+                    };
+
+                    //Insertar Colaboradores
+                    for ($i = 0; $i < count($res); $i++) {
+                        if ($res[$i]['idUsuario'] != $res[$i]['userID']) {
+
+                            for ($j = 0; $j < count($arrayTasks); $j++) {
+
+                                if ($res[$i]['tareasID'] == $arrayTasks[$j]['id']) {
+
+                                    $arrayTemp = array(
+                                        "id" => $res[$i]['userID'],
+                                        "usuario" => $res[$i]['usuario'],
+                                        "imagen" => $res[$i]['imagen']
+                                    );
+                                    array_push($arrayTasks[$j]['colaboradores'], $arrayTemp);
+                                }
+                            }
+                        }
+                    };
+
+                    //Insertar Comentarios
+                    for ($i = 0; $i < count($res); $i++) {
+                        if ($res[$i]['comentario'] != NULL) {
+                            for ($j = 0; $j < count($arrayTasks); $j++) {
+
+                                if ($res[$i]['tareasID'] == $arrayTasks[$j]['id']) {
+
+                                    $arrayTemp = array(
+                                        "id" => $res[$i]['comentarioID'],
+                                        "usuario" => $res[$i]['usuario'],
+                                        "comentario" => $res[$i]['comentario'],
+                                        "fecha" => $res[$i]['comentariosFecha'],
+                                        "imagen" => $res[$i]['imagen']
+                                    );
+                                    array_push($arrayTasks[$j]['comentarios'], $arrayTemp);
+                                }
+                            }
+                        }
+                    };
+
+                    $arrayResponse['status'] =  true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['tasks'] = $arrayTasks;
+                    $arrayResponse['todayCount'] = count($arrayTasks);
+                } else {
+                    $arrayResponse['status'] = false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = '';
+                }
             } else {
                 $arrayResponse['status'] = false;
                 $arrayResponse['errorCode'] = "1001";
@@ -825,7 +989,6 @@ return function (App $app) {
         $response->getBody()->write(json_encode($arrayResponse));
         return $response;
     });
-
 
     //Función para eliminar una tarea
     $app->post('/eliminarTarea', function ($request, $response) {
@@ -930,7 +1093,7 @@ return function (App $app) {
         try {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
-            $url = "default2.jpg";
+            $imagen = "default.jpg";
 
             $nombre = $postResponse['nombre'];
             $tokenUsuario = $postResponse['tokenUsuario'];
@@ -944,23 +1107,14 @@ return function (App $app) {
 
             if ($resultado['id_equipo'] == NULL) {
                 $idUser = $resultado['id'];
-                //Comprobar si el nombre existe
-                /* $queryExisteEquipo = "SELECT nombre FROM equipos WHERE nombre = '$nombre'";
-                $resultadoExisteEquipo = $db->prepare($queryExisteEquipo);
-                $resultadoExisteEquipo->execute();
 
-                if ($resultadoExisteEquipo->rowCount() == 1) {
-                    $arrayResponse['status'] =  false;
-                    $arrayResponse['errorCode'] = "1002";
-                    $arrayResponse['response'] = "Ya existe un equipo con ese nombre...";
-                } else { */
                 $now = date("Y-m-d H:i:s");
                 $query = "INSERT INTO equipos (nombre, creador, creacion, imagen) VALUES (?, ?, ?, ?)";
                 $resultado = $db->prepare($query);
                 $resultado->bindParam(1, $nombre);
                 $resultado->bindParam(2, $idUser);
                 $resultado->bindParam(3, $now);
-                $resultado->bindParam(4, $url);
+                $resultado->bindParam(4, $imagen);
 
                 $resultado->execute();
                 $idEquipo = $db->lastInsertId();
@@ -985,12 +1139,10 @@ return function (App $app) {
                     $arrayResponse['errorCode'] = "1002";
                     $arrayResponse['response'] = "Se ha producido un error al crear el equipo";
                 }
-                /*  } */
             } else {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "";
                 $arrayResponse['response'] = "Abandona el grupo actual para crear uno nuevo";
-                /*  $arrayResponse['dataTeam'] = $resultadoUserHasTeam->fetchAll(PDO::FETCH_ASSOC); */
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;
@@ -1021,23 +1173,45 @@ return function (App $app) {
             $resultadoUserHasTeam = $db->prepare($queryUserHasTeam);
             $resultadoUserHasTeam->execute();
             $resultado = $resultadoUserHasTeam->fetch(PDO::FETCH_ASSOC);
+
             if ($resultado['id_equipo'] !== NULL) {
                 $idUsuario = $resultado['id'];
                 $idEquipo = $resultado['id_equipo'];
 
-                $query = "SELECT equipos.id, equipos.nombre, equipos.creador, equipos.imagen, equipos.descripcion, equipos.creacion FROM equipos INNER JOIN usuarios_equipos ON usuarios_equipos.id_equipo = equipos.id AND usuarios_equipos.id_usuario = '$idUsuario'";
+                $query = "SELECT equipos.id, equipos.creador, equipos.nombre, equipos.creador, equipos.imagen, equipos.descripcion, equipos.creacion FROM equipos INNER JOIN usuarios_equipos ON usuarios_equipos.id_equipo = equipos.id AND usuarios_equipos.id_usuario = '$idUsuario'";
                 $resultado = $db->prepare($query);
                 $resultado->execute();
 
                 if ($resultado->rowCount() === 1) {
+                    $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
                     $arrayResponse['status'] =  true;
                     $arrayResponse['errorCode'] = "";
-                    $arrayResponse['response'] = $resultado->fetch(PDO::FETCH_ASSOC);
+                    $arrayResponse['response'] = $resultado;
+                    $creadorEquipo = $resultado['creador'];
 
-                    $query = "SELECT usuarios.imagen, usuarios.usuario, usuarios.email FROM usuarios INNER JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario AND usuarios_equipos.id_equipo = '$idEquipo'";
+                    if ($creadorEquipo === $idUsuario) {
+                        $arrayResponse['response']['admin'] = true;
+                    } else {
+                        $arrayResponse['response']['admin'] = false;
+                    }
+
+                    $query = "SELECT usuarios.id, usuarios.imagen, usuarios.usuario, usuarios.email FROM usuarios INNER JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario AND usuarios_equipos.id_equipo = '$idEquipo'";
                     $resultado = $db->prepare($query);
                     $resultado->execute();
-                    $arrayResponse['response']['usersData'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+                    $res = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                    for ($i = 0; $i < count($res); $i++) {
+                        $arrayResponse['response']['usersData'][$i]['id'] = $res[$i]['id'];
+                        $arrayResponse['response']['usersData'][$i]['email'] = $res[$i]['email'];
+                        $arrayResponse['response']['usersData'][$i]['imagen'] = $res[$i]['imagen'];
+                        $arrayResponse['response']['usersData'][$i]['usuario'] = $res[$i]['usuario'];
+                        if ($res[$i]['id'] == $creadorEquipo) {
+                            $arrayResponse['response']['usersData'][$i]['admin'] = true;
+                        } else {
+                            $arrayResponse['response']['usersData'][$i]['admin'] = false;
+                        }
+                    }
+
                     $arrayResponse['response']['usersCount'] = $resultado->rowCount();
                 } else {
                     $arrayResponse['status'] =  false;
@@ -1200,6 +1374,133 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "El equipo introducido no existe";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para actualizar el grupo
+    $app->post('/actualizarDatosEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenUsuario = $postResponse['token'];
+            $idGrupo = $postResponse['idGrupo'];
+            $nuevoNombre = $postResponse['nuevoNombre'];
+            $nuevaDescripcion = $postResponse['nuevaDescripcion'];
+
+            //Comprobar si el usuario es el admin
+            $query = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $respuesta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $idUsuario = $respuesta['id'];
+
+                $query = "SELECT * FROM equipos WHERE creador = '$idUsuario'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $query = "UPDATE equipos SET nombre = '$nuevoNombre', descripcion = '$nuevaDescripcion' WHERE id = '$idGrupo'";
+                    $resultado = $db->prepare($query);
+                    $resultado->execute();
+                    if ($resultado->rowCount() === 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = "Datos de equipo actualizados correctamente!";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "Se ha producido un error al actualizar los datos";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "No tienes permisos de administrador";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "El equipo introducido no existe";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para actualizar el grupo
+    $app->post('/eliminarUsuarioEquipo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenUsuario = $postResponse['token'];
+            $idGrupo = $postResponse['idGrupo'];
+            $usuarioABorrar = $postResponse['usuarioABorrar'];
+
+            //Comprobar si el usuario es el admin
+            $query = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $respuesta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $idUsuario = $respuesta['id'];
+
+                $query = "SELECT * FROM equipos WHERE creador = '$idUsuario'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $query = "DELETE FROM usuarios_equipos WHERE id_equipo = '$idGrupo' AND id_usuario = '$usuarioABorrar'";
+                    $resultado = $db->prepare($query);
+                    $resultado->execute();
+                    if ($resultado->rowCount() === 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = "Usuario eliminado correctamente!";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "Se ha producido un error al eliminar el usuario";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "No tienes permisos de administrador";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Ha ocurrido un problema";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

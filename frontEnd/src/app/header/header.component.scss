@@ -794,6 +794,17 @@ div.overlayPopupProfileSettings {
                 }
                 .equipoData {
                     .container {
+                        max-height: 460px;
+                        overflow: auto;
+                        &::-webkit-scrollbar {
+                            width: 10px;
+                        }
+                        &::-webkit-scrollbar-thumb {
+                            background-color: #333333;
+                            background-clip: padding-box;
+                            border: 2px solid transparent;
+                            border-radius: 30px;
+                        }
                         .top {
                             padding: 20px;
                             height: 200px;
@@ -807,25 +818,62 @@ div.overlayPopupProfileSettings {
                             color: #ffffff;
                             .left {
                                 z-index: 99;
-                                width: 60%;
+                                width: 56%;
                                 .data {
                                     display: flex;
                                     align-items: center;
+                                    #teamName {
+                                        width: 50%;
+                                        &.active {
+                                            border: 1px solid #000000;
+                                            border-radius: 4px;
+                                            padding: 2px;
+                                        }
+                                    }
+                                    p.date {
+                                        font-size: 12px;
+                                        font-style: italic;
+                                        margin-left: 15px;
+                                    }
                                 }
-                                p.date {
-                                    font-size: 12px;
-                                    font-style: italic;
-                                    margin-left: 15px;
+                                #teamDescription {
+                                    margin-top: 10px;
+                                    &.active {
+                                        border: 1px solid #000000;
+                                        border-radius: 4px;
+                                        padding: 2px;
+                                    }
                                 }
                             }
                             .right {
                                 z-index: 99;
                                 display: flex;
                                 align-items: center;
-                                i {
-                                    margin-right: 20px;
-                                    cursor: pointer;
-                                    font-size: 13px;
+                                .edit {
+                                    display: flex;
+                                    align-items: center;
+                                    i {
+                                        margin-right: 20px;
+                                        cursor: pointer;
+                                        font-size: 13px;
+                                    }
+                                    button#confirmEditDataTeam {
+                                        display: none;
+                                        align-items: center;
+                                        background: #2ecc40;
+                                        padding: 4px 8px;
+                                        border-radius: 3px;
+                                        border: none;
+                                        color: $whiteColor;
+                                        margin-right: 10px;
+                                        i {
+                                            font-size: 12px !important;
+                                            margin-right: 6px !important;
+                                        }
+                                        &:hover {
+                                            background: #24b134;
+                                        }
+                                    }
                                 }
                                 button {
                                     color: #ffffff;
@@ -868,18 +916,8 @@ div.overlayPopupProfileSettings {
                             }
                             ul.miembros {
                                 width: 100%;
-                                max-height: 200px;
                                 overflow-x: hidden;
                                 overflow-y: auto;
-                                &::-webkit-scrollbar {
-                                    width: 10px;
-                                }
-                                &::-webkit-scrollbar-thumb {
-                                    background-color: #333333;
-                                    background-clip: padding-box;
-                                    border: 2px solid transparent;
-                                    border-radius: 30px;
-                                }
                                 li {
                                     list-style: none;
                                     margin: 10px;
@@ -932,6 +970,34 @@ div.overlayPopupProfileSettings {
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+            #tab4 {
+                .container {
+                    padding: 25px;
+                    .themeContainer {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
+                        margin-top: 15px;
+                        .tema {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            margin-top: 10px;
+                            cursor: pointer;
+                            p {
+                                border: 1px solid transparent;
+                                width: 180px;
+                                height: 100px;
+                                margin-bottom: 20px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 6px;
                             }
                         }
                     }

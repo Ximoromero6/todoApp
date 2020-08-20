@@ -128,7 +128,7 @@ export class HeaderComponent implements OnInit {
     let hideOverlay = document.querySelector('.overlayPopupProfileSettings');
 
     window.onclick = function (e) {
-      if (e.srcElement.className !== "noClose") {
+      if (e.srcElement.className !== "noCloseMenu") {
         hideDrop.classList.remove('open');
       } else {
         hideDrop.classList.add('open');
@@ -247,7 +247,7 @@ export class HeaderComponent implements OnInit {
             }
             this.data.imagen = response.data.imagen;
             this.imagen = this.sanitizer.bypassSecurityTrustUrl(`${window.location.origin}/assets/uploads/${this.data.usuario}/${response.data.imagen}`);
-
+            this.updateLocal(this.data);
           } else {
             this.mensajeNotificacion = response.response;
             this.statusNotificacion = 'error';
@@ -579,10 +579,10 @@ export class HeaderComponent implements OnInit {
   unirseEquipo() {
     this.servicio.unirseEquipo(this.data.token, this.idEquipoHidden, this.formularioUnirseEquipo.get('unirseEquipoField').value).subscribe(
       (response) => {
+        this.mensajeNotificacion = response.response;
         if (response.status) {
           this.statusNotificacion = 'success';
           this.iconoNotificacion = 'fas fa-check-circle';
-          this.mensajeNotificacion = response.response;
           let updated = this.formularioUnirseEquipo.get('unirseEquipoField').value;
           this.data.equipo = updated;
           this.equipo = updated;
@@ -593,7 +593,6 @@ export class HeaderComponent implements OnInit {
         } else {
           this.statusNotificacion = 'error';
           this.iconoNotificacion = 'fas fa-exclamation-circle';
-          this.mensajeNotificacion = response.response;
         }
         this.ocultarNotificacion(false);
         setTimeout(() => {
@@ -602,6 +601,88 @@ export class HeaderComponent implements OnInit {
       },
       (error) => {
         console.error(error);
+      }
+    );
+  }
+
+  //Editar datos de equipo
+  changeEditButton() {
+    let editButton = document.getElementById('buttonEditDataTeam');
+    editButton.style.display = 'none';
+
+    let confirm = document.getElementById('confirmEditDataTeam');
+    confirm.style.display = 'flex';
+
+    let name: any = document.getElementById('teamName');
+    name.contentEditable = true;
+    name.classList.toggle('active');
+
+    let description: any = document.getElementById('teamDescription');
+    description.contentEditable = true;
+    description.classList.toggle('active');
+  }
+
+
+  editarDatosEquipo() {
+    //Cuando le demos al botón de guardar se envían los datos del formulario
+    let confirm = document.getElementById('confirmEditDataTeam');
+    let name: any = document.getElementById('teamName');
+    let description: any = document.getElementById('teamDescription');
+    let editButton = document.getElementById('buttonEditDataTeam');
+
+    name.contentEditable = false;
+    description.contentEditable = false;
+    name.classList.remove('active');
+    description.classList.remove('active');
+    confirm.style.display = 'none';
+    editButton.style.display = 'flex';
+
+    let newTitle = name.textContent;
+    let newDescription = description.textContent;
+
+    //Llamamos al back
+    this.servicio.actualizarDatosEquipo(this.data.token, this.datosEquipo.id, newTitle, newDescription).subscribe(
+      (response) => {
+        this.mensajeNotificacion = response.response;
+        if (response.status) {
+          this.statusNotificacion = 'success';
+          this.iconoNotificacion = 'fas fa-check-circle';
+        } else {
+          this.statusNotificacion = 'error';
+          this.iconoNotificacion = 'fas fa-exclamation-circle';
+        }
+        this.ocultarNotificacion(false);
+        setTimeout(() => {
+          this.ocultarNotificacion(true);
+        }, 5000);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    
+  }
+
+  //Eliminar un usuario
+  deleteUser(id) {
+    /*  alert(this.parentElement); */
+    this.servicio.eliminarUsuarioEquipo(this.data.token, this.datosEquipo.id, id).subscribe(
+      (response) => {
+        this.mensajeNotificacion = response.response;
+        if (response.status) {
+          this.statusNotificacion = 'success';
+          this.iconoNotificacion = 'fas fa-check-circle';
+        } else {
+          this.statusNotificacion = 'error';
+          this.iconoNotificacion = 'fas fa-exclamation-circle';
+        }
+        this.ocultarNotificacion(false);
+        setTimeout(() => {
+          this.ocultarNotificacion(true);
+        }, 5000);
+      },
+      (error) => {
+        console.log(error);
       }
     );
   }

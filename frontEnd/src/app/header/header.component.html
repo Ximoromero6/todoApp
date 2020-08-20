@@ -4,12 +4,12 @@
             <div class="logoPart">
                 <a routerLink="/home">Hubbet</a>
                 <!-- <button><i class="fas fa-plus"></i><label>Añadir Tarea</label></button> -->
-                <a id="closeMenuIcon"><img src="../../assets/images/menu.svg" alt=""></a>
+                <a id="closeMenuIcon"><img src="../../assets/images/menu.svg" alt="" loading="lazy"></a>
             </div>
             <div class="menu">
                 <ul>
                     <li>
-                        <a class="active"><img src="../../assets/images/burguer.svg" alt=""> <label>Dashboard</label></a>
+                        <a class="active"><img src="../../assets/images/burguer.svg" alt="" loading="lazy"> <label>Dashboard</label></a>
                     </li>
                     <!--  <li class="misTareasButton">
                         <a>
@@ -21,7 +21,7 @@
                         </a>
                     </li> -->
                     <li>
-                        <a><img src="../../assets/images/checkMenu.svg" alt=""><label>Tareas Completadas</label></a>
+                        <a><img src="../../assets/images/checkMenu.svg" alt="" loading="lazy"><label>Tareas Completadas</label></a>
                     </li>
                     <!-- <li>
                         <a href="#0"><img src="../../assets/images/comprobado.svg" alt=""><label>Tareas Completadas</label></a>
@@ -32,42 +32,42 @@
                 </ul>
             </div>
             <div class="preCloseSession">
-                <img src="../../assets/images/checklist_.svg" alt="">
+                <img src="../../assets/images/checklist_.svg" alt="" loading="lazy">
                 <small>¡Empieza ahora creando nuevas tareas!</small>
             </div>
         </div>
         <div class="bottomPart">
             <hr>
-            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/close.svg" alt=""></button>
+            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/close.svg" alt="" loading="lazy"></button>
         </div>
     </nav>
 </header>
-<a id="openMenuIcon"><img src="../../assets/images/menu-abierto.svg" alt=""></a>
+<a id="openMenuIcon"><img src="../../assets/images/menu-abierto.svg" alt="" loading="lazy"></a>
 
 <!-- Menú horizontal con el buscador y los ajustes del perfil del usuario -->
 <nav id="horizontalMenu">
     <ul>
         <li>
-            <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt=""><input type="text" placeholder="Buscar"></div>
+            <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt="" loading="lazy"><input type="text" placeholder="Buscar"></div>
         </li>
-        <li><a class="noClose">{{ nombre }}<img class="noClose" [src]="imagen" alt=""></a></li>
+        <li><a class="noCloseMenu">{{ nombre }}<img class="noCloseMenu" [src]="imagen" alt="" loading="lazy"></a></li>
     </ul>
     <div id="dropDownMenu">
         <ul>
-            <li class="noClose">
-                <a class="noClose">Opción 1</a>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu">Opción 1</a>
             </li>
-            <li class="noClose">
-                <a class="noClose">Opción 2</a>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu">Opción 2</a>
             </li>
-            <li class="noClose">
-                <a class="noClose">Opción 3</a>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu">Opción 3</a>
             </li>
-            <li class="noClose">
-                <a class="noClose">Opción 4</a>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu">Opción 4</a>
             </li>
-            <li class="noClose">
-                <a class="noClose">Opción 5</a>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu">Opción 5</a>
             </li>
             <li>
                 <a id="profileSettingsButton">Ajustes de mi perfil...</a>
@@ -111,7 +111,7 @@
                     <p class="title">Tu foto</p>
                     <form class="fotoform" method="POST" enctype="multipart/form-data" id="formCambiarFoto" [formGroup]="formGroup">
                         <label for="fileField" id="fakeFotoLabel">
-                            <img [src]="imagen" alt="" id="profileFoto">
+                            <img [src]="imagen" alt="" id="profileFoto" loading="lazy">
 
                             <!-- Preloader -->
                             <div class="pswp__preloader__icn" id="preloader">
@@ -231,13 +231,16 @@
                         <div class="top" style="background: url(../../assets/teams/{{datosEquipo.imagen}});">
                             <div class="left">
                                 <div class="data">
-                                    <h2> {{ datosEquipo.nombre }} </h2>
+                                    <h2 id="teamName"> {{ datosEquipo.nombre }} </h2>
                                     <p class="date">Creado el {{ datosEquipo.creacion }} </p>
                                 </div>
-                                <p> {{ datosEquipo.descripcion }}</p>
+                                <p id="teamDescription"> {{ datosEquipo.descripcion }}</p>
                             </div>
                             <div class="right">
-                                <i class="fas fa-pen"></i>
+                                <div class="edit">
+                                    <i class="fas fa-pen" *ngIf="datosEquipo.admin" (click)="changeEditButton()" id="buttonEditDataTeam"></i>
+                                    <button id="confirmEditDataTeam" (click)="editarDatosEquipo()"><i class="fas fa-check"></i>Guardar</button>
+                                </div>
                                 <button (click)="abandonarEquipo(data.token)">Abandonar el equipo</button>
                             </div>
                             <div class="overlay"></div>
@@ -245,14 +248,14 @@
                         <div class="bottom">
                             <h4>Miembros del equipo ({{ datosEquipo.usersCount }})</h4>
                             <ul class="miembros">
-                                <li *ngFor="let data of datosEquipo.usersData">
+                                <li *ngFor="let item of datosEquipo.usersData">
                                     <div class="item">
-                                        <img src="../../assets/uploads/{{ data.usuario }}/{{ data.imagen }}" alt="">
-                                        <p>{{ data.usuario }}</p>
-                                        <label class="admin">Administrador</label>
-                                        <small>{{ data.email }}</small>
+                                        <img src="../../assets/uploads/{{ item.usuario }}/{{ item.imagen }}" alt="" loading="lazy">
+                                        <p>{{ item.usuario }}</p>
+                                        <label class="admin" *ngIf="item.admin">Administrador</label>
+                                        <small>{{ item.email }}</small>
                                     </div>
-                                    <i class="fas fa-minus-circle"></i>
+                                    <i class="fas fa-minus-circle" *ngIf="datosEquipo.admin" title="Eliminar usuario" (click)="deleteUser(item.id)"></i>
                                 </li>
                             </ul>
                         </div>
@@ -260,8 +263,27 @@
                 </div>
             </div>
             <div id="tab4" class="tabContent">
-                <h1>CUARTA</h1>
-                <!-- TEMAS -->
+                <div class="container">
+                    <h3>Selecciona un tema</h3>
+                    <div class="themeContainer">
+                        <label for="tema1" class="tema">
+                        <p style="border-color: #4f25f3; color: #4f25f3;">Por defecto</p>
+                        <input type="radio" name="temas" id="tema1" checked>
+                    </label>
+                        <label for="tema2" class="tema">
+                        <p style="border-color: #3D9970; color: #3D9970;">Verde</p>
+                        <input type="radio" name="temas" id="tema2">
+                    </label>
+                        <label for="tema3" class="tema">
+                        <p style="border-color: #FF851B; color: #FF851B;">Naranja</p>
+                        <input type="radio" name="temas" id="tema3">
+                    </label>
+                        <label for="tema4" class="tema">
+                        <p style="border-color: #FF4136; color: #FF4136;">Rojo</p>
+                        <input type="radio" name="temas" id="tema4">
+                    </label>
+                    </div>
+                </div>
             </div>
         </div>
 

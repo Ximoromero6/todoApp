@@ -44,17 +44,20 @@ export class CambiarClaveComponent implements OnInit {
     )
       .subscribe(
         (response) => {
-          if (response.status === 0) {
-            this.statusNotificacion = 'error';
-            this.iconoNotificacion = 'fas fa-exclamation-circle';
-            this.mensajeNotificacion = response.response;
-            this.ocultarNotificacion(false);
-          } else {
+          if (response.status) {
             this.statusNotificacion = 'success';
             this.iconoNotificacion = 'fas fa-check-circle';
             this.mensajeNotificacion = response.response;
-            this.ocultarNotificacion(false);
+            this.formularioResetClave.reset();
+          } else {
+            this.statusNotificacion = 'error';
+            this.iconoNotificacion = 'fas fa-exclamation-circle';
+            this.mensajeNotificacion = response.response;
           }
+          this.ocultarNotificacion(false);
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
         },
         (error) => {
           console.log(error);

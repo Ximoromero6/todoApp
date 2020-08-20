@@ -11,23 +11,23 @@
         <!-- Llamamos al componente de notificaciones -->
         <app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="margin-top: 10px;"></app-notificaciones>
 
-        <a routerLink="/" class="logo">HUBBET</a>
+        <!-- <a routerLink="/" class="logo">HUBBET</a> -->
         <h2 class="title">Crear Nueva Cuenta</h2>
         <form id="formularioRegistro" [formGroup]="formularioRegistro" (ngSubmit)="validarDatosRegistro()">
-            <div class="formField" [class.valid]="formularioRegistro.get('nombre').valid && formularioRegistro.get('nombre').value != ''">
-                <input type="text" placeholder="Nombre" formControlName="nombre">
+            <div class="formField" id="formField1" [class.valid]="formularioRegistro.get('nombre').valid && formularioRegistro.get('nombre').value != ''">
+                <input type="text" placeholder="Nombre" formControlName="nombre" class="field1">
             </div>
-            <div class="formField" [class.invalid]="!formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty" [class.valid]="formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty">
-                <input type="text" placeholder="Usuario*" formControlName="usuario" required>
+            <div class="formField" id="formField2" [class.invalid]="!formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty" [class.valid]="formularioRegistro.get('usuario').valid && formularioRegistro.get('usuario').dirty">
+                <input type="text" placeholder="Usuario*" formControlName="usuario" class="field2" required>
             </div>
-            <div class="formField" [class.invalid]="!formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty" [class.valid]="formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty">
-                <input type="email" placeholder="Email*" formControlName="email" required>
+            <div class="formField" id="formField3" [class.invalid]="!formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty" [class.valid]="formularioRegistro.get('email').valid && formularioRegistro.get('email').dirty">
+                <input type="email" placeholder="Email*" formControlName="email" class="field3" required>
             </div>
-            <div class="formField" [class.invalid]="!formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty" [class.valid]="formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty">
-                <input type="password" placeholder="Contraseña*" formControlName="clave" required>
+            <div class="formField" id="formField4" [class.invalid]="!formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty" [class.valid]="formularioRegistro.get('clave').valid && formularioRegistro.get('clave').dirty">
+                <input type="password" placeholder="Contraseña*" formControlName="clave" class="field4" required>
             </div>
-            <span>* Campos obligatorios</span>
-            <button type="submit" class="formField">Registrar</button>
+            <span><i style="color: red;">*</i> Campos obligatorios</span>
+            <button type="submit" class="formField">Registrar cuenta</button>
         </form>
         <hr class="separator2">
         <p class="linkLogin">¿Ya tienes cuenta?<a routerLink="/login">Inicia sesión aquí</a></p>

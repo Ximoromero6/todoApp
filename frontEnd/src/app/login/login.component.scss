@@ -18,6 +18,7 @@ $whiteColor: #ffffff;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        background-image: url('../../assets/images/dot-grid.png');
         a.logo {
             display: none;
             margin: 10px auto;
@@ -55,7 +56,7 @@ $whiteColor: #ffffff;
             color: $textColor;
             margin-top: 20px;
             transition-duration: .2s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             img {
                 width: 18px;
                 height: 18px;
@@ -68,7 +69,7 @@ $whiteColor: #ffffff;
                 width: 90%;
             }
             &:hover {
-                background: rgba(99, 99, 99, 0.1);
+                background: #ccc;
             }
         }
         .separator {
@@ -108,6 +109,9 @@ $whiteColor: #ffffff;
         }
         #formularioLogin {
             width: 60%;
+            @media(min-width: 2000px) {
+                width: 40%;
+            }
             @media (max-width: 200px) {
                 width: 40%;
             }
@@ -122,8 +126,8 @@ $whiteColor: #ffffff;
                 border-radius: 2px;
                 background: $whiteColor;
                 margin: 12px 0;
-                border: 1px solid transparent;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                border: 1px solid #e5e8ed;
+                // box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                 -webkit-appearance: none;
                 &.valid {
                     border: 1px solid #2ecc40;
@@ -135,9 +139,9 @@ $whiteColor: #ffffff;
                     }
                 }
                 &.invalid {
-                    border: 1px solid #ff4136;
+                    border: 1px solid #ff4136 !important;
                     &::after {
-                        content: "\f00d";
+                        content: "\f06a";
                         font-family: "Font Awesome 5 Free";
                         font-weight: 900;
                         color: #ff4136;
@@ -145,9 +149,14 @@ $whiteColor: #ffffff;
                 }
                 &.focused {
                     border-color: $primaryColor;
+                    input {
+                        &::placeholder {
+                            color: $textColor;
+                        }
+                    }
                 }
                 input {
-                    font-family: "Nunito", sans-serif;
+                    font-family: inherit;
                     background: transparent;
                     border: none;
                     border-radius: 2px;
@@ -160,7 +169,7 @@ $whiteColor: #ffffff;
                     transition: all 0.1s;
                     &::placeholder {
                         font-size: 14px;
-                        color: $textColor;
+                        /* color: $textColor; */
                     }
                     @media (max-width: 576px) {
                         padding: 12px;
@@ -169,22 +178,25 @@ $whiteColor: #ffffff;
                 }
             }
             button[type="submit"] {
-                font-family: "Nunito", sans-serif;
+                font-family: inherit;
                 justify-content: center;
                 cursor: pointer;
                 background-color: $primaryColor;
                 color: $whiteColor;
                 border: none;
                 padding: 15px;
+                font-size: 15px;
                 outline: 0;
-                border-radius: 5px;
+                border-radius: 4px;
                 box-shadow: 0 0 8px rgba(59, 43, 91, 0.3);
                 margin-top: 20px;
+                transition: all .1s;
                 i {
                     margin-left: 10px;
                     transition: all 0.2s;
                 }
                 &:hover {
+                    background: #4016e7;
                     i {
                         margin-left: 20px;
                     }
@@ -235,8 +247,11 @@ $whiteColor: #ffffff;
             a {
                 margin-left: 10px;
                 color: $primaryColor;
-                text-decoration: underline;
+                text-decoration: none;
                 cursor: pointer;
+                &:hover {
+                    color: #4016e7;
+                }
             }
             @media (max-width: 768px) {
                 font-size: 14px;
@@ -247,41 +262,53 @@ $whiteColor: #ffffff;
         }
     }
     .right {
-        background: #e2f2ff;
+        /*  background: $primaryColor; */
+        background-image: url('../../assets/images/dot.svg');
         flex: 1;
-        background-image: url("../../assets/images/4.svg");
-        background-size: 80%;
         background-repeat: no-repeat;
-        background-position-y: 74%;
-        background-position-x: center;
+        background-size: cover;
         @media (max-width: 1200px) {
             display: none;
         }
-        .text {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            margin: 40px 20px;
-            h3 {
-                color: $textColor;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .container {
+            margin: 0 auto;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            color: $whiteColor;
+            h1 {
+                font-size: 46px;
+                font-weight: 700;
+                font-family: inherit;
+                max-width: 550px;
             }
             p {
-                max-width: 40%;
-                text-align: right;
-                color: $grayColor;
-                margin: 20px 0;
+                font-size: 22px;
+                font-weight: lighter;
+                font-family: inherit;
+                max-width: 550px;
             }
-            button {
-                width: 160px;
-                padding: 10px;
-                border: 1px solid $primaryColor;
-                border-radius: 2px;
-                outline: 0;
-                background: none;
-                font-weight: bold;
-                font-family: "Nunito", sans-serif;
-                color: $textColor;
+            a {
+                width: 300px;
+                margin: auto;
+                padding: 10px 30px;
+                text-decoration: none;
+                border: 2px solid transparent;
+                border-radius: 3px;
+                background: $whiteColor;
+                font-family: inherit;
+                font-size: 16px;
+                color: $primaryColor;
+                margin-top: 30px;
+                display: block;
+                outline: none;
                 cursor: pointer;
+                &:hover {
+                    background: rgba(255, 255, 255, .9);
+                }
             }
         }
     }

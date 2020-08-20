@@ -11,26 +11,26 @@ export class ServicioService {
     private http: HttpClient
   ) { }
 
-  getUserNote(email, sesionEmail): Observable<any> {
+  getUserNote(email, token): Observable<any> {
     let headers = new HttpHeaders().set(
       'Content-Type',
       'application/x-www-form-urlencoded; charset=UTF-8'
     );
 
-    let body = 'email=' + email + '&sesionEmail=' + sesionEmail;
+    let body = 'email=' + email + '&token=' + token;
     return this.http.post(this.url + 'getUserNote', body, {
       headers: headers
     });
   }
 
   //Función para crear una tarea
-  addTarea(token, titulo, fecha, descripcion): Observable<any> {
+  addTarea(token, titulo, fecha, descripcion, usuarios): Observable<any> {
     let headers = new HttpHeaders().set(
       'Content-Type',
       'application/x-www-form-urlencoded; charset=UTF-8'
     );
 
-    let body = 'token=' + token + '&titulo=' + titulo + '&fecha=' + fecha + '&descripcion=' + descripcion;
+    let body = 'token=' + token + '&titulo=' + titulo + '&fecha=' + fecha + '&descripcion=' + descripcion + '&usuarios=' + usuarios;
     return this.http.post(this.url + 'addTarea', body, {
       headers: headers
     });

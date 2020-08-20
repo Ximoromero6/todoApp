@@ -15,9 +15,14 @@
                 <div class="top">
                     <i class="fas fa-caret-right active"></i>
                     <p>Hoy</p>
-                    <span id="todayTaskCount">(0)</span>
+                    <span id="todayTaskCount">({{todayTaskCount}})</span>
                 </div>
                 <div class="bottom active" [sortablejs]="listaTareasToday">
+                    <!-- TEST -->
+                    <!-- <pre>
+                        <p>{{ listaTareasToday | json }}</p>
+                    </pre> -->
+                    <!-- TEST -->
                     <div *ngFor="let todayTask of listaTareasToday" (click)="ampliarTarea(todayTask)" class="task">
                         <div class="left">
                             <i class="fas fa-grip-vertical draggableIcon"></i>
@@ -45,7 +50,7 @@
                 <div class="top">
                     <i class="fas fa-caret-right"></i>
                     <p>Mañana</p>
-                    <span id="tomorrowTaskCount">(0)</span>
+                    <span id="tomorrowTaskCount">({{ tomorrowTaskCount }})</span>
                 </div>
                 <div class="bottom">
                     <div *ngFor="let tomorrowTask of listaTareasTomorrow" (click)="ampliarTarea(tomorrowTask)" class="task">
@@ -72,7 +77,7 @@
                 <div class="top">
                     <i class="fas fa-caret-right"></i>
                     <p>Próximas tareas</p>
-                    <span id="tomorrowTaskCount">(0)</span>
+                    <span id="nextTaskCount">(0)</span>
                 </div>
                 <div class="bottom"></div>
             </div>
@@ -117,38 +122,20 @@
                 <div class="descripcion">
                     <p>Descripción</p>
                     <p contenteditable="true" id="descripcionTarea">{{ tareaSeleccionada.descripcion }}</p>
-                    <!-- <a (click)="setUrl()"><i class="fa fa-link fa-fw"></i></a> -->
                 </div>
                 <div class="comentarios">
-                    <div class="comentario">
+                    <div class="comentario" *ngFor="let comentario of tareaSeleccionada.comentarios">
                         <div class="top">
                             <div>
-                                <img src="../../assets/uploads/test/f17583ece9ae6bdf.jpg" alt="">
+                                <img src="../../assets/uploads/{{tareaSeleccionada.usuario}}/{{tareaSeleccionada.imagen}}" alt="">
                                 <div class="right">
-                                    <p>Ximo Romero</p>
-                                    <span>Hace 2 días</span>
+                                    <p>{{ comentario.usuario }}</p>
+                                    <span>{{ comentario.fecha }}</span>
                                 </div>
                             </div>
-                            <i class="fas fa-angle-down"></i>
+                            <i class="fas fa-eraser"></i>
                         </div>
-                        <p>
-                            Lorem ipsum dolor sit amet, illum repellendus voluptatem esse est, provident, ducimus fugiat!
-                        </p>
-                    </div>
-                    <div class="comentario">
-                        <div class="top">
-                            <div>
-                                <img src="../../assets/uploads/test/f17583ece9ae6bdf.jpg" alt="">
-                                <div class="right">
-                                    <p>Ximo Romero</p>
-                                    <span>Hace 2 días</span>
-                                </div>
-                            </div>
-                            <i class="fas fa-angle-down"></i>
-                        </div>
-                        <p>
-                            Esto es un comentario de prueba!!
-                        </p>
+                        <p>{{ comentario.comentario }}</p>
                     </div>
                 </div>
             </div>

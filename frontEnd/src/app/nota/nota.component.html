@@ -37,7 +37,7 @@
                         <input type="radio" id="noneDate" name="date">
                         <label for="noneDate" id="labelNoneDate">
                             <i class="fas fa-times"></i>
-                            Sin fecha de entrega
+                            Sin fecha
                         </label>
                     </div>
                     <!--  <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small> -->
@@ -49,7 +49,7 @@
                 </div>
                 <div class="moreOptions">
                     <i class="fas fa-chevron-right"></i>
-                    <span>Mostrar más opciones</span>
+                    <span>Mostrar menos opciones</span>
                 </div>
                 <div class="moreOptionsContainer">
                     <div class="field" id="moreOptionsContainer2">
@@ -60,7 +60,7 @@
                             <!-- Popup agregar personas -->
                             <form id="popupAdd" method="POST" [formGroup]="formularioAddPerson" (ngSubmit)="validarDatosAddPerson()">
                                 <input type="email" placeholder="Introduce email" formControlName="email" #inputAdd id="addPerson">
-                                <button type="submit">Agregar</button>
+                                <button type="submit" class="agregarPersonaButton" hidden=true>Agregar</button>
                             </form>
                             <div class="tooltip">
                                 <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>

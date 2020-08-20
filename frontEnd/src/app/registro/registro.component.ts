@@ -38,20 +38,56 @@ export class RegistroComponent implements OnInit {
         Validators.compose([Validators.minLength(6), Validators.required]),
       ],
     });
+
+    this.focusField();
+  }
+
+  focusField() {
+    let field1: any = document.querySelector('.field1');
+    let field2: any = document.querySelector('.field2');
+    let field3: any = document.querySelector('.field3');
+    let field4: any = document.querySelector('.field4');
+
+    field1.addEventListener('focus', () => {
+      document.getElementById('formField1').classList.add('focused');
+    });
+    field1.addEventListener('focusout', () => {
+      document.getElementById('formField1').classList.remove('focused');
+    });
+
+    field2.addEventListener('focus', () => {
+      document.getElementById('formField2').classList.add('focused');
+    });
+    field2.addEventListener('focusout', () => {
+      document.getElementById('formField2').classList.remove('focused');
+    });
+
+    field3.addEventListener('focus', () => {
+      document.getElementById('formField3').classList.add('focused');
+    });
+    field3.addEventListener('focusout', () => {
+      document.getElementById('formField3').classList.remove('focused');
+    });
+
+    field4.addEventListener('focus', () => {
+      document.getElementById('formField4').classList.add('focused');
+    });
+    field4.addEventListener('focusout', () => {
+      document.getElementById('formField4').classList.remove('focused');
+    });
   }
 
   validarDatosRegistro() {
+
     if (this.formularioRegistro.invalid) {
       this.formularioRegistro.get('nombre').markAsDirty();
       this.formularioRegistro.get('usuario').markAsDirty();
       this.formularioRegistro.get('email').markAsDirty();
       this.formularioRegistro.get('clave').markAsDirty();
       return;
-    } else {
-      this.showLoader = false;
     }
 
-    console.log(JSON.stringify(this.formularioRegistro.value));
+    this.showLoader = false;
 
     this.registro
       .registrarUsuario(
@@ -62,22 +98,27 @@ export class RegistroComponent implements OnInit {
       )
       .subscribe(
         (response) => {
-          console.log(response);
-          if (response.status == 1) {
+          this.showLoader = true;
+          if (response.status) {
             //Redireccionar a página verificar cuenta pero si hay un error se muestra
             localStorage.setItem('userToken', response.data.token);
             this.ruta.navigateByUrl('/registroFinal', { state: { email: this.formularioRegistro.value.email } });
+            setTimeout(() => {
+
+            }, 4000);
           } else {
             this.statusNotificacion = 'error';
             this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.mensajeNotificacion = response.response;
             this.ocultarNotificacion(false);
-            setTimeout(() => {
-              this.ocultarNotificacion(true);
-            }, 5000);
           }
+
+          setTimeout(() => {
+            this.ocultarNotificacion(true);
+          }, 5000);
         },
         (error) => {
+          this.showLoader = true;
           console.log(error);
         }
       );

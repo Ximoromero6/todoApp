@@ -110,4 +110,28 @@ export class ServicioService {
     });
   }
 
+  //Función para actualizar los datos de un equipo si eres el admin
+  actualizarDatosEquipo(token, idGrupo, nuevoNombre, nuevaDescripcion): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'token=' + token + '&idGrupo=' + idGrupo + '&nuevoNombre=' + nuevoNombre + '&nuevaDescripcion=' + nuevaDescripcion;
+    return this.http.post(this.url + 'actualizarDatosEquipo', body, {
+      headers: headers
+    });
+  }
+
+  //Función para eliminar usuarios de un equipo si eres admin
+  eliminarUsuarioEquipo(token, idGrupo, usuarioABorrar): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'token=' + token + '&idGrupo=' + idGrupo + '&usuarioABorrar=' + usuarioABorrar;
+    return this.http.post(this.url + 'eliminarUsuarioEquipo', body, {
+      headers: headers
+    });
+  }
+
 }

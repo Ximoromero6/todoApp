@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NotaComponent } from '../nota/nota.component';
 import { DashBoardServiceService } from './dash-board-service.service';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,11 +11,12 @@ import { DashBoardServiceService } from './dash-board-service.service';
 export class DashboardComponent implements OnInit {
 
   data: any;
-  todayTaskCount: number;
-  tomorrowTaskCount: number;
+  todayTaskCount: number = 0;
+  tomorrowTaskCount: number = 0;
+  futureTaskCount: number = 0;
 
   //Array con todas las tareas
-  listaTareasToday;
+  listaTareasToday = [];
   listaTareasTomorrow;
 
   //Array para saber la tarea seleccionada
@@ -30,7 +32,6 @@ export class DashboardComponent implements OnInit {
   @ViewChild(NotaComponent) child;
 
   ngOnInit(): void {
-    console.log(this.listaTareasToday);
     this.obtenerTareas(this.data.token);
     this.addTarea();
     this.init();
@@ -133,29 +134,23 @@ export class DashboardComponent implements OnInit {
   obtenerTareas(userToken) {
     this.servicio.obtenerTareas(userToken).subscribe(
       (response) => {
-        console.log(response);
         if (response.status) {
+          let date = new Date();
+          let today = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`;
+          let tomorrow = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate() + 1)).slice(-2)}`;
 
-          //Añadimos las tareas de hoy a un array
-          this.listaTareasToday = response.todayTasks;
-          this.listaTareasTomorrow = response.tomorrowTasks;
+          //Asignamos las tareas
+          this.listaTareasToday = response.tasks.filter(e => e.fecha == today);
 
-          response.todayTasks.forEach(item => {
+          //Asignamos el número de tareas de hoy
+          this.todayTaskCount = this.listaTareasToday.length;
 
-            //Contador de tareas de hoy
-            this.todayTaskCount = item.todayCount;
-            this.tomorrowTaskCount = item.tomorrowCount;
+          //añadimos las tareas de mañana a un array
+          this.listaTareasTomorrow = response.tasks.filter(e => e.fecha == tomorrow);
 
-            //Añadimos el contador de tareas de hoy
-            let counter: any = document.createTextNode(`(${response.todayCount})`);
-            document.getElementById('todayTaskCount').innerHTML = counter.textContent;
+          //Asignamos el número de tareas de mañana
+          this.tomorrowTaskCount = this.listaTareasTomorrow.length;
 
-            //Añadimos el contador de tareas de mañana
-            let tomorrowCounter: any = document.createTextNode(`(${response.tomorrowCount})`);
-            document.getElementById('tomorrowTaskCount').innerHTML = tomorrowCounter.textContent;
-          });
-        } else {
-          document.querySelector('.taskContainer > .bottom').appendChild(document.createTextNode(response.response));
         }
       },
       (error) => {
@@ -172,21 +167,10 @@ export class DashboardComponent implements OnInit {
 
   setUrl() {
     let url = (<HTMLTextAreaElement>document.getElementById("descripcionTarea")).value;
-    console.log(url);
     let sText = document.getSelection();
     document.execCommand('insertHTML', false, '<a href="' + url + '" target="_blank">' + sText + '</a>');
     url = '';
   }
-
-  activeTask() {
-    let el = document.querySelectorAll('.controllers span');
-    el.forEach(element => {
-      element.addEventListener('click', (e) => {
-
-      });
-    });
-  }
-
 
   //Función para eliminar las tareas
   eliminarTarea(token, id) {

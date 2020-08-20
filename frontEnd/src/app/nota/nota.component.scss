@@ -20,7 +20,7 @@ div.overlayPopupTask {
     padding-top: 100px;
     .containerTarea {
         background: $whiteColor;
-        /*  width: 600px; */
+        width: 600px;
         height: 550px;
         border-radius: 6px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -341,7 +341,8 @@ div.overlayPopupTask {
                 margin: 15px 5px;
                 cursor: pointer;
                 i {
-                    margin: 0 20px;
+                    margin: 0 15px 0 20px;
+                    font-size: 14px;
                     cursor: pointer;
                     transition: all .1s ease-in;
                     &.active {

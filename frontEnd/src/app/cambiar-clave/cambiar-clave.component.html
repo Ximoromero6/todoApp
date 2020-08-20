@@ -1,11 +1,15 @@
-<h1>Introduce tu email para restablecer tu contraseña</h1>
-
 <!-- Llamamos al componente de notificaciones -->
-<app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="position: absolute; margin-top: 10px;"></app-notificaciones>
+<app-notificaciones [statusNotificacion]="statusNotificacion" [iconoNotificacion]="iconoNotificacion" [mensajeNotificacion]="mensajeNotificacion" [hidden]="mostrarNotificacion" (mostrarNotificacion)="ocultarNotificacion($event)" style="position: absolute; top: 25px; left: 50%; transform: translateX(-50%); "></app-notificaciones>
 
-<form [formGroup]="formularioResetClave" (ngSubmit)="validarDatosResetClave()">
-    <div class="formField" [class.invalid]="!formularioResetClave.get('email').valid && formularioResetClave.get('email').dirty">
-        <input type="email" placeholder="Introduce tu email" formControlName="email">
-    </div>
-    <button type="submit">Resetear Contraseña</button>
-</form>
+<div class="container">
+    <img src="../../assets/images/mensaje.svg" alt="">
+    <h1>Introduce tu email para restablecer tu contraseña</h1>
+    <!-- <img src="../../assets/images/forgottMan.svg" alt=""> -->
+    <form [formGroup]="formularioResetClave" (ngSubmit)="validarDatosResetClave()">
+        <div class="formField" [class.invalid]="!formularioResetClave.get('email').valid && formularioResetClave.get('email').dirty">
+            <input type="email" placeholder="Introduce tu email" formControlName="email">
+        </div>
+        <button type="submit">Resetear Contraseña gg</button>
+        <p>También puedes <a routerLink="/login">volver al inicio</a></p>
+    </form>
+</div>

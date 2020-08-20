@@ -36,6 +36,27 @@ export class LoginComponent implements OnInit {
 
     //Google Login
     this.googleSDK();
+
+    this.focusField();
+  }
+
+  focusField() {
+    let field1: any = document.querySelector('.field1');
+    let field2: any = document.querySelector('.field2');
+
+    field1.addEventListener('focus', () => {
+      document.getElementById('formField1').classList.add('focused');
+    });
+    field1.addEventListener('focusout', () => {
+      document.getElementById('formField1').classList.remove('focused');
+    });
+
+    field2.addEventListener('focus', () => {
+      document.getElementById('formField2').classList.add('focused');
+    });
+    field2.addEventListener('focusout', () => {
+      document.getElementById('formField2').classList.remove('focused');
+    });
   }
 
   validarDatosLogin() {
