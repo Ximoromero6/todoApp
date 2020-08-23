@@ -136,14 +136,14 @@ export class NotaComponent implements OnInit {
       this.inputAdd.nativeElement.focus();
     });
 
-    document.getElementById('addPerson').addEventListener('focusout', () => {
+    /* document.getElementById('addPerson').addEventListener('focusout', () => {
       document.addEventListener('click', (e) => {
         let el: any = e.target;
         if (el.classList !== 'agregarPersonaButton') {
           document.getElementById('popupAdd').style.display = 'none';
         }
       });
-    });
+    }); */
 
     document.querySelector('.moreOptions').addEventListener('click', () => {
       document.querySelector('.moreOptions > i').classList.toggle('active');
@@ -285,6 +285,7 @@ export class NotaComponent implements OnInit {
     ).subscribe(
       (response) => {
         console.log(response);
+        this.users = [];
         if (response.status === true) {
           let parent = document.querySelector('#peopleContainer');
           let children = Array.from(document.getElementById('peopleContainer').children);
@@ -308,6 +309,7 @@ export class NotaComponent implements OnInit {
         }
       },
       (error) => {
+        this.users = [];
         console.log(error);
       }
     )

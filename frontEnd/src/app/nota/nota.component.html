@@ -60,7 +60,7 @@
                             <!-- Popup agregar personas -->
                             <form id="popupAdd" method="POST" [formGroup]="formularioAddPerson" (ngSubmit)="validarDatosAddPerson()">
                                 <input type="email" placeholder="Introduce email" formControlName="email" #inputAdd id="addPerson">
-                                <button type="submit" class="agregarPersonaButton" hidden=true>Agregar</button>
+                                <button type="submit" class="agregarPersonaButton">Agregar</button>
                             </form>
                             <div class="tooltip">
                                 <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>

@@ -799,13 +799,15 @@ return function (App $app) {
             $fecha = filter_var($postResponse['fecha'], FILTER_SANITIZE_STRING);
             $descripcion = filter_var($postResponse['descripcion'], FILTER_SANITIZE_STRING);
             $now = date("Y-m-d H:i:s");
-            
+            /*             $usuarios = []; */
+
             if ($postResponse['usuarios'] == "") {
                 $usuarios = array();
             } else {
-                $usuarios[] = $postResponse['usuarios'];
+                $usuarios = explode(",", $postResponse['usuarios']);
             }
 
+            //Obtener el id del usuario
             $query = "SELECT usuarios.id FROM usuarios WHERE usuarios.token = '$token'";
             $resultado = $db->prepare($query);
             $resultado->execute();
@@ -829,16 +831,15 @@ return function (App $app) {
                 $idTarea = $db->lastInsertId();
 
                 if ($resultadoQuery->rowCount() === 1) {
-                    
-                    for ($i = 0; $i < count($usuarios); $i++) {
+
+                    foreach ($usuarios as $user) {
 
                         //Si la tearea se inserta correctamente, insertamos un registro en la tabla usuarios_tareas con el id usuario y el id de la tarea que acabamos de crear
                         $query = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES (?, ?)";
                         $resultado = $db->prepare($query);
-                        $resultado->bindParam(1, $usuarios[$i]);
+                        $resultado->bindParam(1, $user);
                         $resultado->bindParam(2, $idTarea);
                         $resultado->execute();
-                        
                     }
 
                     if ($resultado->rowCount() == 1) {
@@ -850,7 +851,6 @@ return function (App $app) {
                         $arrayResponse['errorCode'] = "1001";
                         $arrayResponse['response'] = "Se ha producido un error, inténtalo más tarde";
                     }
-
                 } else {
                     $arrayResponse['status'] = false;
                     $arrayResponse['errorCode'] = "1001";
@@ -1400,8 +1400,8 @@ return function (App $app) {
 
             $tokenUsuario = $postResponse['token'];
             $idGrupo = $postResponse['idGrupo'];
-            $nuevoNombre = $postResponse['nuevoNombre'];
-            $nuevaDescripcion = $postResponse['nuevaDescripcion'];
+            $nuevoNombre = trim($postResponse['nuevoNombre']);
+            $nuevaDescripcion = trim($postResponse['nuevaDescripcion']);
 
             //Comprobar si el usuario es el admin
             $query = "SELECT usuarios.id, usuarios_equipos.id_equipo FROM usuarios LEFT JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario WHERE usuarios.token = '$tokenUsuario'";
@@ -1501,6 +1501,77 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "Ha ocurrido un problema";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para publicar un comentario en una tarea
+    $app->post('/addComentario', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenUsuario = $postResponse['token'];
+            $idTarea = $postResponse['idTarea'];
+            $comentario = $postResponse['comentario'];
+
+            //Obtener el id del usuario que está en sesión (el que va a publicar el comentario)
+            $query = "SELECT id FROM usuarios WHERE token = '$tokenUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $respuesta = $resultado->fetch(PDO::FETCH_ASSOC);
+                $idUsuario = $respuesta['id'];
+
+                //Comprobamos que el usuario esté en la tarea
+                $query = "SELECT * FROM usuarios_tareas WHERE id_usuario = '$idUsuario' AND id_tarea = '$idTarea'";
+                $resultado = $db->prepare($query);
+                $resultado->execute();
+
+                if ($resultado->rowCount() === 1) {
+                    $fecha = date("Y-m-d H:i:s");
+                    //Si el usuario tiene equipo se inserta el comentario en la tarea
+                    $query = "INSERT INTO comentarios (id_usuario, id_tarea, comentario, fecha) VALUES (?, ?, ?, ?)";
+                    $resultado = $db->prepare($query);
+                    $resultado->bindParam(1, $idUsuario);
+                    $resultado->bindParam(2, $idTarea);
+                    $resultado->bindParam(3, $comentario);
+                    $resultado->bindParam(4, $fecha);
+                    $resultado->execute();
+
+                    if ($resultado->rowCount() === 1) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "1002";
+                        $arrayResponse['response'] = "Comentario añadido";
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "Error al añadir comentario";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Este usuario no está en la tarea";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al obtener datos";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

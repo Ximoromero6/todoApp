@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NotaComponent } from '../nota/nota.component';
 import { DashBoardServiceService } from './dash-board-service.service';
 import { JsonPipe } from '@angular/common';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,8 +24,12 @@ export class DashboardComponent implements OnInit {
   tareaSeleccionada;
   show = false;
 
+  //Formulario para añadir un comentario
+  formularioAddComentario: FormGroup;
+
   constructor(
-    private servicio: DashBoardServiceService
+    private servicio: DashBoardServiceService,
+    private formBuilder: FormBuilder
   ) {
     this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
   }
@@ -53,6 +58,10 @@ export class DashboardComponent implements OnInit {
     for (let i = 0; i < completedButton.length; i++) {
       completedButton[i].addEventListener('click', animateButton, false);
     }
+
+    this.formularioAddComentario = this.formBuilder.group({
+      comentario: ['', Validators.required]
+    });
 
   }
 
@@ -178,6 +187,24 @@ export class DashboardComponent implements OnInit {
       this.servicio.eliminarTarea(token, id).subscribe((response) => { console.log(response) }, (error) => { console.log(error) });
       this.show = false;
       this.obtenerTareas(this.data.token);
+    }
+  }
+
+  //Función para añadir comentarios
+  insertarComentario(idTarea) {
+    let comentario = this.formularioAddComentario.get('comentario').value;
+    if (comentario != '') {
+      this.servicio.addComentario(this.data.token, idTarea, comentario).subscribe(
+        (response) => {
+          console.log(response);
+          if (response.status) {
+            this.formularioAddComentario.reset();
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     }
   }
 
