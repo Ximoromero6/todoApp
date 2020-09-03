@@ -306,7 +306,7 @@ return function (App $app) {
                 $arrayResponse['data'] = $resultadoExisteEmail->fetch(PDO::FETCH_ASSOC);
                 $tokenDate = strtotime("+2 hour");
                 $token = base64_encode($arrayResponse['data']['token'] . ";" . $tokenDate);
-                $arrayResponse['response'] = 'Email envaido correctamente!';
+                $arrayResponse['response'] = 'Email enviado correctamente!';
                 $arrayResponse['status'] = 1;
 
                 //Si el corrreo existe enviar un enlace junto con su token para restablecer la contraseña
@@ -492,7 +492,7 @@ return function (App $app) {
             }
 
             //Array con extensiones válidas
-            $extensionesValidas = array('png', 'jpeg', 'jpg');
+            $extensionesValidas = array('png', 'jpeg', 'jpg', 'svg');
 
             //Validar extensión
             $extension = pathinfo($folderName . '/' . $image->getClientFilename(), PATHINFO_EXTENSION);
@@ -1002,15 +1002,13 @@ return function (App $app) {
         try {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
+            $id = $postResponse['id'];
 
-            $tokenUsuario = $postResponse['tokenUsuario'];
-            $idTarea = $postResponse['idTarea'];
-
-            $query = "DELETE FROM tareas WHERE id = '$idTarea' AND tokenUsuario = '$tokenUsuario'";
+            $query = "DELETE FROM tareas WHERE id = '$id'";
             $resultado = $db->prepare($query);
             $resultado->execute();
 
-            if ($resultado->rowCount() == 1) {
+            if ($resultado->rowCount() === 1) {
                 $arrayResponse['status'] =  true;
                 $arrayResponse['errorCode'] = "";
                 $arrayResponse['response'] = "Tarea eliminada correctamente!";
@@ -1572,6 +1570,309 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "Error al obtener datos";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para publicar un comentario en una tarea
+    $app->post('/completarTarea', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+
+            //Obtener el id del usuario que está en sesión (el que va a publicar el comentario)
+            $query = "UPDATE tareas SET completada = 1 WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Tarea completada!";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al obtener datos";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para agregar un participante extra en una tarea
+    $app->post('/agregarParticipante', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $tokenSesion = $postResponse['tokenSesion'];
+            $idTarea = $postResponse['idTarea'];
+            $emailUsuario = filter_var($postResponse['emailUsuario'], FILTER_SANITIZE_EMAIL);
+
+            //Comprobar si existe el email introducido y si está en el mismo equipo que el usuario en sesión
+            $query = "SELECT id, usuario, imagen FROM usuarios WHERE email = '$emailUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $data = $resultado->fetch(PDO::FETCH_ASSOC);
+
+                //Guardo el id del email introducido
+                $newUserID = $data['id'];
+
+                $query2 = "SELECT * usuarios WHERE token = '$tokenSesion'";
+                $resultado2 = $db->prepare($query);
+                $resultado2->execute();
+
+                if ($resultado2->rowCount() === 1) {
+                    $data2 = $resultado2->fetch(PDO::FETCH_ASSOC);
+
+                    //Guardo el id del usuario en sesión
+                    $sesionUserID = $data2['id'];
+
+                    //Obtener el id de equipo del usuario en sesión
+                    $query = "SELECT id_equipo FROM usuarios_equipos WHERE id_usuario = '$sesionUserID'";
+                    $resultado = $db->prepare($query);
+                    $resultado->execute();
+
+                    //Obtener el id de equipo del usuario buscado
+                    $query2 = "SELECT id_equipo FROM usuarios_equipos WHERE id_usuario = '$newUserID'";
+                    $resultado2 = $db->prepare($query2);
+                    $resultado2->execute();
+
+                    //Comprobar si están en el mismo equipo
+                    if ($resultado->rowCount() === 1 && $resultado2->rowCount() === 1) {
+                        $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
+                        $resultado2 = $resultado2->fetch(PDO::FETCH_ASSOC);
+
+                        //Id equipo usuario sesión
+                        $id_equipo = $resultado['id_equipo'];
+
+                        //Id del equipo del usuario buscado
+                        $id_equipo2 = $resultado2['id_equipo'];
+
+                        //Comprobamos si son iguales
+                        if ($id_equipo === $id_equipo2) {
+
+                            $query = "SELECT * FROM tareas WHERE id = '$idTarea' AND idUsuario = '$newUserID'";
+                            $resultado = $db->prepare($query);
+                            $resultado->execute();
+
+                            if ($resultado->rowCount() !== 1) {
+                                //Pertenecen al mismo equipo
+                                $consulta = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES (?, ?)";
+                                $resultado = $db->prepare($consulta);
+                                $resultado->bindParam(1, $newUserID);
+                                $resultado->bindParam(2, $idTarea);
+                                $resultado->execute();
+
+                                if ($resultado->rowCount() === 1) {
+                                    $arrayResponse['status'] =  true;
+                                    $arrayResponse['errorCode'] = "";
+                                    $arrayResponse['response'] = $data;
+                                } else {
+                                    $arrayResponse['status'] =  false;
+                                    $arrayResponse['errorCode'] = "1004";
+                                    $arrayResponse['response'] = "Error al agregar al participante";
+                                }
+                            } else {
+                                $arrayResponse['status'] =  false;
+                                $arrayResponse['errorCode'] = "1003";
+                                $arrayResponse['response'] = "No se puede agregar al creador";
+                            }
+                        } else {
+                            $arrayResponse['status'] =  false;
+                            $arrayResponse['errorCode'] = "1002";
+                            $arrayResponse['response'] = "Ambos debeis pertenecer al mismo equipo";
+                        }
+                    }
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "No hemos encontrado ningún email...";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+
+    //Función para eliminar un participante de una tarea
+    $app->post('/eliminarParticipanteExtra', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+            $idUsuario = $postResponse['idUsuario'];
+
+            //Obtener el id del usuario que está en sesión (el que va a publicar el comentario)
+            $query = "DELETE FROM usuarios_tareas WHERE id_tarea = '$idTarea' AND id_usuario = '$idUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Participante eliminado";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al eliminar participante";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para editar el título de una nota
+    $app->post('/editarTitulo', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+            $texto = $postResponse['texto'];
+
+            $query = "UPDATE tareas SET titulo = '$texto' WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Título editado";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al actualizar el título";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para editar la descripción de una nota
+    $app->post('/editarDescripcion', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+            $texto = $postResponse['texto'];
+
+            $query = "UPDATE tareas SET descripcion = '$texto' WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Descripción editada";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al actualizar la descripción";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para eliminar un comentario
+    $app->post('/eliminarComentario', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $idTarea = $postResponse['idTarea'];
+            $idComentario = $postResponse['idComentario'];
+
+            $query = "DELETE FROM comentarios WHERE id_tarea = $idTarea AND id = $idComentario";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Comentario eliminado";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al eliminar el comentario";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

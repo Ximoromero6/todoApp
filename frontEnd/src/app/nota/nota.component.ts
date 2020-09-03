@@ -51,7 +51,6 @@ export class NotaComponent implements OnInit {
       descripcion: ['', Validators.required]
     });
     this.notaFuncion();
-    /*     this.inputTitle.nativeElement.focus(); */
     // this.removeItem();
 
     //Obtener fecha seleccionada
@@ -69,10 +68,10 @@ export class NotaComponent implements OnInit {
     this.finalData = `${yyyy}/${mm}/${dd}`;
 
     todayDate.addEventListener('click', () => {
-      if (todayDate.checked && !tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
+      if (todayDate.checked && !tomorrowDate.checked /* && !customDate.checked */ && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.add('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        document.getElementById('customDataField').classList.remove('active');
+        /* document.getElementById('customDataField').classList.remove('active'); */
         document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Today: ${yyyy}/${mm}/${dd}`);
         this.finalData = `${yyyy}/${mm}/${dd}`;
@@ -82,10 +81,10 @@ export class NotaComponent implements OnInit {
     });
 
     tomorrowDate.addEventListener('click', () => {
-      if (!todayDate.checked && tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
+      if (!todayDate.checked && tomorrowDate.checked /* && !customDate.checked */ && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.add('active');
-        document.getElementById('customDataField').classList.remove('active');
+        /*  document.getElementById('customDataField').classList.remove('active'); */
         document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Tomorrow: ${yyyy}/${mm}/${dd + 1}`);
         this.finalData = `${yyyy}/${mm}/${dd + 1}`;
@@ -94,7 +93,7 @@ export class NotaComponent implements OnInit {
       }
     });
 
-    customDate.addEventListener('click', () => {
+    /* customDate.addEventListener('click', () => {
       if (!todayDate.checked && !tomorrowDate.checked && customDate.checked && !noneDate.checked) {
         document.getElementById('customDataField').classList.add('active');
         document.getElementById('labelTodayDate').classList.remove('active');
@@ -104,20 +103,18 @@ export class NotaComponent implements OnInit {
       } else {
         document.getElementById('customDataField').classList.remove('active');
       }
-    });
+    }); */
     noneDate.addEventListener('click', () => {
-      if (!todayDate.checked && !tomorrowDate.checked && !customDate.checked && noneDate.checked) {
+      if (!todayDate.checked && !tomorrowDate.checked /* && !customDate.checked */ && noneDate.checked) {
         document.getElementById('labelNoneDate').classList.add('active');
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        document.getElementById('customDataField').classList.remove('active');
+        /* document.getElementById('customDataField').classList.remove('active'); */
         this.finalData = '';
       } else {
         document.getElementById('labelNoneDate').classList.remove('active');
       }
     });
-
-    document.getElementById('crearTareaButton').addEventListener('click', () => { this.addTarea(); });
   }
 
   notaFuncion() {
@@ -276,11 +273,14 @@ export class NotaComponent implements OnInit {
 
   //Función crear tarea
   addTarea() {
+    let titulo = this.formularioAddTarea.value.titulo != "" ? this.formularioAddTarea.value.titulo : "";
+    let descripcion = this.formularioAddTarea.value.descripcion != "" ? this.formularioAddTarea.value.descripcion : "";
+
     this.servicio.addTarea(
       this.userdata.token,
-      this.formularioAddTarea.value.titulo,
+      titulo,
       this.finalData,
-      this.formularioAddTarea.value.descripcion,
+      descripcion,
       this.users
     ).subscribe(
       (response) => {

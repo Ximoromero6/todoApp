@@ -56,6 +56,13 @@ export class HeaderComponent implements OnInit {
 
   //Datos del equipo
   datosEquipo;
+  imagenEquipo: string;
+  nombreEquipo: string;
+  creacionEquipo: string;
+  descripcionEquipo: string;
+  usersCountEquipo;
+  adminEquipo;
+  usersDataEquipo;
 
   //Para unirse a equipo
   idEquipoHidden;
@@ -462,6 +469,13 @@ export class HeaderComponent implements OnInit {
         console.log(response);
         if (response.status) {
           this.datosEquipo = response.response;
+          this.imagenEquipo = this.datosEquipo.imagen !== '' ? this.datosEquipo.imagen : '';
+          this.nombreEquipo = this.datosEquipo.nombre !== '' ? this.datosEquipo.nombre : '';
+          this.descripcionEquipo = this.datosEquipo.descripcion !== '' ? this.datosEquipo.descripcion : '';
+          this.creacionEquipo = this.datosEquipo.creacion !== '' ? this.datosEquipo.creacion : '';
+          this.adminEquipo = this.datosEquipo.admin !== '' ? this.datosEquipo.admin : '';
+          this.usersCountEquipo = this.datosEquipo.usersCount !== '' ? this.datosEquipo.usersCount : '';
+          this.usersDataEquipo = this.datosEquipo.usersData !== '' ? this.datosEquipo.usersData : '';
         }
       },
       (error) => {
@@ -660,7 +674,7 @@ export class HeaderComponent implements OnInit {
         console.log(error);
       }
     );
-    
+
   }
 
   //Eliminar un usuario

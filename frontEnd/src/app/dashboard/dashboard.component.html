@@ -18,15 +18,10 @@
                     <span id="todayTaskCount">({{todayTaskCount}})</span>
                 </div>
                 <div class="bottom active" [sortablejs]="listaTareasToday">
-                    <!-- TEST -->
-                    <!-- <pre>
-                        <p>{{ listaTareasToday | json }}</p>
-                    </pre> -->
-                    <!-- TEST -->
-                    <div *ngFor="let todayTask of listaTareasToday" (click)="ampliarTarea(todayTask)" class="task">
+                    <div *ngFor="let todayTask of listaTareasToday" (click)="ampliarTarea(todayTask, $event)" class="task">
                         <div class="left">
                             <i class="fas fa-grip-vertical draggableIcon"></i>
-                            <i class="far fa-check-circle"></i>
+                            <i class="far fa-check-circle" (click)="completeLeftButton(todayTask.id, $event.target)"></i>
                             <h4>{{ todayTask.titulo }}</h4>
                         </div>
                         <div class="right">
@@ -46,10 +41,10 @@
                     <span id="tomorrowTaskCount">({{ tomorrowTaskCount }})</span>
                 </div>
                 <div class="bottom">
-                    <div *ngFor="let tomorrowTask of listaTareasTomorrow" (click)="ampliarTarea(tomorrowTask)" class="task">
+                    <div *ngFor="let tomorrowTask of listaTareasTomorrow" (click)="ampliarTarea(tomorrowTask, $event)" class="task">
                         <div class="left">
                             <i class="fas fa-grip-vertical draggableIcon"></i>
-                            <i class="far fa-check-circle"></i>
+                            <i class="far fa-check-circle" (click)="completeLeftButton(tomorrowTask.id, $event.target)"></i>
                             <h4>{{ tomorrowTask.titulo }}</h4>
                         </div>
                         <div class="right">
@@ -76,16 +71,17 @@
         <!-- Contenedor para ver las tareas en detalle -->
         <div class="containerViewTask" *ngIf="show">
             <div class="topNote">
-                <button class="completedButton" id="completedButton" (click)="completed()">Completar <i class="fas fa-check"></i></button>
+                <button class="completedButton" id="completedButton" (click)="completed(tareaSeleccionada.id)">Completar <!-- <i class="fas fa-check"></i> --> <img src="../../assets/images/comprobar.svg" alt=""></button>
                 <div class="right">
-                    <i class="far fa-trash-alt" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(data['token'], tareaSeleccionada['id'])"></i>
-                    <i class="fas fa-times" (click)="show = !show"></i>
+                    <i class="far fa-trash-alt" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(tareaSeleccionada['id'])"></i>
+                    <img src="../../assets/images/crossButton.svg" alt="" class="closeTaskButton" (click)="show = !show">
+                    <!--  <i class="fas fa-times" (click)="show = !show"></i> -->
                 </div>
             </div>
             <div class="middle">
                 <div class="top">
                     <!--   <p>#108</p> -->
-                    <h2 contenteditable="true">{{ tareaSeleccionada.titulo }}</h2>
+                    <h2 contenteditable="true" (focusout)="editarTitulo(tareaSeleccionada.id)">{{ tareaSeleccionada.titulo }}</h2>
                 </div>
                 <div class="creadorContainer">
                     <p>Responsable</p>
@@ -97,23 +93,41 @@
                 </div>
                 <div class="fechaEntregaContainer">
                     <p>Fecha de entrega</p>
-                    <div class="fecha">
+                    <label for="customDataField" class="fecha">
                         <i class="far fa-calendar"></i>
-                        <p>{{ tareaSeleccionada.creacion | date }}</p>
+                        <p>{{ returnDate(tareaSeleccionada.fecha) }}</p>
                         <i class="fas fa-times-circle"></i>
-                    </div>
+                    </label>
+                    <!-- Input fecha para seleccionar otra fecha -->
+                    <!-- <input type="text" id="customDataField"> -->
                 </div>
                 <div class="contenedorAsignadas">
                     <p>Participantes</p>
-                    <div class="personasAsignadas">
-                        <div class="asignada" *ngFor="let asignada of tareaSeleccionada.colaboradores">
-                            <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="">
+                    <div class="subContenedorAsignadas">
+                        <div class="personasAsignadas" id="personasAsignadas">
+                            <div class="asignada" *ngFor="let asignada of tareaSeleccionada.colaboradores">
+                                <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="">
+                                <i class="fas fa-times-circle" title="Eliminar usuario" (click)="eliminarParticipanteExtra(tareaSeleccionada.id, asignada.id)"></i>
+                            </div>
+                            <div class="asignar" title="Añadir participante" id="agregarParticipanteButton" (click)="open($event)">
+                                <!--  <i class="far fa-user"></i> -->
+                                <i class="fas fa-plus"></i>
+                            </div>
                         </div>
+                        <form method="POST" class="contenedorAddPersonas" id="contenedorAddPersonas" [formGroup]="formularioAddParticipante" (ngSubmit)="agregarParticipanteExtra(tareaSeleccionada['id'])">
+                            <div class="top">
+                                <small>Introduce el email de la persona que quieras agregar <i class="fas fa-times" (click)="closePopup()"></i></small>
+                            </div>
+                            <div class="addFields">
+                                <input type="text" placeholder="Email" formControlName="usuario">
+                                <button type="submit">Añadir</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="descripcion">
                     <p>Descripción</p>
-                    <p contenteditable="true" id="descripcionTarea">{{ tareaSeleccionada.descripcion }}</p>
+                    <p contenteditable="true" id="descripcionTarea" (focusout)="editarDescripcion(tareaSeleccionada.id)">{{ tareaSeleccionada.descripcion }}</p>
                 </div>
                 <div class="comentarios">
                     <div class="comentario" *ngFor="let comentario of tareaSeleccionada.comentarios">
@@ -125,7 +139,7 @@
                                     <span>{{ comentario.fecha }}</span>
                                 </div>
                             </div>
-                            <i class="fas fa-trash"></i>
+                            <i class="far fa-times-circle" title="Eliminar comentario" (click)="eliminarComentario($event, tareaSeleccionada.id, comentario.id)"></i>
                         </div>
                         <p>{{ comentario.comentario }}</p>
                     </div>

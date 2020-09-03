@@ -219,10 +219,14 @@ div.overlayPopupTask {
                             /* border: 1px solid #cccccc; */
                             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                         }
-                        button {
+                        button.agregarPersonaButton {
                             background: #4f25f3;
                             color: #ffffff;
                         }
+                    }
+                    button#addPersonButton {
+                        width: 150px;
+                        margin-right: 30px;
                     }
                 }
                 .dates {
@@ -304,6 +308,7 @@ div.overlayPopupTask {
                             margin-right: 12px;
                         }
                         &.active {
+                            color: #FF4136;
                             border-color: #FF4136 !important;
                             i {
                                 color: #FF4136 !important;

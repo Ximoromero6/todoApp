@@ -30,14 +30,14 @@
                         <label for="tomorrowDate" id="labelTomorrowDate">
                     <i class="fas fa-sun"></i>Mañana
                 </label>
-                        <input type="radio" id="customDate" name="date">
+                        <!--  <input type="radio" id="customDate" name="date">
                         <label for="customDate" id="labelCustomDate">
                             <input type="date" id="customDataField">
-                        </label>
+                        </label> -->
                         <input type="radio" id="noneDate" name="date">
                         <label for="noneDate" id="labelNoneDate">
-                            <i class="fas fa-times"></i>
-                            Sin fecha
+                            <i class="fas fa-calendar-times"></i>
+                            Sin fecha de entrega
                         </label>
                     </div>
                     <!--  <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small> -->
@@ -62,17 +62,14 @@
                                 <input type="email" placeholder="Introduce email" formControlName="email" #inputAdd id="addPerson">
                                 <button type="submit" class="agregarPersonaButton">Agregar</button>
                             </form>
-                            <div class="tooltip">
-                                <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>
-                                <span class="tooltiptext">Tooltip text</span>
-                            </div>
+                            <button id="addPersonButton"><i class="fas fa-plus"></i>Añadir Miembro</button>
                         </div>
                         <small>Asigna tareas a otras personas mediante su email</small>
                     </div>
                 </div>
             </div>
             <div class="bottom">
-                <button id="crearTareaButton">Crear Tarea</button>
+                <button id="crearTareaButton" (click)="addTarea()">Crear Tarea</button>
             </div>
         </div>
     </form>
