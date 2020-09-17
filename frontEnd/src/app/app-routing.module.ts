@@ -9,6 +9,8 @@ import { GuardianHomeGuard } from './guardian-home.guard';
 import { CambiarClaveComponent } from './cambiar-clave/cambiar-clave.component';
 import { ResetComponent } from './reset/reset.component';
 import { GuardianLoginGuard } from './guardian-login.guard';
+import { TareasCompletadasComponent } from './tareas-completadas/tareas-completadas.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 const routes: Routes = [
@@ -20,10 +22,9 @@ const routes: Routes = [
   {
     path: 'home', component: HomeComponent, canActivate: [GuardianHomeGuard],
     children: [
-      { path: 'home', redirectTo: 'dashboard', canActivate: [GuardianHomeGuard] }/* ,
-      { path: 'tareas', component: TareasComponent },
-      { path: 'completadas', component: CompletadasComponent } */
-    ]
+      { path: '',  component: DashboardComponent, canActivate: [GuardianHomeGuard] },
+      { path: 'completadas', component: TareasCompletadasComponent, canActivate: [GuardianHomeGuard] }
+    ],
   },
   { path: 'cambiarClave', component: CambiarClaveComponent, canActivate: [GuardianLoginGuard] },
   { path: 'reset/:token', component: ResetComponent, canActivate: [GuardianLoginGuard] },

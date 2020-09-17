@@ -1,6 +1,7 @@
 $fuschia: #00bf9c;
 $button-bg: $fuschia;
 $button-text-color: #fff;
+@import '@angular/material/prebuilt-themes/pink-bluegrey.css';
 #mainContainerHome {
     width: 100%;
     min-height: 100vh;
@@ -67,6 +68,11 @@ $button-text-color: #fff;
                 font-weight: 700;
                 margin-right: 5px;
                 cursor: pointer;
+            }
+            .mat-body p,
+            .mat-body-1 p,
+            .mat-typography p {
+                margin: 0 !important;
             }
             span {
                 font-size: 15px;
@@ -439,39 +445,117 @@ $button-text-color: #fff;
                     }
                 }
                 .creadorContainer {
-                    .creador {
-                        display: flex;
-                        align-items: center;
-                        border: 1px solid transparent;
-                        border-radius: 4px;
-                        padding: 5px;
-                        cursor: pointer;
-                        img {
-                            width: 30px;
-                            height: 30px;
-                            border-radius: 50%;
-                            object-fit: cover;
-                        }
-                        p {
-                            margin: 0 8px;
-                            font-weight: normal;
-                            color: #666666;
-                            width: fit-content !important;
-                        }
-                        i {
-                            font-size: 12px;
+                    .creadorSubContainer {
+                        position: relative;
+                        .creador {
+                            display: flex;
+                            align-items: center;
+                            border: 1px solid transparent;
+                            border-radius: 4px;
+                            padding: 5px 21px;
                             cursor: pointer;
-                            color: #333;
+                            position: absolute;
+                            background: #fff;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            img {
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                object-fit: cover;
+                            }
+                            p {
+                                margin: 0 8px;
+                                font-weight: normal;
+                                color: #666666;
+                                width: fit-content !important;
+                            }
+                            i {
+                                font-size: 12px;
+                                cursor: pointer;
+                                color: #333;
+                            }
+                            &:hover {
+                                background-color: #f6f8f9;
+                                border-color: #6f7782;
+                                color: #273240;
+                                fill: #273240;
+                                border-style: solid;
+                                color: #6f7782;
+                                cursor: pointer;
+                                outline: 0;
+                            }
+                            &.active {
+                                background-color: #f6f8f9;
+                                border-color: #6f7782;
+                                color: #273240;
+                                fill: #273240;
+                                border-style: solid;
+                                color: #6f7782;
+                                cursor: pointer;
+                                outline: 0;
+                            }
                         }
-                        &:hover {
-                            background-color: #f6f8f9;
-                            border-color: #6f7782;
-                            color: #273240;
-                            fill: #273240;
-                            border-style: solid;
-                            color: #6f7782;
-                            cursor: pointer;
-                            outline: 0;
+                        #contenedorCambiarCreador {
+                            display: none;
+                            z-index: 99;
+                            position: absolute;
+                            top: 30px;
+                            right: -170px;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                            padding: 5px 0;
+                            border-radius: 3px;
+                            min-width: 300px;
+                            max-height: 200px;
+                            overflow-y: auto;
+                            border: 1px solid #bec6cc;
+                            background: #fff;
+                            &::-webkit-scrollbar {
+                                width: 10px;
+                            }
+                            &::-webkit-scrollbar-thumb {
+                                background-color: #555555;
+                                background-clip: padding-box;
+                                border: 2px solid #242d4200;
+                                border-radius: 30px;
+                            }
+                            ul.peopleTeam {
+                                background: #fff;
+                                li {
+                                    display: flex;
+                                    align-items: center;
+                                    cursor: pointer;
+                                    padding: 6px 0;
+                                    border-top: 1px solid #ccc;
+                                    background: #fff;
+                                    img {
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        object-fit: cover;
+                                        margin: 0 10px;
+                                    }
+                                    p {
+                                        width: auto;
+                                        margin-right: 10px;
+                                        color: #333 !important;
+                                    }
+                                    small {
+                                        font-size: 12px;
+                                        color: #888888;
+                                    }
+                                    &:hover {
+                                        background: #f6f8f9;
+                                        border-color: #e8ecee;
+                                    }
+                                    &:first-child {
+                                        border: none !important;
+                                    }
+                                }
+                            }
+                            &.active {
+                                display: block;
+                            }
                         }
                     }
                 }
@@ -506,6 +590,11 @@ $button-text-color: #fff;
                             justify-content: center;
                             border: 1px dashed #333;
                         }
+                        i.fechaEntregaTarea {
+                            &:hover {
+                                color: red;
+                            }
+                        }
                         &:hover {
                             background-color: #f6f8f9;
                             border-color: #6f7782;
@@ -515,6 +604,25 @@ $button-text-color: #fff;
                             color: #6f7782;
                             cursor: pointer;
                             outline: 0;
+                        }
+                    }
+                    #customDataField {
+                        position: relative;
+                        width: 50%;
+                        display: none;
+                        /*  visibility: hidden; */
+                        &::-webkit-calendar-picker-indicator {
+                            background: red;
+                            bottom: 0;
+                            color: transparent;
+                            width: 100%;
+                            height: 100%;
+                            cursor: pointer;
+                            height: auto;
+                            left: 0;
+                            position: absolute;
+                            right: 0;
+                            top: 0;
                         }
                     }
                 }
@@ -536,6 +644,7 @@ $button-text-color: #fff;
                             border: 1px solid transparent;
                             border-radius: 3px;
                             padding: 5px;
+                            cursor: default !important;
                             .asignar {
                                 position: relative;
                                 padding: 15px;
@@ -781,6 +890,7 @@ $button-text-color: #fff;
                         resize: none;
                         box-shadow: inset 0 1px #e8ecee;
                         transition: height .2s ease;
+                        overflow: hidden;
                         &:focus {
                             //height: 100px;
                             .textEditor {
@@ -903,4 +1013,14 @@ $button-text-color: #fff;
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+.cdk-overlay-pane {
+    position: absolute !important;
+    right: 540px !important;
+    bottom: 170px !important;
+}
+
+.mat-datepicker-input {
+    visibility: hidden;
 }

@@ -134,4 +134,16 @@ export class ServicioService {
     });
   }
 
+  //Buscar tareas en la barra de busquedas
+  searchTask(text): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+    let body = 'text=' + text;
+    return this.http.post(this.url + 'searchTask', body, {
+      headers: headers
+    });
+  }
+
 }

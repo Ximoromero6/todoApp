@@ -6,7 +6,7 @@
 
         <!--  <a routerLink="/" class="logo">HUBBET</a> -->
         <h2 class="title">Bienvenido de nuevo</h2>
-        <button class="googleButton" #loginRef>
+        <!-- <button class="googleButton" #loginRef>
       <img src="../../assets/images/googleLogo.png" alt="" />Inicia sesión con
       Google
     </button>
@@ -14,7 +14,7 @@
             <hr />
             <span>O inicia sesión con tu email</span>
             <hr />
-        </div>
+        </div> -->
         <form id="formularioLogin" [formGroup]="formularioLogin" (ngSubmit)="validarDatosLogin()">
             <div id="formField1" class="formField" [class.invalid]="
           !formularioLogin.get('email').valid &&

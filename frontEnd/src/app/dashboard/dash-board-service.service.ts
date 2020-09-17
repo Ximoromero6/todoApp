@@ -126,4 +126,56 @@ export class DashBoardServiceService {
       headers: headers
     });
   }
+
+  //Obtener los datos de los usuarios de un equipo para mostrarlos y así cambiar el creador
+  obtenerDatosEquipo2(tokenUsuario): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+
+    let body = 'tokenUsuario=' + tokenUsuario;
+    return this.http.post(this.url + 'obtenerDatosEquipo2', body, {
+      headers: headers
+    });
+  }
+
+  //Función para reeemplazar el creador
+  replaceCreator(idTarea, oldCreatorName, idSustituto): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+
+    let body = 'idTarea=' + idTarea + '&idSustituto=' + idSustituto + '&oldCreatorName=' + oldCreatorName;
+    return this.http.post(this.url + 'replaceCreator', body, {
+      headers: headers
+    });
+  }
+
+  //Función para eliminar la fecha de entrega de una tarea
+  deleteTaskDate(idTarea): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+
+    let body = 'idTarea=' + idTarea;
+    return this.http.post(this.url + 'deleteTaskDate', body, {
+      headers: headers
+    });
+  }
+
+  //Función para cambiar la fecha de una tarea
+  changeTaskDate(idTarea, newDate): Observable<any> {
+    let headers = new HttpHeaders().set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8'
+    );
+
+    let body = 'idTarea=' + idTarea + '&newDate=' + newDate;
+    return this.http.post(this.url + 'changeTaskDate', body, {
+      headers: headers
+    });
+  }
 }

@@ -2,7 +2,6 @@
 <!-- Color acento: #009688 -->
 <main id="mainContainerHome">
     <app-nota (evento)="obtenerTareas($event)"></app-nota>
-
     <div class="topPart">
         <h2>Todas las tareas</h2>
         <button id="addTareaButton"><i class="fas fa-plus"></i>Añadir Tarea</button>
@@ -17,10 +16,11 @@
                     <p>Hoy</p>
                     <span id="todayTaskCount">({{todayTaskCount}})</span>
                 </div>
-                <div class="bottom active" [sortablejs]="listaTareasToday">
+                <div class="bottom active">
+                    <!--  [sortablejs]="listaTareasToday" -->
                     <div *ngFor="let todayTask of listaTareasToday" (click)="ampliarTarea(todayTask, $event)" class="task">
                         <div class="left">
-                            <i class="fas fa-grip-vertical draggableIcon"></i>
+                            <!--  <i class="fas fa-grip-vertical draggableIcon"></i> -->
                             <i class="far fa-check-circle" (click)="completeLeftButton(todayTask.id, $event.target)"></i>
                             <h4>{{ todayTask.titulo }}</h4>
                         </div>
@@ -43,7 +43,7 @@
                 <div class="bottom">
                     <div *ngFor="let tomorrowTask of listaTareasTomorrow" (click)="ampliarTarea(tomorrowTask, $event)" class="task">
                         <div class="left">
-                            <i class="fas fa-grip-vertical draggableIcon"></i>
+                            <!-- <i class="fas fa-grip-vertical draggableIcon"></i> -->
                             <i class="far fa-check-circle" (click)="completeLeftButton(tomorrowTask.id, $event.target)"></i>
                             <h4>{{ tomorrowTask.titulo }}</h4>
                         </div>
@@ -67,6 +67,7 @@
                 <div class="bottom"></div>
             </div>
         </div>
+        <div id="my-calendar"></div>
 
         <!-- Contenedor para ver las tareas en detalle -->
         <div class="containerViewTask" *ngIf="show">
@@ -81,32 +82,46 @@
             <div class="middle">
                 <div class="top">
                     <!--   <p>#108</p> -->
-                    <h2 contenteditable="true" (focusout)="editarTitulo(tareaSeleccionada.id)">{{ tareaSeleccionada.titulo }}</h2>
+                    <h2 contenteditable="true" [textContent]="tareaSeleccionada.titulo" (input)="tareaSeleccionada.titulo=$event.target.textContent" (focusout)="editarTitulo(tareaSeleccionada.id)">{{ tareaSeleccionada.titulo }}</h2>
                 </div>
                 <div class="creadorContainer">
                     <p>Responsable</p>
-                    <div class="creador">
-                        <img src="../../assets/uploads/{{ tareaSeleccionada.usuario }}/{{ tareaSeleccionada.imagen }}" alt="">
-                        <p>{{ tareaSeleccionada.usuario }}</p>
-                        <i class="fas fa-times-circle"></i>
+                    <div class="creadorSubContainer">
+                        <div class="creador" (click)="getInfoUsersTeam()" id="creador">
+                            <img src="../../assets/uploads/{{ tareaSeleccionada.usuario }}/{{ tareaSeleccionada.imagen }}" alt="" title="{{ tareaSeleccionada.usuario }}">
+                            <p>{{ tareaSeleccionada.usuario }}</p>
+                            <!-- <i class="fas fa-times-circle"></i> -->
+                        </div>
+                        <div class="contenedorCambiarCreador" id="contenedorCambiarCreador">
+                            <ul class="peopleTeam" id="peopleTeam">
+                                <li *ngFor="let miembro of miembros" (click)="replaceCreator(tareaSeleccionada.id, tareaSeleccionada.usuario, miembro.id, miembro.usuario, miembro.imagen)">
+                                    <img src="../../assets/uploads/{{miembro.usuario}}/{{miembro.imagen}}" alt="">
+                                    <p class="usuario">{{ miembro.usuario }}</p>
+                                    <small class="email">{{ miembro.email }}</small>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="fechaEntregaContainer">
                     <p>Fecha de entrega</p>
-                    <label for="customDataField" class="fecha">
+                    <label for="customDataField" class="fecha" (click)="picker.open()">
                         <i class="far fa-calendar"></i>
                         <p>{{ returnDate(tareaSeleccionada.fecha) }}</p>
-                        <i class="fas fa-times-circle"></i>
+                        <i class="fas fa-times-circle fechaEntregaTarea" title="Eliminar fecha de entrega" (click)="deleteTaskDate($event, tareaSeleccionada.id)"></i>
                     </label>
-                    <!-- Input fecha para seleccionar otra fecha -->
-                    <!-- <input type="text" id="customDataField"> -->
+
+                    <!-- Angular datePicker -->
+                    <input matInput [matDatepicker]="picker" (dateInput)="dateChanged($event, tareaSeleccionada.id)">
+                    <mat-datepicker #picker></mat-datepicker>
+
                 </div>
                 <div class="contenedorAsignadas">
                     <p>Participantes</p>
                     <div class="subContenedorAsignadas">
                         <div class="personasAsignadas" id="personasAsignadas">
                             <div class="asignada" *ngFor="let asignada of tareaSeleccionada.colaboradores">
-                                <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="">
+                                <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="" title="{{ asignada.usuario }}">
                                 <i class="fas fa-times-circle" title="Eliminar usuario" (click)="eliminarParticipanteExtra(tareaSeleccionada.id, asignada.id)"></i>
                             </div>
                             <div class="asignar" title="Añadir participante" id="agregarParticipanteButton" (click)="open($event)">
@@ -119,7 +134,7 @@
                                 <small>Introduce el email de la persona que quieras agregar <i class="fas fa-times" (click)="closePopup()"></i></small>
                             </div>
                             <div class="addFields">
-                                <input type="text" placeholder="Email" formControlName="usuario">
+                                <input type="email" placeholder="Email" formControlName="usuario">
                                 <button type="submit">Añadir</button>
                             </div>
                         </form>

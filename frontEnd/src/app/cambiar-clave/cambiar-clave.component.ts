@@ -18,6 +18,8 @@ export class CambiarClaveComponent implements OnInit {
   mensajeNotificacion: string;
   mostrarNotificacion: boolean = true;
 
+  loading: boolean = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private CambiarClaveService: CambiarClaveService,
@@ -36,8 +38,9 @@ export class CambiarClaveComponent implements OnInit {
       this.formularioResetClave.get('email').markAsDirty();
       return;
     }
-    console.log(JSON.stringify(this.formularioResetClave.value));
 
+    this.loading = true;
+    (document.getElementById('sendLoading') as HTMLInputElement).disabled = true;
     //Función para ver si el usuario está logueado
     this.CambiarClaveService.resetClave(
       this.formularioResetClave.value.email
@@ -49,10 +52,13 @@ export class CambiarClaveComponent implements OnInit {
             this.iconoNotificacion = 'fas fa-check-circle';
             this.mensajeNotificacion = response.response;
             this.formularioResetClave.reset();
+            this.loading = false;
           } else {
             this.statusNotificacion = 'error';
             this.iconoNotificacion = 'fas fa-exclamation-circle';
             this.mensajeNotificacion = response.response;
+            this.loading = false;
+            (document.getElementById('sendLoading') as HTMLInputElement).disabled = false;
           }
           this.ocultarNotificacion(false);
           setTimeout(() => {
@@ -60,6 +66,7 @@ export class CambiarClaveComponent implements OnInit {
           }, 5000);
         },
         (error) => {
+          this.loading = false;
           console.log(error);
         }
       );

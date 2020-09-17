@@ -30,14 +30,16 @@
                         <label for="tomorrowDate" id="labelTomorrowDate">
                     <i class="fas fa-sun"></i>Mañana
                 </label>
-                        <!--  <input type="radio" id="customDate" name="date">
-                        <label for="customDate" id="labelCustomDate">
-                            <input type="date" id="customDataField">
-                        </label> -->
+                        <input type="radio" id="customDate" name="date">
+                        <label for="customDate" id="labelCustomDate" (click)="customDateSelect()">
+                            <i class="fas fa-calendar-alt"></i>
+                            <input readonly placeholder="Elegir fecha" matInput [matDatepicker]="picker2" (click)="picker2.open()" (dateInput)="selectCustomDate($event)" class="inputCustomDate">
+                        <mat-datepicker #picker2></mat-datepicker>
+                        </label>
                         <input type="radio" id="noneDate" name="date">
                         <label for="noneDate" id="labelNoneDate">
                             <i class="fas fa-calendar-times"></i>
-                            Sin fecha de entrega
+                            Sin fecha
                         </label>
                     </div>
                     <!--  <small>Dale a tu tarea algún propósito. Descripción de para qué se utilizará</small> -->

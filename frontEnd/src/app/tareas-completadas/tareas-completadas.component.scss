@@ -1,0 +1,53 @@
+//Colores Light Theme
+$primaryColor: #4f25f3;
+$textColor: #272727;
+$grayColor: #e8ecee;
+$whiteColor: #ffffff;
+$azulOscuro: #0b0f32;
+$azulClaro: #e8f4fd;
+$cGrey:#cccccc;
+#mainContainerTareasCompletadas {
+    width: 100%;
+    min-height: 100vh;
+    position: absolute;
+    background: #ffffff;
+    left: 0;
+    padding-left: 250px;
+    top: 80px;
+    transition: padding-left 240ms ease-out, transform 240ms ease-out;
+    @media(max-width: 768px) {
+        padding-left: 80px;
+    }
+    .topPart {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1740px;
+        margin: 10px 30px;
+        @media(min-width: 1600px) {
+            margin: 30px auto;
+        }
+        button#ordenarButton {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #4f25f3;
+            color: #ffffff;
+            font-family: inherit;
+            cursor: pointer;
+            outline: 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            i {
+                font-size: 15px;
+                margin-left: 5px;
+            }
+            &:hover {
+                background: rgba(79, 37, 243, .9);
+            }
+        }
+    }
+}

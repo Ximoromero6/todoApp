@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ServicioService } from './servicio.service';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-nota',
@@ -58,7 +59,7 @@ export class NotaComponent implements OnInit {
     let tomorrowDate: any = document.getElementById('tomorrowDate');
     let customDate: any = document.getElementById('customDate');
     let noneDate: any = document.getElementById('noneDate');
-    let customDataField: any = document.getElementById('customDataField');
+    /*  let customDataField: any = document.getElementById('customDataField'); */
 
     let today: any = new Date();
     let dd: number = today.getDate();
@@ -68,10 +69,10 @@ export class NotaComponent implements OnInit {
     this.finalData = `${yyyy}/${mm}/${dd}`;
 
     todayDate.addEventListener('click', () => {
-      if (todayDate.checked && !tomorrowDate.checked /* && !customDate.checked */ && !noneDate.checked) {
+      if (todayDate.checked && !tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.add('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        /* document.getElementById('customDataField').classList.remove('active'); */
+        document.getElementById('labelCustomDate').classList.remove('active');
         document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Today: ${yyyy}/${mm}/${dd}`);
         this.finalData = `${yyyy}/${mm}/${dd}`;
@@ -81,10 +82,10 @@ export class NotaComponent implements OnInit {
     });
 
     tomorrowDate.addEventListener('click', () => {
-      if (!todayDate.checked && tomorrowDate.checked /* && !customDate.checked */ && !noneDate.checked) {
+      if (!todayDate.checked && tomorrowDate.checked && !customDate.checked && !noneDate.checked) {
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.add('active');
-        /*  document.getElementById('customDataField').classList.remove('active'); */
+        document.getElementById('labelCustomDate').classList.remove('active');
         document.getElementById('labelNoneDate').classList.remove('active');
         console.log(`Tomorrow: ${yyyy}/${mm}/${dd + 1}`);
         this.finalData = `${yyyy}/${mm}/${dd + 1}`;
@@ -93,28 +94,45 @@ export class NotaComponent implements OnInit {
       }
     });
 
-    /* customDate.addEventListener('click', () => {
-      if (!todayDate.checked && !tomorrowDate.checked && customDate.checked && !noneDate.checked) {
-        document.getElementById('customDataField').classList.add('active');
-        document.getElementById('labelTodayDate').classList.remove('active');
-        document.getElementById('labelTomorrowDate').classList.remove('active');
-        document.getElementById('labelNoneDate').classList.remove('active');
-        this.finalData = `${customDataField.value}`;
-      } else {
-        document.getElementById('customDataField').classList.remove('active');
-      }
-    }); */
     noneDate.addEventListener('click', () => {
-      if (!todayDate.checked && !tomorrowDate.checked /* && !customDate.checked */ && noneDate.checked) {
+      if (!todayDate.checked && !tomorrowDate.checked && !customDate.checked && noneDate.checked) {
         document.getElementById('labelNoneDate').classList.add('active');
         document.getElementById('labelTodayDate').classList.remove('active');
         document.getElementById('labelTomorrowDate').classList.remove('active');
-        /* document.getElementById('customDataField').classList.remove('active'); */
+        document.getElementById('labelCustomDate').classList.remove('active');
         this.finalData = '';
       } else {
         document.getElementById('labelNoneDate').classList.remove('active');
       }
     });
+  }
+  selectCustomDate(evt) {
+    this.finalData = `${((evt as HTMLInputElement).value)}`;
+    let today = new Date(this.finalData);
+    let dd: number = today.getDate();
+    let mm: number = today.getMonth() + 1;
+    const yyyy = today.getFullYear();
+    this.finalData = `${yyyy}/${mm}/${dd}`;
+    console.log(`Custom: ${yyyy}/${mm}/${dd}`);
+  }
+
+  customDateSelect() {
+    let todayDate: any = document.getElementById('todayDate');
+    let tomorrowDate: any = document.getElementById('tomorrowDate');
+    let inputRadio = (document.getElementById('customDate') as HTMLInputElement);
+    let noneDate: any = document.getElementById('noneDate');
+
+    inputRadio.checked = true;
+
+    if (!todayDate.checked && !tomorrowDate.checked && inputRadio.checked && !noneDate.checked) {
+      document.getElementById('labelCustomDate').classList.add('active');
+      document.getElementById('labelTodayDate').classList.remove('active');
+      document.getElementById('labelTomorrowDate').classList.remove('active');
+      document.getElementById('labelNoneDate').classList.remove('active');
+
+    } else {
+      document.getElementById('labelCustomDate').classList.remove('active');
+    }
   }
 
   notaFuncion() {

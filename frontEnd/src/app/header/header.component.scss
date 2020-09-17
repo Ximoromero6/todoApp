@@ -164,6 +164,14 @@ header {
                                 justify-content: center;
                             }
                         }
+                        a.addTareaButtonHeader {
+                            background: #5C35FA;
+                            font-weight: 700;
+                            justify-content: center !important;
+                            &:hover {
+                                background: #4f25f3;
+                            }
+                        }
                     }
                     .misTareasButton {
                         a {
@@ -283,7 +291,7 @@ nav#horizontalMenu {
     align-items: flex-end;
     ul {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         li {
             list-style: none;
             display: flex;
@@ -341,6 +349,11 @@ nav#horizontalMenu {
                     border-color: #373737;
                 }
             }
+        }
+        li.containerBox {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
     }
     #dropDownMenu {
@@ -895,7 +908,7 @@ div.overlayPopupProfileSettings {
                                 z-index: 1;
                                 width: 100%;
                                 height: 100%;
-                                background-image: linear-gradient(rgba(0, 0, 0, 0.64), rgba(255, 255, 255, 0) 80%);
+                                background: rgba(0, 0, 0, .5) !important;
                                 position: absolute;
                                 left: 0;
                                 top: 0;

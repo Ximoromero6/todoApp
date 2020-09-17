@@ -19,6 +19,12 @@ import { ResetComponent } from './reset/reset.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NotaComponent } from './nota/nota.component';
 import { SortablejsModule } from 'ngx-sortablejs';
+/* import { MaterialModule } from '@angular/material'; */
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCalendar } from '@angular/material/datepicker';
+import { MatMomentDateModule, MomentDateModule } from '@angular/material-moment-adapter';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TareasCompletadasComponent } from './tareas-completadas/tareas-completadas.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +40,8 @@ import { SortablejsModule } from 'ngx-sortablejs';
     HeaderComponent,
     ResetComponent,
     DashboardComponent,
-    NotaComponent
+    NotaComponent,
+    TareasCompletadasComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +49,12 @@ import { SortablejsModule } from 'ngx-sortablejs';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    SortablejsModule.forRoot({ handle: '.draggableIcon', animation: 150 })
+    SortablejsModule.forRoot({ handle: '.draggableIcon', animation: 150 }),
+    /* MaterialModule.forRoot(), */
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MomentDateModule,
+    BrowserAnimationsModule
     /*  SortablejsModule.forRoot({
        animation: 200,
      }) */

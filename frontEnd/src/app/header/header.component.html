@@ -3,32 +3,19 @@
         <div class="topPart">
             <div class="logoPart">
                 <a routerLink="/home">Hubbet</a>
-                <!-- <button><i class="fas fa-plus"></i><label>Añadir Tarea</label></button> -->
                 <a id="closeMenuIcon"><img src="../../assets/images/menu.svg" alt="" loading="lazy"></a>
             </div>
             <div class="menu">
                 <ul>
                     <li>
-                        <a class="active"><img src="../../assets/images/burguer.svg" alt="" loading="lazy"> <label>Dashboard</label></a>
-                    </li>
-                    <!--  <li class="misTareasButton">
-                        <a>
-                            <div class="left">
-                                <img src="../../assets/images/lista.svg" alt="">
-                                <label>Mis Tareas</label>
-                            </div>
-                            <label class="taskCount">0</label>
-                        </a>
-                    </li> -->
-                    <li>
-                        <a><img src="../../assets/images/checkMenu.svg" alt="" loading="lazy"><label>Tareas Completadas</label></a>
-                    </li>
-                    <!-- <li>
-                        <a href="#0"><img src="../../assets/images/comprobado.svg" alt=""><label>Tareas Completadas</label></a>
+                        <a class="addTareaButtonHeader"><img src="../../assets/images/anadir.svg" alt=""> Añadir tarea</a>
                     </li>
                     <li>
-                        <a href="#0"><img src="../../assets/images/comprobado.svg" alt=""><label>Tareas Completadas</label></a>
-                    </li> -->
+                        <a class="active" routerLink="/home"><img src="../../assets/images/burguer.svg" alt="" loading="lazy"> <label>Dashboard</label></a>
+                    </li>
+                    <li>
+                        <a routerLink="completadas"><img src="../../assets/images/checkMenu.svg" alt="" loading="lazy"><label>Tareas Completadas</label></a>
+                    </li>
                 </ul>
             </div>
             <div class="preCloseSession">
@@ -38,7 +25,7 @@
         </div>
         <div class="bottomPart">
             <hr>
-            <button (click)="cerrarSesionFunction()"><label>Cerrar Sesión</label><img src="../../assets/images/close.svg" alt="" loading="lazy"></button>
+            <button (click)="cerrarSesionFunction()"><label>Cerrar sesión</label><img src="../../assets/images/close.svg" alt="" loading="lazy"></button>
         </div>
     </nav>
 </header>
@@ -47,30 +34,19 @@
 <!-- Menú horizontal con el buscador y los ajustes del perfil del usuario -->
 <nav id="horizontalMenu">
     <ul>
-        <li>
-            <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt="" loading="lazy"><input type="text" placeholder="Buscar"></div>
+        <li class="containerBox">
+            <div id="inputSearch"><img src="../../assets/images/buscar.svg" alt="" loading="lazy"><input type="text" placeholder="Buscar" (keyup)="searchTask()"></div>
+            <ul id="searchBoxResult"></ul>
         </li>
         <li><a class="noCloseMenu">{{ nombre }}<img class="noCloseMenu" [src]="imagen" alt="" loading="lazy"></a></li>
     </ul>
     <div id="dropDownMenu">
         <ul>
-            <li class="noCloseMenu">
-                <a class="noCloseMenu">Opción 1</a>
-            </li>
-            <li class="noCloseMenu">
-                <a class="noCloseMenu">Opción 2</a>
-            </li>
-            <li class="noCloseMenu">
-                <a class="noCloseMenu">Opción 3</a>
-            </li>
-            <li class="noCloseMenu">
-                <a class="noCloseMenu">Opción 4</a>
-            </li>
-            <li class="noCloseMenu">
-                <a class="noCloseMenu">Opción 5</a>
-            </li>
             <li>
-                <a id="profileSettingsButton">Ajustes de mi perfil...</a>
+                <a id="profileSettingsButton">Ajustes de mi perfil</a>
+            </li>
+            <li class="noCloseMenu">
+                <a class="noCloseMenu" (click)="cerrarSesionFunction()">Cerrar sesión</a>
             </li>
         </ul>
     </div>
@@ -255,7 +231,9 @@
                                         <label class="admin" *ngIf="item.admin">Administrador</label>
                                         <small>{{ item.email }}</small>
                                     </div>
-                                    <i class="fas fa-minus-circle" *ngIf="adminEquipo" title="Eliminar usuario" (click)="deleteUser(item.id)"></i>
+                                    <div *ngIf="!item.admin">
+                                        <i class="fas fa-minus-circle" *ngIf="adminEquipo" title="Eliminar usuario" (click)="deleteUser($event, item.id)"></i>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -263,7 +241,7 @@
                 </div>
             </div>
             <div id="tab4" class="tabContent">
-                <div class="container">
+                <!-- <div class="container">
                     <h3>Selecciona un tema</h3>
                     <div class="themeContainer">
                         <label for="tema1" class="tema">
@@ -283,7 +261,7 @@
                         <input type="radio" name="temas" id="tema4">
                     </label>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 

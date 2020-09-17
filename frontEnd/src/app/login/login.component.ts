@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
     });
 
     //Google Login
-    this.googleSDK();
+    /* this.googleSDK(); */
 
     this.focusField();
   }

@@ -75,6 +75,18 @@ export class HeaderComponent implements OnInit {
     //this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
     this.obtenerDatosEquipo(this.data.token);
 
+    let menuElements = document.querySelectorAll('.menu > li');
+
+    menuElements.forEach(e => {
+      e.addEventListener('click', () => {
+        /* menuElements.forEach(element => {
+          element.classList.remove('active');
+        });
+        e.classList.add('active'); */
+        alert('hola');
+      });
+    });
+
     //Añadimos las variables
     this.nombre = this.data.nombre != '' ? this.data.nombre : this.data.usuario;
     this.ubicacion = this.data.ubicacion;
@@ -103,6 +115,7 @@ export class HeaderComponent implements OnInit {
       document.getElementById('sideBarMenu').classList.add('active');
       document.getElementById('openMenuIcon').style.marginLeft = '30px';
       document.getElementById('mainContainerHome').style.paddingLeft = '0';
+      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '0';
     } else {
       document.getElementById('sideBarMenu').classList.remove('active');
     }
@@ -113,6 +126,7 @@ export class HeaderComponent implements OnInit {
       document.getElementById('sideBarMenu').classList.add('active');
       document.getElementById('openMenuIcon').style.marginLeft = '30px';
       document.getElementById('mainContainerHome').style.paddingLeft = '0';
+      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '0';
     });
 
     //Menú abrir
@@ -120,6 +134,7 @@ export class HeaderComponent implements OnInit {
       localStorage.setItem('menu', 'open');
       document.getElementById('sideBarMenu').classList.remove('active');
       document.getElementById('mainContainerHome').style.paddingLeft = '250px';
+      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '250px';
     });
 
     //Input search
@@ -185,7 +200,7 @@ export class HeaderComponent implements OnInit {
             let liItems: any = document.getElementsByClassName('listItem');
 
             for (let item of liItems) {
-              item.style.padding = '8px 4px';
+              item.style.padding = '10px 4px';
               item.style.listStyle = 'none';
               item.style.cursor = 'pointer';
               item.style.borderBottom = '1px solid #ccc';
@@ -194,6 +209,14 @@ export class HeaderComponent implements OnInit {
               item.addEventListener('click', (e) => {
                 this.formularioDatosExtra.get('ubicacion').setValue(e.target.textContent);
                 document.getElementById("showData").style.display = 'none';
+              });
+
+              item.addEventListener('mouseover', () => {
+                item.style.background = "#f6f8f9";
+              });
+
+              item.addEventListener('mouseout', () => {
+                item.style.background = "#ffffff";
               });
             }
 
@@ -678,14 +701,15 @@ export class HeaderComponent implements OnInit {
   }
 
   //Eliminar un usuario
-  deleteUser(id) {
-    /*  alert(this.parentElement); */
+  deleteUser(evt, id) {
     this.servicio.eliminarUsuarioEquipo(this.data.token, this.datosEquipo.id, id).subscribe(
       (response) => {
         this.mensajeNotificacion = response.response;
         if (response.status) {
           this.statusNotificacion = 'success';
           this.iconoNotificacion = 'fas fa-check-circle';
+          let parent = (<HTMLElement>(<HTMLElement>evt.target).parentNode.parentNode);
+          parent.remove();
         } else {
           this.statusNotificacion = 'error';
           this.iconoNotificacion = 'fas fa-exclamation-circle';
@@ -697,6 +721,26 @@ export class HeaderComponent implements OnInit {
       },
       (error) => {
         console.log(error);
+      }
+    );
+  }
+
+  //Función para buscar tareas con el buscador
+  searchTask() {
+    let text = (event.target as HTMLInputElement).value;
+    this.servicio.searchTask(text).subscribe(
+      (response) => {
+        //Si encuentra alguna tarea mostrarla
+        if (response.status) {
+          let item: any = document.createElement('li');
+          item.appendChild(document.createTextNode('TEST'));
+          document.getElementById('searchBoxResult').appendChild(item);
+        } else {
+
+        }
+      },
+      (error) => {
+        console.error(error);
       }
     );
   }

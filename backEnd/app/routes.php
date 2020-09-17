@@ -330,7 +330,6 @@ return function (App $app) {
         return $response;
     });
 
-    //
     //Cambio de contraseña con el token del usuario, y generar otro token
     $app->post('/verifyTokenReset', function ($request, $response) {
         $db = $this->get('db');
@@ -879,92 +878,73 @@ return function (App $app) {
             $db = $this->get('db');
             $postResponse = $request->getParsedBody();
             $userToken = $postResponse['userToken'];
-            $today = date('Y-m-d');
-            $tomorrow = date('Y-m-d', strtotime($today . ' + 1 days'));
 
-            $query = "SELECT usuarios.id, usuarios_tareas.id_tarea FROM usuarios LEFT JOIN usuarios_tareas ON usuarios.id = usuarios_tareas.id_usuario WHERE usuarios.token = '$userToken'";
+            $query = "SELECT usuarios.id FROM usuarios WHERE usuarios.token = '$userToken'";
             $resultado = $db->prepare($query);
             $resultado->execute();
 
             if ($resultado->rowCount() > 0) {
                 $resultado = $resultado->fetch(PDO::FETCH_ASSOC);
                 $idUsuario = $resultado['id'];
-                $idTarea = $resultado['id_tarea'];
 
-                //Obtener todas las tareas de hoy
-                $query = "SELECT usuarios.id AS 'userID', usuarios.usuario, usuarios.imagen, tareas.id AS 'tareasID', tareas.titulo, tareas.fecha, 
-                tareas.descripcion, tareas.creacion, tareas.idUsuario, comentarios.comentario, comentarios.id AS 'comentarioID', comentarios.fecha AS 'comentariosFecha' 
+                //Obtener tareas
+                $query = "SELECT usuarios.id AS 'userID', usuarios.usuario, usuarios.imagen, tareas.id AS 'tareasID', tareas.titulo, tareas.fecha, tareas.descripcion, tareas.creacion, tareas.idUsuario 
                 FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id 
-                INNER JOIN usuarios ON usuarios_tareas.id_usuario = usuarios.id 
-                LEFT JOIN comentarios ON comentarios.id_tarea = tareas.id AND usuarios.id = comentarios.id_usuario 
-                WHERE (usuarios_tareas.id_usuario = '$idUsuario' OR usuarios_tareas.id_tarea IN (SELECT tareas.id FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id WHERE usuarios_tareas.id_usuario = '$idUsuario') ) 
-                AND tareas.completada = 0 ORDER BY creacion DESC";
+                INNER JOIN usuarios ON tareas.idUsuario = usuarios.id 
+                WHERE usuarios_tareas.id_usuario = '$idUsuario' AND tareas.completada = 0 ORDER BY creacion DESC";
 
                 $resultado = $db->prepare($query);
                 $resultado->execute();
-                $res = $resultado->fetchAll(PDO::FETCH_ASSOC);
+                $resTarea = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
                 if ($resultado->rowCount() > 0) {
+                    for ($i = 0; $i < count($resTarea); $i++) {
 
-                    $arrayTasks = array();
-                    $contador = 0;
+                        $arrayTasks[$i]['id'] = $resTarea[$i]['tareasID'];
+                        $arrayTasks[$i]['titulo'] = $resTarea[$i]['titulo'];
+                        $arrayTasks[$i]['fecha'] = $resTarea[$i]['fecha'];
+                        $arrayTasks[$i]['descripcion'] = $resTarea[$i]['descripcion'];
+                        $arrayTasks[$i]['creacion'] = $resTarea[$i]['creacion'];
+                        $arrayTasks[$i]['usuario'] = $resTarea[$i]['usuario'];
+                        $arrayTasks[$i]['imagen'] = $resTarea[$i]['imagen'];
+                        $arrayTasks[$i]['colaboradores'] = array();
+                        $arrayTasks[$i]['comentarios'] = array();
 
-                    //Insertar Tareas
-                    for ($i = 0; $i < count($res); $i++) {
+                        //Obtener colaboradores
+                        $query = "SELECT usuarios.id, usuarios.usuario, usuarios.imagen 
+                        FROM usuarios INNER JOIN usuarios_tareas ON usuarios.id = usuarios_tareas.id_usuario 
+                        INNER JOIN tareas ON usuarios_tareas.id_tarea = tareas.id 
+                        WHERE usuarios_tareas.id_tarea = " . $resTarea[$i]['tareasID'] . " AND usuarios.id != tareas.idUsuario";
 
-                        $key = array_search($res[$i]['tareasID'], array_column($arrayTasks, 'id'));
+                        $resultado = $db->prepare($query);
+                        $resultado->execute();
+                        $resColab = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
-                        if ($res[$i]['idUsuario'] == $res[$i]['userID'] && !$key) {
-                            $arrayTasks[$contador]['id'] = $res[$i]['tareasID'];
-                            $arrayTasks[$contador]['titulo'] = $res[$i]['titulo'];
-                            $arrayTasks[$contador]['fecha'] = $res[$i]['fecha'];
-                            $arrayTasks[$contador]['descripcion'] = $res[$i]['descripcion'];
-                            $arrayTasks[$contador]['creacion'] = $res[$i]['creacion'];
-                            $arrayTasks[$contador]['usuario'] = $res[$i]['usuario'];
-                            $arrayTasks[$contador]['imagen'] = $res[$i]['imagen'];
-                            $arrayTasks[$contador]['colaboradores'] = array();
-                            $arrayTasks[$contador]['comentarios'] = array();
-                            $contador++;
-                        };
-                    };
+                        for ($j = 0; $j < count($resColab); $j++) {
 
-                    //Insertar Colaboradores
-                    for ($i = 0; $i < count($res); $i++) {
-                        if ($res[$i]['idUsuario'] != $res[$i]['userID']) {
-
-                            for ($j = 0; $j < count($arrayTasks); $j++) {
-
-                                if ($res[$i]['tareasID'] == $arrayTasks[$j]['id']) {
-
-                                    $arrayTemp = array(
-                                        "id" => $res[$i]['userID'],
-                                        "usuario" => $res[$i]['usuario'],
-                                        "imagen" => $res[$i]['imagen']
-                                    );
-                                    array_push($arrayTasks[$j]['colaboradores'], $arrayTemp);
-                                }
-                            }
+                            $arrayTasks[$i]['colaboradores'][$j]['id'] = $resColab[$j]['id'];
+                            $arrayTasks[$i]['colaboradores'][$j]['usuario'] = $resColab[$j]['usuario'];
+                            $arrayTasks[$i]['colaboradores'][$j]['imagen'] = $resColab[$j]['imagen'];
                         }
-                    };
 
-                    //Insertar Comentarios
-                    for ($i = 0; $i < count($res); $i++) {
-                        if ($res[$i]['comentario'] != NULL) {
-                            for ($j = 0; $j < count($arrayTasks); $j++) {
+                        //Obtener comentarios
+                        $query = "SELECT comentarios.id, comentarios.comentario, comentarios.fecha, usuarios.usuario, usuarios.imagen
+                        FROM comentarios INNER JOIN usuarios ON comentarios.id_usuario = usuarios.id
+                        WHERE comentarios.id_tarea = " . $resTarea[$i]['tareasID'];
 
-                                if ($res[$i]['tareasID'] == $arrayTasks[$j]['id']) {
+                        $resultado = $db->prepare($query);
+                        $resultado->execute();
+                        $resCom = $resultado->fetchAll(PDO::FETCH_ASSOC);
 
-                                    $arrayTemp = array(
-                                        "id" => $res[$i]['comentarioID'],
-                                        "usuario" => $res[$i]['usuario'],
-                                        "comentario" => $res[$i]['comentario'],
-                                        "fecha" => $res[$i]['comentariosFecha'],
-                                        "imagen" => $res[$i]['imagen']
-                                    );
-                                    array_push($arrayTasks[$j]['comentarios'], $arrayTemp);
-                                }
-                            }
+                        for ($j = 0; $j < count($resCom); $j++) {
+
+                            $arrayTasks[$i]['comentarios'][$j]['id'] = $resCom[$j]['id'];
+                            $arrayTasks[$i]['comentarios'][$j]['comentario'] = $resCom[$j]['comentario'];
+                            $arrayTasks[$i]['comentarios'][$j]['fecha'] = $resCom[$j]['fecha'];
+                            $arrayTasks[$i]['comentarios'][$j]['usuario'] = $resCom[$j]['usuario'];
+                            $arrayTasks[$i]['comentarios'][$j]['imagen'] = $resCom[$j]['imagen'];
                         }
-                    };
+                    }
 
                     $arrayResponse['status'] =  true;
                     $arrayResponse['errorCode'] = "";
@@ -975,6 +955,15 @@ return function (App $app) {
                     $arrayResponse['errorCode'] = "1002";
                     $arrayResponse['response'] = '';
                 }
+
+                /*  
+                $query = "SELECT usuarios.id AS 'userID', usuarios.usuario, usuarios.imagen, tareas.id AS 'tareasID', tareas.titulo, tareas.fecha, 
+                tareas.descripcion, tareas.creacion, tareas.idUsuario, comentarios.comentario, comentarios.id AS 'comentarioID', comentarios.fecha AS 'comentariosFecha' 
+                FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id 
+                INNER JOIN usuarios ON usuarios_tareas.id_usuario = usuarios.id 
+                LEFT JOIN comentarios ON comentarios.id_tarea = tareas.id AND usuarios.id = comentarios.id_usuario 
+                WHERE (usuarios_tareas.id_usuario = '$idUsuario' OR usuarios_tareas.id_tarea IN (SELECT tareas.id FROM tareas INNER JOIN usuarios_tareas ON usuarios_tareas.id_tarea = tareas.id WHERE usuarios_tareas.id_usuario = '$idUsuario') ) 
+                AND tareas.completada = 0 ORDER BY creacion DESC"; */
             } else {
                 $arrayResponse['status'] = false;
                 $arrayResponse['errorCode'] = "1001";
@@ -1873,6 +1862,249 @@ return function (App $app) {
                 $arrayResponse['status'] =  false;
                 $arrayResponse['errorCode'] = "1001";
                 $arrayResponse['response'] = "Error al eliminar el comentario";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para obtener datos equipo
+    $app->post('/obtenerDatosEquipo2', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $tokenUsuario = $postResponse['tokenUsuario'];
+
+            //Obtener el id del usuario con el token
+            $query = "SELECT id FROM usuarios WHERE token = '$tokenUsuario'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $userData = $resultado->fetch(PDO::FETCH_ASSOC);
+                $userID = $userData['id'];
+
+                //Obtener el id del grupo con el id del usuario
+                $query2 = "SELECT id_equipo FROM usuarios_equipos WHERE id_usuario = '$userID'";
+                $resultado2 = $db->prepare($query2);
+                $resultado2->execute();
+
+                if ($resultado2->rowCount() === 1) {
+                    $teamData = $resultado2->fetch(PDO::FETCH_ASSOC);
+                    $teamID = $teamData['id_equipo'];
+
+                    $query3 = "SELECT usuarios.id, usuarios.imagen, usuarios.usuario, usuarios.email FROM usuarios INNER JOIN usuarios_equipos ON usuarios.id = usuarios_equipos.id_usuario AND usuarios_equipos.id_equipo = '$teamID'";
+                    $resultado3 = $db->prepare($query3);
+                    $resultado3->execute();
+
+                    if ($resultado3->rowCount() > 0) {
+                        $arrayResponse['status'] =  true;
+                        $arrayResponse['errorCode'] = "";
+                        $arrayResponse['response'] = $resultado3->fetchAll(PDO::FETCH_ASSOC);
+                    } else {
+                        $arrayResponse['status'] =  false;
+                        $arrayResponse['errorCode'] = "1003";
+                        $arrayResponse['response'] = "Error al obtener los datos de los usuarios";
+                    }
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Error al obtener id del grupo";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al obtener id usuario";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para cambiar el creador
+    $app->post('/replaceCreator', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+
+            $idTarea = $postResponse['idTarea'];
+            $oldCreatorName = $postResponse['oldCreatorName'];
+            $idSustituto = $postResponse['idSustituto'];
+
+            $query = "UPDATE tareas SET idUsuario = '$idSustituto' WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+
+                //Hay que obtener el id del antiguo creador para insertarlo en la tabla de usuarios_tareas y así "asignarlo a la tarea"
+                $query2 = "SELECT id from usuarios WHERE usuario = '$oldCreatorName'";
+                $resultado2 = $db->prepare($query2);
+                $resultado2->execute();
+
+                if ($resultado2->rowCount() === 1) {
+                    $dataOld = $resultado2->fetch(PDO::FETCH_ASSOC);
+                    $oldCreatorID = $dataOld['id'];
+
+                    //Insertamos el que era antiguo creador
+                    $query3 = "DELETE FROM usuarios_tareas WHERE id_usuario = '$oldCreatorID'";
+                    $resultado3 = $db->prepare($query3);
+                    $resultado3->execute();
+
+                    $query4 = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES ('$idSustituto', '$idTarea')";
+                    $resultado4 = $db->prepare($query4);
+                    $resultado4->execute();
+
+                    $arrayResponse['status'] =  true;
+                    $arrayResponse['errorCode'] = "";
+                    $arrayResponse['response'] = "Creador actualizado correctamente";
+                } else {
+                    $arrayResponse['status'] =  false;
+                    $arrayResponse['errorCode'] = "1002";
+                    $arrayResponse['response'] = "Error al crear una entrada nueva en usuarios_tareas";
+                }
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al actualizar el creador";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para eliminar la fecha de entrega de una tarea
+    $app->post('/deleteTaskDate', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+
+
+            $query = "UPDATE tareas SET fecha = '0000-00-00' WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Fecha de la tarea eliminada";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al eliminar la fecha de la tarea";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para cambiar la fecha de una tarea
+    $app->post('/changeTaskDate', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $idTarea = $postResponse['idTarea'];
+            $newDate = $postResponse['newDate'];
+            $finalDate = date("Y-m-d", strtotime($newDate));
+
+            $query = "UPDATE tareas SET fecha = '$finalDate' WHERE id = '$idTarea'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = "Fecha de la tarea cambiada";
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Error al cambiar la fecha de la tarea";
+            }
+        } catch (Exception $e) {
+            $arrayResponse['status'] =  false;
+            $arrayResponse['errorCode'] = "1000";
+            $arrayResponse['response'] = $e->getMessage();
+        }
+
+        $response->getBody()->write(json_encode($arrayResponse));
+        return $response;
+    });
+
+    //Función para buscar una tarea
+    $app->post('/searchTask', function ($request, $response) {
+
+        $arrayResponse = [
+            "status" => '',
+            "errorCode" => '',
+            "response" => ''
+        ];
+
+        try {
+            $db = $this->get('db');
+            $postResponse = $request->getParsedBody();
+            $text = $postResponse['text'];
+
+            $query = "SELECT * FROM tareas WHERE titulo LIKE '%$text%' || titulo LIKE '%$text' || titulo LIKE '$text%'";
+            $resultado = $db->prepare($query);
+            $resultado->execute();
+
+            if ($resultado->rowCount() === 1) {
+                $arrayResponse['status'] =  true;
+                $arrayResponse['errorCode'] = "";
+                $arrayResponse['response'] = $resultado->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $arrayResponse['status'] =  false;
+                $arrayResponse['errorCode'] = "1001";
+                $arrayResponse['response'] = "Ninguna tarea encontrada";
             }
         } catch (Exception $e) {
             $arrayResponse['status'] =  false;

@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NotaComponent } from '../nota/nota.component';
 import { DashBoardServiceService } from './dash-board-service.service';
-import { JsonPipe } from '@angular/common';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,14 +30,36 @@ export class DashboardComponent implements OnInit {
   //Formulario para añadir un comentario
   formularioAddParticipante: FormGroup;
 
+  //Formulario para cambiar el creador de la tarea
+  formularioCambiarCreador: FormGroup;
+
+  //Miembros del equipo
+  miembros;
+
   constructor(
     private servicio: DashBoardServiceService,
     private formBuilder: FormBuilder
-  ) {
-    this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
-  }
+  ) { this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData'))); }
 
   @ViewChild(NotaComponent) child;
+
+
+
+  dateChanged(event: MatDatepickerInputEvent<Date>, idTask) {
+    let date = new Date((event.targetElement as HTMLInputElement).value);
+    let finalDate = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate() + 1)).slice(-2)}`;
+
+    this.servicio.changeTaskDate(idTask, finalDate).subscribe(
+      (response) => {
+        if (response.status) {
+          ((event.targetElement as HTMLInputElement).previousSibling.childNodes[1]).textContent = finalDate;
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.obtenerTareas(this.data.token);
@@ -56,17 +78,15 @@ export class DashboardComponent implements OnInit {
       }, 600);
     };
 
-    let completedButton: any = document.getElementsByClassName("completedButton");
-
-    for (let i = 0; i < completedButton.length; i++) {
-      completedButton[i].addEventListener('click', animateButton, false);
-    }
-
     this.formularioAddComentario = this.formBuilder.group({
       comentario: ['', Validators.required]
     });
 
     this.formularioAddParticipante = this.formBuilder.group({
+      usuario: ['', Validators.required]
+    });
+
+    this.formularioCambiarCreador = this.formBuilder.group({
       usuario: ['', Validators.required]
     });
   }
@@ -178,11 +198,12 @@ export class DashboardComponent implements OnInit {
       (response) => {
         if (response.status) {
           let date = new Date();
+
           let today = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`;
           let tomorrow = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate() + 1)).slice(-2)}`;
 
           //Asignamos las tareas
-          this.listaTareasToday = response.tasks.filter(e => e.fecha == today);
+          this.listaTareasToday = response.tasks.filter(e => e.fecha == today || e.fecha < today);
 
           //Asignamos el número de tareas de hoy
           this.todayTaskCount = this.listaTareasToday.length;
@@ -192,9 +213,10 @@ export class DashboardComponent implements OnInit {
 
           //Asignamos el número de tareas de mañana
           this.tomorrowTaskCount = this.listaTareasTomorrow.length;
-
+          console.log(this.listaTareasToday);
+          console.log(this.listaTareasTomorrow);
         } else {
-          document.querySelector('.taskContainer .task').remove();
+          //  document.querySelector('.taskContainer .task').remove();
           /* this.todayTaskCount--;
           this.tomorrowTaskCount--; */
         }
@@ -208,16 +230,9 @@ export class DashboardComponent implements OnInit {
     let el = evt;
     if (el.target.classList.value === 'task') {
       this.tareaSeleccionada = tarea;
+      console.log(this.tareaSeleccionada);
       this.show = true;
     }
-    console.log(el.target.classList.value);
-  }
-
-  setUrl() {
-    let url = (<HTMLTextAreaElement>document.getElementById("descripcionTarea")).value;
-    let sText = document.getSelection();
-    document.execCommand('insertHTML', false, '<a href="' + url + '" target="_blank">' + sText + '</a>');
-    url = '';
   }
 
   //Función para eliminar las tareas
@@ -347,7 +362,6 @@ export class DashboardComponent implements OnInit {
   open(evt) {
     document.querySelector('.contenedorAddPersonas').classList.add('active');
     document.getElementById('personasAsignadas').classList.add('active');
-    console.log(event.target);
   }
 
   agregarParticipanteExtra(idTarea) {
@@ -357,47 +371,19 @@ export class DashboardComponent implements OnInit {
           console.log(response);
           if (response.status) {
             this.formularioAddParticipante.reset();
+
+            let aux = {
+              "id": response.response.id,
+              "imagen": response.response.imagen,
+              "usuario": response.response.usuario
+            }
+            this.tareaSeleccionada.colaboradores.push(aux);
+            console.log(this.listaTareasToday);
+
             document.getElementById('contenedorAddPersonas').classList.remove('active');
             document.getElementById('personasAsignadas').classList.remove('active');
 
-            //Creamos el contenedor de la imagen
-            let asignada = document.createElement('div');
-            asignada.classList.add('asignada');
-            let asignadaStyles = {
-              display: 'flex',
-              alignItems: 'center',
-              margin: '6px 10px 6px 6px',
-              position: 'relative'
-            };
-            Object.assign(asignada.style, asignadaStyles);
 
-            let imagen = document.createElement('img');
-            imagen.src = `../../assets/uploads/${response.response.usuario}/${response.response.imagen}`;
-            let imagenStyles = {
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              objectFit: 'cover'
-            };
-            Object.assign(imagen.style, imagenStyles);
-
-            let iconoCerrar = document.createElement('i');
-            iconoCerrar.classList.add('fas', 'fa-times-circle');
-            let iconoCerrarStyles = {
-              position: 'absolute',
-              right: '-4px',
-              top: '-4px',
-              fontSize: '10px',
-              color: '#222222'
-            };
-            Object.assign(iconoCerrar.style, iconoCerrarStyles);
-
-            asignada.appendChild(imagen);
-            asignada.appendChild(iconoCerrar);
-
-            let container = document.getElementById('personasAsignadas');
-            container.insertBefore(asignada, container.childNodes[0]);
-            /*  container.appendChild(asignada); */
           }
         },
         (error) => {
@@ -438,6 +424,14 @@ export class DashboardComponent implements OnInit {
     );
   }
   editarDescripcion(idTarea) {
+
+    /* let editor = document.getElementById("descripcionTarea");
+    editor.addEventListener("paste", function (e) {
+      e.preventDefault();
+      let text = e.clipboardData.getData('text/plain');
+      document.execCommand("insertHTML", false, text);
+    }); */
+
     let texto = (<HTMLElement>event.target).textContent;
     this.servicio.editarDescripcion(idTarea, texto).subscribe(
       (response) => {
@@ -466,7 +460,6 @@ export class DashboardComponent implements OnInit {
 
   //Función para devolver si la fecha es hoy en letras, mañana etc
   returnDate(fecha) {
-    console.log(fecha);
     let date = new Date();
     let today = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`;
     let tomorrow = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate() + 1)).slice(-2)}`;
@@ -476,9 +469,62 @@ export class DashboardComponent implements OnInit {
     }
     else if (fecha == tomorrow) {
       return "Mañana";
+    } else if (fecha == '0000-00-00') {
+      return "Sin fecha de entrega";
     } else {
       return fecha;
     }
+  }
+
+  //Obtener tdooa loa participantes del equipo para seleccionar alguno
+  getInfoUsersTeam() {
+    this.servicio.obtenerDatosEquipo2(this.data.token).subscribe(
+      (response) => {
+        if (response.status) {
+          document.getElementById('creador').classList.add('active');
+          document.getElementById('contenedorCambiarCreador').classList.add('active');
+          this.miembros = response.response;
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }
+
+  //Función que reemplaza al creador
+  replaceCreator(idTarea, oldCreatorName, idSustituto, newUser, newImagen) {
+    this.servicio.replaceCreator(idTarea, oldCreatorName, idSustituto).subscribe(
+      (response) => {
+        if (response.status) {
+          document.getElementById('contenedorCambiarCreador').classList.remove('active');
+          //(document.querySelector('#creador > img') as HTMLImageElement).src = `../../assets/uploads/${newUser}/${newImagen}`;
+          //document.querySelector('#creador > p').textContent = newUser;
+
+          this.tareaSeleccionada.imagen = newImagen;
+          this.tareaSeleccionada.usuario = newUser;
+
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+
+  }
+
+  //Función para eliminar la fecha de entrega
+  deleteTaskDate(evt, idTarea) {
+    this.servicio.deleteTaskDate(idTarea).subscribe(
+      (response) => {
+        if (response.status) {
+          evt.target.previousSibling.textContent = "Sin fecha de entrega";
+        }
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   }
 
 }
