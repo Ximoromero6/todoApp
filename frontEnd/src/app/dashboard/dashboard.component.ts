@@ -3,6 +3,9 @@ import { NotaComponent } from '../nota/nota.component';
 import { DashBoardServiceService } from './dash-board-service.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SharedDashboardHeaderServiceService } from '../home/shared-dashboard-header-service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,11 +17,14 @@ export class DashboardComponent implements OnInit {
   data: any;
   todayTaskCount: number = 0;
   tomorrowTaskCount: number = 0;
-  futureTaskCount: number = 0;
+  nextTaskCount: number = 0;
 
   //Array con todas las tareas
+  listaTareas = [];
+
   listaTareasToday = [];
-  listaTareasTomorrow;
+  listaTareasTomorrow = [];
+  listaTareasNext = [];
 
   //Array para saber la tarea seleccionada
   tareaSeleccionada;
@@ -36,14 +42,51 @@ export class DashboardComponent implements OnInit {
   //Miembros del equipo
   miembros;
 
+  //Montamos la imágen
+  imagen;
+
+  subscription: Subscription;
+
+  date = new Date();
+  today = `${this.date.getFullYear()}-${("0" + (this.date.getMonth() + 1)).slice(-2)}-${("0" + (this.date.getUTCDate())).slice(-2)}`;
+  tomorrow = `${this.date.getFullYear()}-${("0" + (this.date.getMonth() + 1)).slice(-2)}-${("0" + (this.date.getUTCDate() + 1)).slice(-2)}`;
+
   constructor(
     private servicio: DashBoardServiceService,
-    private formBuilder: FormBuilder
-  ) { this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData'))); }
+    private formBuilder: FormBuilder,
+    private sanitizer: DomSanitizer,
+    private SharedDashboardHeaderServiceService: SharedDashboardHeaderServiceService
+  ) {
+    this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
+    this.subscription = SharedDashboardHeaderServiceService.task$.subscribe(
+      (response) => {
+
+        //Asignamos las tareas
+        this.listaTareasToday = this.listaTareas.filter(e => e.fecha == this.today || e.fecha < this.today);
+        /* this.SharedDashboardHeaderServiceService.updateTasks(this.listaTareasToday); */
+
+        //Asignamos el número de tareas de hoy
+        this.todayTaskCount = this.listaTareasToday.length;
+
+        //añadimos las tareas de mañana a un array
+        this.listaTareasTomorrow = this.listaTareas.filter(e => e.fecha == this.tomorrow);
+
+        //Asignamos el número de tareas de mañana
+        this.tomorrowTaskCount = this.listaTareasTomorrow.length;
+
+        //Asignamos las próximas tareas al array next
+        this.listaTareasNext = this.listaTareas.filter(e => e.fecha > this.tomorrow);
+
+        //Asignamos el número de tareas próximas
+        this.nextTaskCount = this.listaTareasNext.length;
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }
 
   @ViewChild(NotaComponent) child;
-
-
 
   dateChanged(event: MatDatepickerInputEvent<Date>, idTask) {
     let date = new Date((event.targetElement as HTMLInputElement).value);
@@ -114,23 +157,26 @@ export class DashboardComponent implements OnInit {
 
   completeLeftButton(id, target: HTMLElement): void {
     let el: HTMLElement | null = target;
-    (<Element>el.parentNode.parentNode).classList.add('removed-item');
-    setTimeout(() => {
-      (<Element>el.parentNode.parentNode).remove();
-    }, 1000);
+    let task = (<Element>el.parentNode.parentNode);
+    task.classList.add('animate__animated', 'animate__zoomOutLeft'); //animate__bounceOutLeft
 
-    //Llamamos al servicio
-    this.servicio.completarTarea(id).subscribe(
-      (response) => {
-        if (response.status) {
+    task.addEventListener('animationend', () => {
+      //Llamamos al servicio
+      this.servicio.completarTarea(id).subscribe(
+        (response) => {
           this.obtenerTareas(this.data.token);
-          this.todayTaskCount--;
-        }
-      },
-      (error) => { console.log(error) }
-    );
-  }
+          if (response.status) {
+            task.remove();
+            this.SharedDashboardHeaderServiceService.updateTasks(this.listaTareas);
+          }
+        },
+        (error) => { console.log(error) }
+      );
 
+    });
+
+
+  }
 
   addTarea() {
     document.getElementById('addTareaButton').addEventListener('click', () => {
@@ -191,34 +237,32 @@ export class DashboardComponent implements OnInit {
 
     let texto = document.querySelector('.moreOptions > span');
     texto.textContent === 'Mostrar más opciones' ? texto.textContent = 'Mostrar menos opciones' : texto.textContent = 'Mostrar más opciones';
+
+    //Paste
+    document.addEventListener('paste', function (e) {
+      e.preventDefault();
+
+      let pastedText = '';
+      let clipboardData = (<any>window).clipboardData;
+      console.log(clipboardData);
+
+      /* if (clipboardData && clipboardData.getData) {
+        pastedText = clipboardData.getData('Text');
+      } else if (e.clipboardData && e.clipboardData.getData) {
+        pastedText = e.clipboardData.getData('text/html');
+      }
+
+      document.getElementById('target').innerHTML = pastedText */
+    });
   }
 
   obtenerTareas(userToken) {
     this.servicio.obtenerTareas(userToken).subscribe(
       (response) => {
+        console.log('b');
         if (response.status) {
-          let date = new Date();
-
-          let today = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`;
-          let tomorrow = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate() + 1)).slice(-2)}`;
-
-          //Asignamos las tareas
-          this.listaTareasToday = response.tasks.filter(e => e.fecha == today || e.fecha < today);
-
-          //Asignamos el número de tareas de hoy
-          this.todayTaskCount = this.listaTareasToday.length;
-
-          //añadimos las tareas de mañana a un array
-          this.listaTareasTomorrow = response.tasks.filter(e => e.fecha == tomorrow);
-
-          //Asignamos el número de tareas de mañana
-          this.tomorrowTaskCount = this.listaTareasTomorrow.length;
-          console.log(this.listaTareasToday);
-          console.log(this.listaTareasTomorrow);
-        } else {
-          //  document.querySelector('.taskContainer .task').remove();
-          /* this.todayTaskCount--;
-          this.tomorrowTaskCount--; */
+          this.listaTareas = response.tasks;
+          this.SharedDashboardHeaderServiceService.updateTasks(this.listaTareas);
         }
       },
       (error) => {
@@ -258,83 +302,18 @@ export class DashboardComponent implements OnInit {
           console.log(response);
           if (response.status) {
             this.formularioAddComentario.reset();
-
-            //Creamos el comentario
-            let comment = document.createElement('div');
-
-            let comentarioStyle = {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              padding: '8px',
-              borderRadius: '3px',
-              marginTop: '10px',
-              background: '#f6f8f9',
-              border: '1px solid #ccc'
-            }
-            Object.assign(comment.style, comentarioStyle);
-
-            let top = document.createElement('div');
-            top.classList.add('top');
-
-            let subTop = document.createElement('div');
-
-            let image = document.createElement('img');
-            image.style.cssText = "width: 25px; height: 25px; border-radius: 50%; object-fit: cover; margin-right: 8px; object-fit: cover;";
-            image.src = `assets/uploads/${this.data.usuario}/${this.data.imagen}`;
-            subTop.appendChild(image);
-
-
-            let right = document.createElement('div');
-
-            let rightStyles = {
-              display: 'flex',
-              alignItems: 'center'
-            };
-
-            let topStyles = {
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between'
-            };
-
-            Object.assign(subTop.style, rightStyles);
-
-            Object.assign(right.style, rightStyles);
-
-            let user = document.createElement('p');
-            user.appendChild(document.createTextNode(this.data.usuario));
-            user.style.cssText = "font-size: 15px; color: #444444; font-weight: 700;";
-
-            let fecha = document.createElement('span');
             let date = new Date();
-            fecha.appendChild(document.createTextNode(`${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`));
-            fecha.style.cssText = "font-size: 13px; color: #888888; margin-left: 10px;";
 
-            right.appendChild(user);
-            right.appendChild(fecha);
-
-            subTop.appendChild(right);
-            top.appendChild(subTop);
-
-            let icon = document.createElement('i');
-            icon.classList.add('far', 'fa-times-circle');
-            //icon.addEventListener('click', ()=>{this});
-            icon.style.cssText = "color: #FF4136; font-size: 14px; cursor: pointer; transition: all .1s;";
-            top.appendChild(icon);
-            Object.assign(top.style, topStyles);
-            comment.appendChild(top);
-
-            let texto = document.createElement('p');
-            let comentarioTexto = document.createTextNode(comentario);
-            texto.style.cssText = "font-size: 14px; margin-top: 5px;";
-            texto.appendChild(comentarioTexto);
-            comment.appendChild(texto);
-
-            let container = document.querySelector('.comentarios');
-            container.insertBefore(comment, container.childNodes[0]);
+            let today = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + (date.getUTCDate())).slice(-2)}`;
+            let aux = {
+              "id": response.response,
+              "imagen": this.data.imagen,
+              "usuario": this.data.usuario,
+              "comentario": comentario,
+              "fecha": today
+            }
+            this.tareaSeleccionada.comentarios.push(aux);
+            this.SharedDashboardHeaderServiceService.updateTasks(this.listaTareas);
           }
         },
         (error) => {
@@ -378,11 +357,9 @@ export class DashboardComponent implements OnInit {
               "usuario": response.response.usuario
             }
             this.tareaSeleccionada.colaboradores.push(aux);
-            console.log(this.listaTareasToday);
 
             document.getElementById('contenedorAddPersonas').classList.remove('active');
             document.getElementById('personasAsignadas').classList.remove('active');
-
 
           }
         },
@@ -423,6 +400,7 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
+
   editarDescripcion(idTarea) {
 
     /* let editor = document.getElementById("descripcionTarea");
@@ -527,4 +505,12 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  //Función para mostrar las X cuando haces hover en una imágen de un usuario participante
+  showCross(evt) {
+    evt.target.nextSibling.style.display = 'flex';
+  }
+
+  hideCross(evt) {
+    evt.target.style.display = 'none';
+  }
 }

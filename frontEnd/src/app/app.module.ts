@@ -25,6 +25,7 @@ import { MatCalendar } from '@angular/material/datepicker';
 import { MatMomentDateModule, MomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TareasCompletadasComponent } from './tareas-completadas/tareas-completadas.component';
+import { SharedDashboardHeaderServiceService } from './home/shared-dashboard-header-service.service';
 
 @NgModule({
   declarations: [
@@ -61,8 +62,8 @@ import { TareasCompletadasComponent } from './tareas-completadas/tareas-completa
   ],
   providers: [
     RegistroService,
-    LoginService
-
+    LoginService,
+    SharedDashboardHeaderServiceService
   ],
   bootstrap: [AppComponent]
 })

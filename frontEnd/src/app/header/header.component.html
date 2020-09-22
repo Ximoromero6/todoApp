@@ -8,13 +8,13 @@
             <div class="menu">
                 <ul>
                     <li>
-                        <a class="addTareaButtonHeader"><img src="../../assets/images/anadir.svg" alt=""> Añadir tarea</a>
+                        <a class="addTareaButtonHeader" id="addTareaButtonHeader"><img src="../../assets/images/anadir.svg" alt=""> Añadir tarea</a>
                     </li>
                     <li>
-                        <a class="active" routerLink="/home"><img src="../../assets/images/burguer.svg" alt="" loading="lazy"> <label>Dashboard</label></a>
+                        <a class="menuItem active" routerLink="/home" (click)="toggleClass($event)"><img src="../../assets/images/burguer.svg" alt="" loading="lazy" class="child"> <label class="child">Dashboard</label></a>
                     </li>
                     <li>
-                        <a routerLink="completadas"><img src="../../assets/images/checkMenu.svg" alt="" loading="lazy"><label>Tareas Completadas</label></a>
+                        <a class="menuItem" routerLink="completadas" (click)="toggleClass($event)"><img src="../../assets/images/checkMenu.svg" alt="" loading="lazy" class="child"><label class="child">Tareas Completadas</label></a>
                     </li>
                 </ul>
             </div>

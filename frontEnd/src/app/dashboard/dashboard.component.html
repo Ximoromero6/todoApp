@@ -14,7 +14,7 @@
                 <div class="top">
                     <i class="fas fa-caret-right active"></i>
                     <p>Hoy</p>
-                    <span id="todayTaskCount">({{todayTaskCount}})</span>
+                    <span id="todayTaskCount">({{ todayTaskCount }})</span>
                 </div>
                 <div class="bottom active">
                     <!--  [sortablejs]="listaTareasToday" -->
@@ -62,9 +62,23 @@
                 <div class="top">
                     <i class="fas fa-caret-right"></i>
                     <p>Próximas tareas</p>
-                    <span id="nextTaskCount">(0)</span>
+                    <span id="nextTaskCount">({{ nextTaskCount }})</span>
                 </div>
-                <div class="bottom"></div>
+                <div class="bottom">
+                    <div *ngFor="let nextTask of listaTareasNext" (click)="ampliarTarea(nextTask, $event)" class="task">
+                        <div class="left">
+                            <!-- <i class="fas fa-grip-vertical draggableIcon"></i> -->
+                            <i class="far fa-check-circle" (click)="completeLeftButton(nextTask.id, $event.target)"></i>
+                            <h4>{{ nextTask.titulo }}</h4>
+                        </div>
+                        <div class="right">
+                            <span class="idNota">#{{ nextTask.id }}</span>
+
+                            <img src="../../assets/uploads/{{ nextTask.usuario }}/{{ nextTask.imagen }}" alt="" class="imageUser">
+                            <i class="fas fa-angle-right"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="my-calendar"></div>
@@ -72,10 +86,10 @@
         <!-- Contenedor para ver las tareas en detalle -->
         <div class="containerViewTask" *ngIf="show">
             <div class="topNote">
-                <button class="completedButton" id="completedButton" (click)="completed(tareaSeleccionada.id)">Completar <!-- <i class="fas fa-check"></i> --> <img src="../../assets/images/comprobar.svg" alt=""></button>
+                <button class="completedButton" id="completedButton" (click)="completed(tareaSeleccionada.id)">Completar <!-- <i class="fas fa-check"></i> --> <img src="../../assets/images/cheque.svg" alt=""></button>
                 <div class="right">
-                    <i class="far fa-trash-alt" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(tareaSeleccionada['id'])"></i>
-                    <img src="../../assets/images/crossButton.svg" alt="" class="closeTaskButton" (click)="show = !show">
+                    <i class="fas fa-trash" id="eliminarTarea" title="Eliminar tarea" (click)="eliminarTarea(tareaSeleccionada['id'])"></i>
+                    <img src="../../assets/images/closeNote.svg" alt="" class="closeTaskButton" (click)="show = !show">
                     <!--  <i class="fas fa-times" (click)="show = !show"></i> -->
                 </div>
             </div>
@@ -90,9 +104,9 @@
                         <div class="creador" (click)="getInfoUsersTeam()" id="creador">
                             <img src="../../assets/uploads/{{ tareaSeleccionada.usuario }}/{{ tareaSeleccionada.imagen }}" alt="" title="{{ tareaSeleccionada.usuario }}">
                             <p>{{ tareaSeleccionada.usuario }}</p>
-                            <!-- <i class="fas fa-times-circle"></i> -->
                         </div>
                         <div class="contenedorCambiarCreador" id="contenedorCambiarCreador">
+                            <i class="fas fa-times"></i>
                             <ul class="peopleTeam" id="peopleTeam">
                                 <li *ngFor="let miembro of miembros" (click)="replaceCreator(tareaSeleccionada.id, tareaSeleccionada.usuario, miembro.id, miembro.usuario, miembro.imagen)">
                                     <img src="../../assets/uploads/{{miembro.usuario}}/{{miembro.imagen}}" alt="">
@@ -121,15 +135,15 @@
                     <div class="subContenedorAsignadas">
                         <div class="personasAsignadas" id="personasAsignadas">
                             <div class="asignada" *ngFor="let asignada of tareaSeleccionada.colaboradores">
-                                <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="" title="{{ asignada.usuario }}">
-                                <i class="fas fa-times-circle" title="Eliminar usuario" (click)="eliminarParticipanteExtra(tareaSeleccionada.id, asignada.id)"></i>
+                                <img src="../../assets/uploads/{{asignada.usuario}}/{{asignada.imagen}}" alt="" title="{{ asignada.usuario }}" (mouseover)="showCross($event)">
+                                <i class="fas fa-times-circle" title="Eliminar usuario" (click)="eliminarParticipanteExtra(tareaSeleccionada.id, asignada.id)" (mouseout)="hideCross($event)"></i>
                             </div>
                             <div class="asignar" title="Añadir participante" id="agregarParticipanteButton" (click)="open($event)">
                                 <!--  <i class="far fa-user"></i> -->
                                 <i class="fas fa-plus"></i>
                             </div>
                         </div>
-                        <form method="POST" class="contenedorAddPersonas" id="contenedorAddPersonas" [formGroup]="formularioAddParticipante" (ngSubmit)="agregarParticipanteExtra(tareaSeleccionada['id'])">
+                        <form method="POST" class="contenedorAddPersonas" id="contenedorAddPersonas" [formGroup]="formularioAddParticipante" (ngSubmit)="agregarParticipanteExtra(tareaSeleccionada.id)">
                             <div class="top">
                                 <small>Introduce el email de la persona que quieras agregar <i class="fas fa-times" (click)="closePopup()"></i></small>
                             </div>
@@ -161,7 +175,7 @@
                 </div>
             </div>
             <div class="bottom">
-                <form method="POST" class="formularioAddComentario" [formGroup]="formularioAddComentario" (ngSubmit)="insertarComentario(tareaSeleccionada['id'])">
+                <form method="POST" class="formularioAddComentario" [formGroup]="formularioAddComentario" (ngSubmit)="insertarComentario(tareaSeleccionada.id)">
                     <textarea placeholder="Realiza un comentario" formControlName="comentario"></textarea>
                     <div class="right">
                         <button type="submit">Comentar</button>

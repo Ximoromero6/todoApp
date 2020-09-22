@@ -23,6 +23,7 @@ $button-text-color: #fff;
             margin: 30px auto;
         }
         button#addTareaButton {
+            /*  display: none; */
             border: none;
             background: #5C35FA;
             color: #ffffff;
@@ -53,7 +54,7 @@ $button-text-color: #fff;
             border-bottom: 1px solid #e8ecee;
             cursor: pointer;
             i {
-                font-size: 15px;
+                font-size: 20px;
                 cursor: pointer;
                 margin-right: 10px;
                 transition: all .1s;
@@ -264,6 +265,7 @@ $button-text-color: #fff;
             }
         }
         .containerViewTask {
+            bottom: 35px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border: 1px solid #f6f8f9;
             border-radius: 4px;
@@ -591,6 +593,8 @@ $button-text-color: #fff;
                             border: 1px dashed #333;
                         }
                         i.fechaEntregaTarea {
+                            display: none;
+                            cursor: default;
                             &:hover {
                                 color: red;
                             }
@@ -604,6 +608,9 @@ $button-text-color: #fff;
                             color: #6f7782;
                             cursor: pointer;
                             outline: 0;
+                            i.fechaEntregaTarea {
+                                display: flex;
+                            }
                         }
                     }
                     #customDataField {
@@ -678,6 +685,7 @@ $button-text-color: #fff;
                                     object-fit: cover;
                                 }
                                 i {
+                                    display: none;
                                     position: absolute;
                                     right: -4px;
                                     top: -4px;
@@ -821,7 +829,7 @@ $button-text-color: #fff;
                         border-radius: 3px;
                         margin-top: 10px;
                         background: #f6f8f9;
-                        border: 1px solid #ccc;
+                        /*      border: 1px solid #ccc; */
                         .top {
                             width: 100%;
                             display: flex;
@@ -868,7 +876,7 @@ $button-text-color: #fff;
                 }
             }
             .bottom {
-                border-top: 1px solid #f6f8f9;
+                border-top: 1px solid #ccc;
                 background: #f6f8f9;
                 width: 100%;
                 box-shadow: 0 -1px 3px 0 rgba(21, 27, 38, .15);

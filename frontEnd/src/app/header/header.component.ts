@@ -1,27 +1,45 @@
-import { Component, OnInit, Output, EventEmitter, Renderer2, Inject } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Renderer2, Inject, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ServicioService } from './servicio.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DOCUMENT, JsonPipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { NotaComponent } from '../nota/nota.component';
+import { SharedDashboardHeaderServiceService } from '../home/shared-dashboard-header-service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
   @Output("cerrarSesion") cerrarSesion = new EventEmitter<any>();
+
+  subscription: Subscription;
+  tasks;
+  sessionTasks;
 
   constructor(
     private sanitizer: DomSanitizer,
     private servicio: ServicioService,
     private formBuilder: FormBuilder,
-
+    public router: Router,
+    private SharedDashboardHeaderServiceService: SharedDashboardHeaderServiceService,
     //Esto es para el tema oscuro, REVISAR!!
     /* @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2 */
   ) {
     this.data = localStorage.getItem('userData') != null ? JSON.parse(atob(localStorage.getItem('userData'))) : JSON.parse(atob(sessionStorage.getItem('userData')));
+
+    this.subscription = SharedDashboardHeaderServiceService.task$.subscribe(
+      (response) => {
+        this.tasks = response;
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   }
 
   //Formulario datos extra
@@ -67,25 +85,27 @@ export class HeaderComponent implements OnInit {
   //Para unirse a equipo
   idEquipoHidden;
 
+  @ViewChild(NotaComponent) child;
+
+  addTarea() {
+    document.getElementById('addTareaButtonHeader').addEventListener('click', () => {
+      this.child.showTask();
+      this.child.hideTask();
+    });
+  }
+
   public formGroup = this.formBuilder.group({
     file: [null, Validators.required]
   });
 
   ngOnInit(): void {
+    this.addTarea();
+    if (this.router.url === '/home/completadas') {
+      (document.querySelector('.menuItem').lastChild as HTMLElement).classList.add('active');
+    }
+
     //this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
     this.obtenerDatosEquipo(this.data.token);
-
-    let menuElements = document.querySelectorAll('.menu > li');
-
-    menuElements.forEach(e => {
-      e.addEventListener('click', () => {
-        /* menuElements.forEach(element => {
-          element.classList.remove('active');
-        });
-        e.classList.add('active'); */
-        alert('hola');
-      });
-    });
 
     //Añadimos las variables
     this.nombre = this.data.nombre != '' ? this.data.nombre : this.data.usuario;
@@ -111,30 +131,36 @@ export class HeaderComponent implements OnInit {
     });
 
     /* Funcionalidad de recordar el estado del menú (open / close) con LocalStorage */
+
+    let sideBarMenu = document.getElementById('sideBarMenu');
+    let openMenuIcon = document.getElementById('openMenuIcon');
+    let mainContainerHome = document.getElementById('mainContainerHome');
+    let mainContainerTareasCompletadas = document.getElementById('mainContainerTareasCompletadas');
+
     if (localStorage.getItem('menu') === 'close') {
-      document.getElementById('sideBarMenu').classList.add('active');
-      document.getElementById('openMenuIcon').style.marginLeft = '30px';
-      document.getElementById('mainContainerHome').style.paddingLeft = '0';
-      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '0';
+      sideBarMenu.classList.add('active');
+      openMenuIcon.style.marginLeft = '30px';
+      mainContainerHome != undefined ? mainContainerHome.style.paddingLeft = '0' : '';
+      mainContainerTareasCompletadas != undefined ? mainContainerTareasCompletadas.style.paddingLeft = '0' : '';
     } else {
-      document.getElementById('sideBarMenu').classList.remove('active');
+      sideBarMenu.classList.remove('active');
     }
 
     //Menú cerrar
     document.getElementById('closeMenuIcon').addEventListener('click', () => {
       localStorage.setItem('menu', 'close');
-      document.getElementById('sideBarMenu').classList.add('active');
-      document.getElementById('openMenuIcon').style.marginLeft = '30px';
-      document.getElementById('mainContainerHome').style.paddingLeft = '0';
-      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '0';
+      sideBarMenu.classList.add('active');
+      openMenuIcon.style.marginLeft = '30px';
+      mainContainerHome != undefined ? mainContainerHome.style.paddingLeft = '0' : '';
+      mainContainerTareasCompletadas != undefined ? mainContainerTareasCompletadas.style.paddingLeft = '0' : '';
     });
 
     //Menú abrir
-    document.getElementById('openMenuIcon').addEventListener('click', () => {
+    openMenuIcon.addEventListener('click', () => {
       localStorage.setItem('menu', 'open');
-      document.getElementById('sideBarMenu').classList.remove('active');
-      document.getElementById('mainContainerHome').style.paddingLeft = '250px';
-      document.getElementById('mainContainerTareasCompletadas').style.paddingLeft = '250px';
+      sideBarMenu.classList.remove('active');
+      mainContainerHome != undefined ? mainContainerHome.style.paddingLeft = '250px' : '';
+      mainContainerTareasCompletadas != undefined ? mainContainerTareasCompletadas.style.paddingLeft = '250px' : '';
     });
 
     //Input search
@@ -155,7 +181,6 @@ export class HeaderComponent implements OnInit {
       } else {
         hideDrop.classList.add('open');
       }
-
       if (e.srcElement.className.includes("overlayPopupProfileSettings")) {
         hideOverlay.classList.remove('open');
       }
@@ -257,6 +282,22 @@ export class HeaderComponent implements OnInit {
 
   } /* Fin ngOnInit */
 
+  //Función para añadir o quitar la clase active al menú leteral izquierdo
+  toggleClass(e) {
+    let tg = (<HTMLElement>(<HTMLElement>e.target));
+    let list = document.querySelectorAll('.menuItem');
+
+    list.forEach(element => {
+      element.classList.remove('active');
+    });
+    if (tg.className == 'child') {
+      (tg.parentElement as HTMLElement).classList.add('active');
+    } else {
+      (tg as HTMLElement).classList.add('active');
+    }
+
+  }
+
   //Función get file
   public onFileChange(event) {
     if (event.target.files.length > 0) {
@@ -278,6 +319,8 @@ export class HeaderComponent implements OnInit {
             this.data.imagen = response.data.imagen;
             this.imagen = this.sanitizer.bypassSecurityTrustUrl(`${window.location.origin}/assets/uploads/${this.data.usuario}/${response.data.imagen}`);
             this.updateLocal(this.data);
+
+
           } else {
             this.mensajeNotificacion = response.response;
             this.statusNotificacion = 'error';

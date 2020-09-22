@@ -491,7 +491,7 @@ return function (App $app) {
             }
 
             //Array con extensiones válidas
-            $extensionesValidas = array('png', 'jpeg', 'jpg', 'svg');
+            $extensionesValidas = array('png', 'jpeg', 'jpg');
 
             //Validar extensión
             $extension = pathinfo($folderName . '/' . $image->getClientFilename(), PATHINFO_EXTENSION);
@@ -565,6 +565,7 @@ return function (App $app) {
             if (!file_exists($folderName)) {
                 mkdir($folderName, 0777, true);
             }
+
             //Borramos todo lo que haya dentro para que siempre haya un solo archivo
             $files = glob($folderName . '*');
             foreach ($files as $file) {
@@ -1544,7 +1545,7 @@ return function (App $app) {
                     if ($resultado->rowCount() === 1) {
                         $arrayResponse['status'] =  true;
                         $arrayResponse['errorCode'] = "1002";
-                        $arrayResponse['response'] = "Comentario añadido";
+                        $arrayResponse['response'] = $db->lastInsertId();
                     } else {
                         $arrayResponse['status'] =  false;
                         $arrayResponse['errorCode'] = "1003";
@@ -1675,6 +1676,7 @@ return function (App $app) {
                             $resultado->execute();
 
                             if ($resultado->rowCount() !== 1) {
+
                                 //Pertenecen al mismo equipo
                                 $consulta = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES (?, ?)";
                                 $resultado = $db->prepare($consulta);
@@ -1961,7 +1963,7 @@ return function (App $app) {
 
             if ($resultado->rowCount() === 1) {
 
-                //Hay que obtener el id del antiguo creador para insertarlo en la tabla de usuarios_tareas y así "asignarlo a la tarea"
+                //Hay que obtener el id del antiguo creador
                 $query2 = "SELECT id from usuarios WHERE usuario = '$oldCreatorName'";
                 $resultado2 = $db->prepare($query2);
                 $resultado2->execute();
@@ -1970,18 +1972,39 @@ return function (App $app) {
                     $dataOld = $resultado2->fetch(PDO::FETCH_ASSOC);
                     $oldCreatorID = $dataOld['id'];
 
-                    //Insertamos el que era antiguo creador
-                    $query3 = "DELETE FROM usuarios_tareas WHERE id_usuario = '$oldCreatorID'";
+
+                    /*  Obtenemos todos los participantes de la actual tarea para ver si el nuevo creador ya es participante o no, 
+                   si no es participante no hay problema, se inserta en la tabla usuarios_tareas y se actualiza el creador */
+
+                    //Obtener todos los participantes de la tarea
+                    $query3 = "SELECT id_usuario FROM usuarios_tareas WHERE id_tarea = '$idTarea'";
                     $resultado3 = $db->prepare($query3);
                     $resultado3->execute();
 
-                    $query4 = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES ('$idSustituto', '$idTarea')";
-                    $resultado4 = $db->prepare($query4);
-                    $resultado4->execute();
+                    if ($resultado3->rowCount() > 0) {
+                        $data3 = $resultado3->fetchAll(PDO::FETCH_ASSOC);
 
-                    $arrayResponse['status'] =  true;
-                    $arrayResponse['errorCode'] = "";
-                    $arrayResponse['response'] = "Creador actualizado correctamente";
+                        //Recorremos los participantes de la tareay miramos si está el nuevo creador
+                        $flag = false;
+                        foreach ($data3 as $participanteID) {
+                            $flag = $participanteID === $idSustituto ? true : false;
+                        }
+                        if (!$flag) {
+                            $query4 = "DELETE FROM usuarios_tareas WHERE id_usuario = '$idSustituto' AND id_tarea = '$idTarea'";
+                            $resultado4 = $db->prepare($query4);
+                            $resultado4->execute();
+
+                            $query5 = "INSERT INTO usuarios_tareas (id_usuario, id_tarea) VALUES ('$idSustituto', '$idTarea')";
+                            $resultado5 = $db->prepare($query5);
+                            $resultado5->execute();
+
+                            if ($resultado5->rowCount() == 1) {
+                                $arrayResponse['status'] =  true;
+                                $arrayResponse['errorCode'] = "";
+                                $arrayResponse['response'] = "Creador actualizado correctamente";
+                            }
+                        }
+                    }
                 } else {
                     $arrayResponse['status'] =  false;
                     $arrayResponse['errorCode'] = "1002";
